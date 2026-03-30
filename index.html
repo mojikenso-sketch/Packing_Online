@@ -293,6 +293,14 @@
                         </div>
                         <div class="table-wrapper" id="stockTableWrapper"></div>
                     </div>
+
+                    <div class="section animate-in" style="margin-top: 24px;">
+                        <div class="section-header">
+                            <div class="section-title"><span>📝</span> หมายเหตุ & กล่องเพิ่ม (รายวัน)</div>
+                        </div>
+                        <div class="table-wrapper" id="remarkTableWrapper"></div>
+                    </div>
+
                 </div>
 
                 <div class="tab-panel" id="tab-order">
@@ -540,7 +548,7 @@
 
         function getDefaultData() {
             const d = {};
-            for (let i = 1; i <= DAYS; i++) d[i] = { crates: '', workers: '', otHours: '', stock: {}, warehouse: {} };
+            for (let i = 1; i <= DAYS; i++) d[i] = { crates: '', crates_shortening: '', workers: '', otHours: '', stock: {}, warehouse: {} };
             return d;
         }
 
@@ -588,7 +596,7 @@
             if (dataSaved) {
                 data = dataSaved;
                 for (let i = 1; i <= DAYS; i++) {
-                    if (!data[i]) data[i] = { crates: '', workers: '', otHours: '', stock: {}, warehouse: {} };
+                    if (!data[i]) data[i] = { crates: '', crates_shortening: '', workers: '', otHours: '', stock: {}, warehouse: {} };
                     if (!data[i].stock) data[i].stock = {};
                     if (!data[i].warehouse) data[i].warehouse = {};
                 }
@@ -714,9 +722,15 @@
             return `${yyyy}-${mm}-${dd}`;
         }
         function calcBottles(day) { return (parseFloat(data[day].crates) || 0) * 12; }
+        function calcBoxes(day) { return (parseFloat(data[day].crates_shortening) || 0) * 12; }
         function calcRate(day) {
-            const b = calcBottles(day), w = parseFloat(data[day].workers) || 0, h = parseFloat(data[day].otHours) || 0;
-            if (w > 0 && h > 0 && b > 0) return (b / w / h).toFixed(2); return '-';
+            // นำยอดขวดบวกกับยอดกล่อง (shortening)
+            const totalItems = calcBottles(day) + calcBoxes(day); 
+            const w = parseFloat(data[day].workers) || 0;
+            const h = parseFloat(data[day].otHours) || 0;
+            
+            if (w > 0 && h > 0 && totalItems > 0) return (totalItems / w / h).toFixed(2); 
+            return '-';
         }
         function calcRatePerSec(day) { const r = calcRate(day); return (r === '-' || parseFloat(r) === 0) ? '-' : (3600 / parseFloat(r)).toFixed(2); }
 
@@ -727,12 +741,20 @@
             html += '</tr></thead><tbody>';
 
             html += '<tr class="row-header-group"><td colspan="2">ท่อกันกระแทก</td>'; for(let i=1;i<=DAYS;i++) html+=`<td${i === _todayNum ? ' class="is-today-col"' : ''}></td>`; html+='</tr>';
-            html += `<tr><td style="padding-left:24px">ลัง</td><td class="cell-label">ลัง</td>`;
-            for (let i = 1; i <= DAYS; i++) html += `<td${i === _todayNum ? ' class="is-today-col"' : ''}><input class="cell-input" type="number" data-day="${i}" data-key="crates" value="${data[i].crates}" placeholder="0" onchange="onProdChange(this)"></td>`;
+            html += `<tr><td style="padding-left:24px">ลัง(น้ำมัน)</td><td class="cell-label">ลัง</td>`;
+            for (let i = 1; i <= DAYS; i++) html += `<td${i === _todayNum ? ' class="is-today-col"' : ''}><input class="cell-input" type="number" data-day="${i}" data-key="crates" value="${data[i].crates || ''}" placeholder="0" onchange="onProdChange(this)"></td>`;
             html += '</tr>';
 
             html += `<tr><td style="padding-left:24px">ขวด <small>(ลัง×12)</small></td><td class="cell-label">ขวด</td>`;
             for (let i = 1; i <= DAYS; i++) html += `<td class="cell-calc${i === _todayNum ? ' is-today-col' : ''}" id="bottles-${i}">${calcBottles(i) || '-'}</td>`;
+            html += '</tr>';
+
+            html += `<tr><td style="padding-left:24px">ลัง(shortening)</td><td class="cell-label">ลัง</td>`;
+            for (let i = 1; i <= DAYS; i++) html += `<td${i === _todayNum ? ' class="is-today-col"' : ''}><input class="cell-input" type="number" data-day="${i}" data-key="crates_shortening" value="${data[i].crates_shortening || ''}" placeholder="0" onchange="onProdChange(this)"></td>`;
+            html += '</tr>';
+
+            html += `<tr><td style="padding-left:24px">กล่อง <small>(ลัง×12)</small></td><td class="cell-label">กล่อง</td>`;
+            for (let i = 1; i <= DAYS; i++) html += `<td class="cell-calc${i === _todayNum ? ' is-today-col' : ''}" id="boxes-${i}">${calcBoxes(i) || '-'}</td>`;
             html += '</tr>';
 
             html += `<tr><td>จำนวนคน</td><td class="cell-label">คน</td>`;
@@ -782,6 +804,7 @@
             const day = el.dataset.day, key = el.dataset.key;
             data[day][key] = el.value;
             document.getElementById(`bottles-${day}`).textContent = calcBottles(day) || '-';
+            document.getElementById(`boxes-${day}`).textContent = calcBoxes(day) || '-';
             document.getElementById(`rate-${day}`).textContent = calcRate(day);
             document.getElementById(`rateSec-${day}`).textContent = calcRatePerSec(day);
             updateSummaryAndCharts(); autoSaveLocal();
@@ -818,7 +841,8 @@
             let bestRate = Infinity; let bestRateDay = '-';
 
             for (let i = 1; i <= DAYS; i++) {
-                const b = calcBottles(i);
+                // รวมยอดขวดและยอดกล่องเข้าด้วยกันเพื่อนำไปคิดสถิติรวม
+                const b = calcBottles(i) + calcBoxes(i);
                 const w = parseFloat(data[i].workers) || 0;
                 const h = parseFloat(data[i].otHours) || 0;
 
@@ -898,8 +922,10 @@
             csv += '\n';
 
             const rows = [
-                { label: 'ลัง', unit: 'ลัง', key: 'crates' },
+                { label: 'ลัง(น้ำมัน)', unit: 'ลัง', key: 'crates' },
                 { label: 'ขวด (ลัง×12)', unit: 'ขวด', key: 'bottles', calc: true },
+                { label: 'ลัง(shortening)', unit: 'ลัง', key: 'crates_shortening' },
+                { label: 'กล่อง (ลัง×12)', unit: 'กล่อง', key: 'boxes', calc: true },
                 { label: 'จำนวนคน', unit: 'คน', key: 'workers' },
                 { label: 'เวลา OT', unit: 'ชม.', key: 'otHours' },
             ];
@@ -907,7 +933,8 @@
             rows.forEach(r => {
                 csv += `${r.label},${r.unit}`;
                 for (let i = 1; i <= DAYS; i++) {
-                    if (r.calc) csv += `,${calcBottles(i) || ''}`;
+                    if (r.key === 'bottles') csv += `,${calcBottles(i) || ''}`;
+                    else if (r.key === 'boxes') csv += `,${calcBoxes(i) || ''}`;
                     else csv += `,${data[i][r.key] || ''}`;
                 }
                 csv += '\n';
@@ -940,10 +967,25 @@
             link.click();
             showToast('📥 Export CSV เรียบร้อย!');
         }
+        function renderRemarkTable() {
+            const wrapper = document.getElementById('remarkTableWrapper');
+            let html = '<table><thead><tr><th>รายละเอียด</th><th>หน่วย</th>';
+            for (let i = 1; i <= DAYS; i++) html += `<th${i === _todayNum ? ' class="is-today"' : ''}>${formatDate(i)}</th>`;
+            html += '</tr></thead><tbody>';
 
+
+            // แถว: ความเห็น
+            html += `<tr><td style="font-weight:700; color:var(--accent-yellow);">ความเห็น</td><td class="cell-label">ข้อความ</td>`;
+            for (let i = 1; i <= DAYS; i++) html += `<td${i === _todayNum ? ' class="is-today-col"' : ''}><input class="cell-input" type="text" data-day="${i}" data-key="remark" value="${data[i].remark || ''}" placeholder="..." style="width: 150px; text-align: left; padding: 7px 10px;" onchange="onProdChange(this)"></td>`;
+            html += '</tr>';
+
+            html += '</tbody></table>';
+            wrapper.innerHTML = html;
+        }
         function refreshAllUI() {
             renderProductionTable();
             renderDynamicTable('stockTableWrapper', 'stock');
+            renderRemarkTable();  // <--- เพิ่มบรรทัดนี้เข้ามาครับ!
             renderDynamicTable('warehouseTableWrapper', 'warehouse');
             updateSummaryAndCharts();
             renderMonthlyOrderSummary(); 
@@ -1133,21 +1175,69 @@
                 if (gA !== gB) return gA - gB; return b[1].total - a[1].total;
             });
 
-            let tableHTML = '<table><thead><tr><th>#</th><th style="text-align:left">กลุ่ม</th><th style="text-align:left">รายการสินค้า</th><th>รวม (กล่อง)</th>';
+            // --- โค้ดใหม่: เตรียมคำนวณแยกหน่วย ---
+            let unitTotalsByGroup = {};
+            let unitGrandTotal = {};
+
+            // ฟังก์ชันช่วยจัดรูปแบบตัวเลข (เช่น { 'ขวด': 24, 'ซอง': 2 } -> "24 ขวด, 2 ซอง")
+            function formatUnitObj(obj) {
+                if (Object.keys(obj).length === 0) return '-';
+                return Object.entries(obj).map(([u, v]) => `${v.toLocaleString()} ${u}`).join(', ');
+            }
+
+            sorted.forEach(([item, info]) => {
+                const regex = /(\d+)\s*(ขวด|ซอง|กระป๋อง|ชิ้น|กล่อง|แผง|ชุด|หลอด|ก้อน)/g;
+                let match;
+                let itemUnitMap = {};
+                let hasMatch = false;
+
+                while ((match = regex.exec(item)) !== null) {
+                    hasMatch = true;
+                    const qty = parseInt(match[1]);
+                    const unit = match[2];
+                    if (!itemUnitMap[unit]) itemUnitMap[unit] = 0;
+                    itemUnitMap[unit] += qty;
+                }
+                if (!hasMatch) itemUnitMap['ชิ้น'] = 1;
+
+                if (!unitTotalsByGroup[info.group]) unitTotalsByGroup[info.group] = {};
+                let rowUnitMap = {};
+
+                for (let unit in itemUnitMap) {
+                    const totalForUnit = itemUnitMap[unit] * info.total;
+                    rowUnitMap[unit] = totalForUnit;
+                    if (!unitTotalsByGroup[info.group][unit]) unitTotalsByGroup[info.group][unit] = 0;
+                    unitTotalsByGroup[info.group][unit] += totalForUnit;
+                    if (!unitGrandTotal[unit]) unitGrandTotal[unit] = 0;
+                    unitGrandTotal[unit] += totalForUnit;
+                }
+                info.unitString = formatUnitObj(rowUnitMap); // เก็บข้อความไว้ใช้ตอนสร้างตาราง
+            });
+
+            // --- โค้ดใหม่: สร้างตารางและเพิ่มคอลัมน์ ---
+            let tableHTML = '<table><thead><tr><th>#</th><th style="text-align:left">กลุ่ม</th><th style="text-align:left">รายการสินค้า</th><th>รวม (กล่อง)</th><th style="color:var(--accent-green);">รวมแยกชิ้น (ขวด,ซอง,ฯลฯ)</th>';
             activePlatforms.forEach(p => tableHTML += `<th>${PLATFORM_NAMES[p]}</th>`); tableHTML += '</tr></thead><tbody>';
             let currentGroup = ''; let idx = 0;
+            
             sorted.forEach(([item, info]) => {
                 if (info.group !== currentGroup) {
-                    currentGroup = info.group; const gi = PRODUCT_GROUPS[currentGroup] || PRODUCT_GROUPS['ผสม/อื่นๆ']; const gTotal = groupTotals[currentGroup] || 0;
-                    tableHTML += `<tr class="group-header-row"><td></td><td colspan="2">${gi.emoji} ${gi.label} — ${gTotal.toLocaleString()} กล่อง</td><td class="cell-calc">${gTotal.toLocaleString()}</td>`;
+                    currentGroup = info.group; 
+                    const gi = PRODUCT_GROUPS[currentGroup] || PRODUCT_GROUPS['ผสม/อื่นๆ']; 
+                    const gTotal = groupTotals[currentGroup] || 0;
+                    const gUnitStr = formatUnitObj(unitTotalsByGroup[currentGroup] || {});
+                    
+                    tableHTML += `<tr class="group-header-row"><td></td><td colspan="2">${gi.emoji} ${gi.label} — ${gTotal.toLocaleString()} กล่อง</td><td class="cell-calc">${gTotal.toLocaleString()}</td><td class="cell-calc" style="color:var(--accent-green); font-size:13px;">${gUnitStr}</td>`;
                     activePlatforms.forEach(() => tableHTML += '<td></td>'); tableHTML += '</tr>';
                 }
                 idx++;
-                tableHTML += `<tr><td>${idx}</td><td><span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(79,195,247,0.1);color:var(--text-secondary)">${info.group}</span></td><td style="text-align:left;font-weight:600">${item}</td><td class="cell-calc">${info.total.toLocaleString()}</td>`;
+                
+                tableHTML += `<tr><td>${idx}</td><td><span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(79,195,247,0.1);color:var(--text-secondary)">${info.group}</span></td><td style="text-align:left;font-weight:600">${item}</td><td class="cell-calc">${info.total.toLocaleString()}</td><td class="cell-calc" style="color:var(--accent-green); font-size:13px;">${info.unitString}</td>`;
                 activePlatforms.forEach(p => { const val = info.platforms[p] || 0; tableHTML += `<td>${val ? val.toLocaleString() : '-'}</td>`; });
                 tableHTML += '</tr>';
             });
-            tableHTML += `<tr style="border-top:2px solid var(--glass-border);"><td></td><td></td><td style="text-align:left;font-weight:700;color:var(--accent-cyan)">รวมทั้งหมด</td><td class="cell-calc" style="font-size:16px">${grandTotal.toLocaleString()}</td>`;
+            
+            const grandTotalStr = formatUnitObj(unitGrandTotal);
+            tableHTML += `<tr style="border-top:2px solid var(--glass-border);"><td></td><td></td><td style="text-align:left;font-weight:700;color:var(--accent-cyan)">รวมทั้งหมด</td><td class="cell-calc" style="font-size:16px">${grandTotal.toLocaleString()}</td><td class="cell-calc" style="font-size:14px;color:var(--accent-green);">${grandTotalStr}</td>`;
             activePlatforms.forEach(p => tableHTML += `<td class="cell-calc">${platformTotals[p].toLocaleString()}</td>`);
             tableHTML += '</tr></tbody></table>'; document.getElementById('orderTableWrapper').innerHTML = tableHTML;
 
@@ -1184,7 +1274,8 @@
 
             }, 100);
 
-            window.lastConsolidated = { allItems, grandTotal, platformTotals, groupTotals, activePlatforms, sorted };
+            // บันทึกข้อมูลเสริมสำหรับตอน Export CSV ด้วย
+            window.lastConsolidated = { allItems, grandTotal, platformTotals, groupTotals, activePlatforms, sorted, unitGrandTotal };
             document.getElementById('btnExportOrder').style.display = 'inline-flex';
             showToast('✅ รวมยอดสำเร็จ!');
         }
@@ -1298,23 +1389,42 @@
             wrapper.innerHTML = html;
         }
 
+        // --- เพิ่มการแก้ไขที่ส่วน Export CSV ด้วย ---
         function exportOrderCSV() {
             if (!window.lastConsolidated || window.lastConsolidated.grandTotal === 0) return showToast('⚠️ ไม่มีข้อมูลให้ Export');
-            const { grandTotal, platformTotals, groupTotals, activePlatforms, sorted } = window.lastConsolidated;
+            const { grandTotal, platformTotals, groupTotals, activePlatforms, sorted, unitGrandTotal } = window.lastConsolidated;
             const dateInput = document.getElementById('orderDateInput').value || getTodayString();
             const [year, month, day] = dateInput.split('-');
 
             let csv = '\uFEFF';
             csv += `สรุปยอดขายรวม วันที่ ${day}/${month}/${year}\n\nแพลตฟอร์ม,จำนวน (กล่อง)\n`;
-            activePlatforms.forEach(p => csv += `${PLATFORM_NAMES[p]},${platformTotals[p]}\n`); csv += `รวมทั้งหมด,${grandTotal}\n\nกลุ่มสินค้า,จำนวน (กล่อง)\n`;
-            Object.keys(groupTotals).forEach(g => csv += `${g},${groupTotals[g]}\n`); csv += '\nรายละเอียดสินค้ารวม\nลำดับ,กลุ่มสินค้า,รายการสินค้า,รวม (กล่อง),';
+            activePlatforms.forEach(p => csv += `${PLATFORM_NAMES[p]},${platformTotals[p]}\n`); 
+            csv += `รวมทั้งหมด,${grandTotal}\n\nกลุ่มสินค้า,จำนวน (กล่อง)\n`;
+            Object.keys(groupTotals).forEach(g => csv += `${g},${groupTotals[g]}\n`); 
+            
+            csv += '\nรายละเอียดสินค้ารวม\nลำดับ,กลุ่มสินค้า,รายการสินค้า,รวม (กล่อง),รวม (ขวด/ซอง/กระป๋อง),';
             activePlatforms.forEach(p => csv += `${PLATFORM_NAMES[p]},`); csv += '\n';
+            
             sorted.forEach(([item, info], index) => {
-                let row = [index + 1, info.group, `"${item.replace(/"/g, '""')}"`, info.total];
+                const match = item.match(/(\d+)\s*(ขวด|ซอง|กระป๋อง|ชิ้น)/);
+                const multiplier = match ? parseInt(match[1]) : 1;
+                const unitTotal = info.total * multiplier;
+
+                let row = [index + 1, info.group, `"${item.replace(/"/g, '""')}"`, info.total, unitTotal];
                 activePlatforms.forEach(p => row.push(info.platforms[p] || 0));
                 csv += row.join(',') + '\n';
             });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `Order_Summary_${year}${month}${day}.csv`; link.click(); showToast('📥 Export ออเดอร์เรียบร้อย!');
+
+            let totalRow = ['', '', 'รวมทั้งหมด', grandTotal, unitGrandTotal];
+            activePlatforms.forEach(p => totalRow.push(platformTotals[p]));
+            csv += totalRow.join(',') + '\n';
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); 
+            const link = document.createElement('a'); 
+            link.href = URL.createObjectURL(blob); 
+            link.download = `Order_Summary_${year}${month}${day}.csv`; 
+            link.click(); 
+            showToast('📥 Export ออเดอร์เรียบร้อย!');
         }
     </script>
 </body>
