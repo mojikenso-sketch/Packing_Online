@@ -30,7 +30,39 @@
             pointer-events: none; z-index: 0;
         }
 
-        .app-container { position: relative; z-index: 1; max-width: 1600px; margin: 0 auto; padding: 20px; }
+        /* ซ่อนเนื้อหาหลักจนกว่าจะ Login ผ่าน */
+        .app-container { position: relative; z-index: 1; max-width: 1600px; margin: 0 auto; padding: 20px; display: none; }
+
+        /* ================= LOGIN OVERLAY ================= */
+        #loginOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-primary); z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease;
+        }
+        .login-box {
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 40px; width: 400px; max-width: 90%;
+            box-shadow: var(--shadow-glow); text-align: center;
+            backdrop-filter: blur(20px);
+        }
+        .login-box h2 { margin-bottom: 10px; color: var(--accent-cyan); font-weight: 800;}
+        .login-box p { color: var(--text-muted); font-size: 14px; margin-bottom: 30px; }
+        .login-input {
+            width: 100%; padding: 14px 16px; margin-bottom: 16px;
+            background: rgba(79, 195, 247, 0.05); border: 1px solid var(--glass-border);
+            border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif;
+            outline: none; transition: border 0.3s; font-size: 15px;
+        }
+        .login-input:focus { border-color: var(--accent-blue); background: rgba(79, 195, 247, 0.1);}
+        .login-btn {
+            width: 100%; padding: 14px; border: none; border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            color: var(--bg-primary); font-weight: 700; font-size: 16px; cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s; font-family: 'Noto Sans Thai', sans-serif;
+        }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(79, 195, 247, 0.3); }
+        #loginError { color: var(--accent-red); font-size: 13px; margin-top: 15px; display: none; font-weight: 500;}
 
         /* Header */
         .header { background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 28px 36px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-glow); backdrop-filter: blur(20px); flex-wrap: wrap; gap: 20px; }
@@ -174,7 +206,20 @@
 </head>
 
 <body>
-    <div class="app-container">
+
+    <div id="loginOverlay">
+        <div class="login-box animate-in">
+            <div style="font-size: 40px; margin-bottom: 10px;">📦</div>
+            <h2>Packing Online</h2>
+            <p>กรุณาเข้าสู่ระบบเพื่อใช้งาน Dashboard</p>
+            <input type="text" id="username" class="login-input" placeholder="ชื่อผู้ใช้งาน (Username)" autocomplete="off">
+            <input type="password" id="password" class="login-input" placeholder="รหัสผ่าน (Password)">
+            <button class="login-btn" onclick="checkLogin()">เข้าสู่ระบบ</button>
+            <div id="loginError">❌ ชื่อผู้ใช้งาน หรือ รหัสผ่าน ไม่ถูกต้อง</div>
+        </div>
+    </div>
+
+    <div class="app-container" id="mainAppContent">
         <header class="header animate-in">
             <div class="header-left">
                 <h1>🏭 Packing Online Dashboard</h1>
@@ -190,6 +235,7 @@
                     <span class="cloud-loader" id="saveLoader"></span> 💾 บันทึกขึ้น Cloud
                 </button>
                 <button class="btn btn-secondary" onclick="exportCSV()">📥 Export ผลิต/สต็อก CSV</button>
+                <button class="btn btn-danger" onclick="logoutUser()" style="padding: 10px;">🚪 ออกจากระบบ</button>
             </div>
         </header>
 
@@ -303,6 +349,14 @@
                             <button class="btn btn-danger" onclick="clearOrders()">🗑️ ล้างข้อมูลออเดอร์</button>
                         </div>
 
+                        <div id="orderHistorySection" style="margin-top:16px">
+                            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+                                <h4 style="color:var(--text-secondary);margin:0">📚 ประวัติยอดขายที่บันทึกแล้ว</h4>
+                                <button class="btn btn-secondary" onclick="toggleHistoryList()" style="padding:4px 12px;font-size:12px" id="historyToggleBtn">▼ แสดง</button>
+                            </div>
+                            <div id="orderHistoryList" style="display:none"></div>
+                        </div>
+
                         <div id="orderResults" style="margin-top:24px;display:none">
                             <div class="order-summary-row" id="orderSummaryRow"></div>
                             <div style="margin-top:20px">
@@ -345,8 +399,7 @@
                                 *ข้อมูลตารางนี้จะดึงจาก "ประวัติที่บันทึกแล้ว" หากบันทึกเพิ่มเติม ตารางนี้จะอัปเดตทันที
                             </div>
                         </div>
-                        <div class="table-wrapper" id="monthlyOrderTableWrapper">
-                            </div>
+                        <div class="table-wrapper" id="monthlyOrderTableWrapper"></div>
                     </div>
 
                 </div>
@@ -373,11 +426,59 @@
 
     <script>
         // =========================================================================
+        // 🔴 🔴 🔴 ตั้งค่าบัญชีและรหัสผ่าน ตรงนี้ 🔴 🔴 🔴
+        const VALID_USER = "admin";
+        const VALID_PASS = "krgpackingonline";
+
         // 🔴 🔴 🔴 CLOUD API URL 🔴 🔴 🔴
         const API_URL = "https://script.google.com/macros/s/AKfycbyqQy-5KC1XGL0dSumddKFCJLSptEzPmQ9Esc07UHvYa8flzA1K1QqkS3KzMVJ1Rg/exec";
         // =========================================================================
 
-        // Plugin สำหรับวาดเส้นป้ายกำกับกราฟวงกลม (Pie Chart Callout Lines)
+        // ================= LOGIN SYSTEM =================
+        function checkLogin() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const errorText = document.getElementById('loginError');
+
+            if (user === VALID_USER && pass === VALID_PASS) {
+                sessionStorage.setItem('isLoggedIn', 'true');
+                const overlay = document.getElementById('loginOverlay');
+                overlay.style.opacity = '0';
+                setTimeout(() => { 
+                    overlay.style.display = 'none'; 
+                    document.getElementById('mainAppContent').style.display = 'block';
+                    // โหลดข้อมูลก็ต่อเมื่อ Login ผ่านแล้ว
+                    initDashboard();
+                }, 500);
+            } else {
+                errorText.style.display = 'block';
+                setTimeout(() => { errorText.style.display = 'none'; }, 3000);
+            }
+        }
+
+        function verifySession() {
+            if (sessionStorage.getItem('isLoggedIn') === 'true') {
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('mainAppContent').style.display = 'block';
+                initDashboard();
+            }
+        }
+
+        function logoutUser() {
+            sessionStorage.removeItem('isLoggedIn');
+            location.reload(); // รีเฟรชหน้าเพื่อกลับไปหน้า Login
+        }
+
+        // รองรับการกด Enter
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') checkLogin();
+        });
+        document.getElementById('username').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') document.getElementById('password').focus();
+        });
+
+        // =========================================================================
+        // Plugin สำหรับวาดเส้นป้ายกำกับกราฟวงกลม
         Chart.register({
             id: 'pieLabelsLine',
             afterDraw(chart) {
@@ -388,7 +489,7 @@
                 
                 chart.data.labels.forEach((label, i) => {
                     const value = dataset.data[i];
-                    if (value === 0) return; // ซ่อนรายการที่เป็น 0
+                    if (value === 0) return; 
                     
                     const total = dataset.data.reduce((a, b) => a + b, 0);
                     const percent = ((value / total) * 100).toFixed(1) + '%';
@@ -398,36 +499,25 @@
                     const angle = (arc.startAngle + arc.endAngle) / 2;
                     
                     const radius = arc.outerRadius;
-                    const x = arc.x;
-                    const y = arc.y;
-                    
-                    const startRadius = radius;
-                    const endRadius = radius + 20;
-                    
-                    const startX = x + Math.cos(angle) * startRadius;
-                    const startY = y + Math.sin(angle) * startRadius;
-                    
-                    const endX = x + Math.cos(angle) * endRadius;
-                    const endY = y + Math.sin(angle) * endRadius;
-                    
+                    const startX = arc.x + Math.cos(angle) * radius;
+                    const startY = arc.y + Math.sin(angle) * radius;
+                    const endX = arc.x + Math.cos(angle) * (radius + 20);
+                    const endY = arc.y + Math.sin(angle) * (radius + 20);
                     const lineX = endX + (Math.cos(angle) >= 0 ? 1 : -1) * 20;
-                    const lineY = endY;
 
-                    // วาดเส้น Callout
                     ctx.beginPath();
                     ctx.moveTo(startX, startY);
                     ctx.lineTo(endX, endY);
-                    ctx.lineTo(lineX, lineY);
+                    ctx.lineTo(lineX, endY);
                     ctx.strokeStyle = dataset.backgroundColor[i];
                     ctx.lineWidth = 2;
                     ctx.stroke();
 
-                    // ตั้งค่าข้อความ
                     ctx.font = 'bold 12px "Inter", "Noto Sans Thai", sans-serif';
                     ctx.fillStyle = '#e8eaf6';
                     ctx.textAlign = Math.cos(angle) >= 0 ? 'left' : 'right';
                     ctx.textBaseline = 'middle';
-                    ctx.fillText(text, lineX + (Math.cos(angle) >= 0 ? 5 : -5), lineY);
+                    ctx.fillText(text, lineX + (Math.cos(angle) >= 0 ? 5 : -5), endY);
                 });
             }
         });
@@ -788,19 +878,14 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#9fa8da', font: { family: 'Inter', size: 12 } } } }, scales: { x: { ticks: { color: '#5c6bc0', font: { size: 10 } }, grid: { color: 'rgba(79,195,247,0.06)' } }, y: { ticks: { color: '#5c6bc0', font: { size: 11 } }, grid: { color: 'rgba(79,195,247,0.06)' } } } } 
             });
             
-            // กราฟ Doughnut วงกลมตั้งค่าให้เข้ากับ Plugin
             charts.pie = new Chart(document.getElementById('stockPieChart'), { 
                 type: 'doughnut', 
                 data: { labels: [], datasets: [{ data: [], borderWidth: 2, borderColor: '#16213e' }] }, 
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
-                    layout: {
-                        padding: { top: 30, bottom: 30, left: 50, right: 50 } // ระยะห่างสำหรับวาดป้ายกำกับ
-                    },
-                    plugins: { 
-                        legend: { display: false } // ปิด Legend เดิมทิ้งไป
-                    } 
+                    layout: { padding: { top: 30, bottom: 30, left: 50, right: 50 } },
+                    plugins: { legend: { display: false } } 
                 } 
             });
         }
@@ -866,7 +951,8 @@
             setTimeout(scrollToToday, 200);
         }
 
-        function init() {
+        // โหลดข้อมูลก็ต่อเมื่อ Login ผ่านแล้ว
+        function initDashboard() {
             const now = new Date();
             document.getElementById('monthSelect').innerHTML = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'].map((m, i) => `<option value="${i}" ${i === now.getMonth() ? 'selected' : ''}>${m}</option>`).join('');
             document.getElementById('yearInput').value = (now.getFullYear() + 543) % 100;
@@ -880,7 +966,9 @@
             document.getElementById('monthSelect').addEventListener('change', loadDataAndCategories);
             document.getElementById('yearInput').addEventListener('change', loadDataAndCategories);
         }
-        document.addEventListener('DOMContentLoaded', init);
+
+        // ตอนเปิดหน้าเว็บ ให้เช็ค Session ก่อน ถ้าไม่มีจะยังไม่โหลดข้อมูล
+        document.addEventListener('DOMContentLoaded', verifySession);
 
         // =========================================================================================
         // ================= ORDER IMPORT TAB =======================================
@@ -1074,7 +1162,6 @@
             });
             document.getElementById('platformBreakdown').innerHTML = breakdownHTML;
 
-            // หน่วงเวลาให้กล่องเปิดก่อนแล้วค่อยวาดกราฟ แก้ปัญหากราฟหายไปเมื่อถูกซ่อน
             setTimeout(() => {
                 const pColors = ['rgba(79,195,247,0.7)', 'rgba(105,240,174,0.7)', 'rgba(255,215,64,0.7)', 'rgba(179,136,255,0.7)', 'rgba(255,171,64,0.7)', 'rgba(255,82,82,0.7)', 'rgba(0,229,255,0.7)', 'rgba(233,30,99,0.5)', 'rgba(76,175,80,0.7)', 'rgba(255,152,0,0.7)', 'rgba(63,81,181,0.7)', 'rgba(244,67,54,0.7)', 'rgba(0,188,212,0.7)', 'rgba(156,39,176,0.7)', 'rgba(121,85,72,0.7)'];
                 const top15 = sorted.slice(0, 15);
@@ -1084,7 +1171,7 @@
                 orderCharts.product = new Chart(document.getElementById('orderProductChart'), { type: 'bar', data: { labels: top15.map(([item]) => item.length > 25 ? item.substring(0, 25) + '...' : item), datasets: [{ label: 'กล่อง', data: top15.map(([, info]) => info.total), backgroundColor: pColors, borderRadius: 6 }] }, options: { ...commonChartOpts, indexAxis: 'y', plugins: { legend: { display: false } } } });
 
                 if (orderCharts.platform) orderCharts.platform.destroy();
-                orderCharts.platform = new Chart(document.getElementById('orderPlatformChart'), { type: 'doughnut', data: { labels: activePlatforms.map(p => PLATFORM_NAMES[p]), datasets: [{ data: activePlatforms.map(p => platformTotals[p]), backgroundColor: activePlatforms.map(p => PLATFORM_COLORS[p]), borderColor: 'rgba(15, 15, 26, 0.8)', borderWidth: 3, hoverOffset: 10 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#9fa8da', font: { family: 'Inter', size: 13 }, padding: 20 } } } } });
+                orderCharts.platform = new Chart(document.getElementById('orderPlatformChart'), { type: 'doughnut', data: { labels: activePlatforms.map(p => PLATFORM_NAMES[p]), datasets: [{ data: activePlatforms.map(p => platformTotals[p]), backgroundColor: activePlatforms.map(p => PLATFORM_COLORS[p]), borderColor: '#16213e', borderWidth: 2, hoverOffset: 10 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#9fa8da', font: { family: 'Inter', size: 13 }, padding: 20 } } } } });
 
                 const activeGroups = groupOrder.filter(g => (groupTotals[g] || 0) > 0);
                 if (orderCharts.group) orderCharts.group.destroy();
@@ -1131,7 +1218,7 @@
             if (!historyIndex.includes(dateKey)) { historyIndex.push(dateKey); historyIndex.sort().reverse(); localStorage.setItem('ot_order_history_index', JSON.stringify(historyIndex)); }
             showToast(`✅ บันทึกประวัติยอดขาย ${dateKey} สำเร็จ!`);
             
-            renderMonthlyOrderSummary(); // อัปเดตตารางรายเดือน
+            renderMonthlyOrderSummary(); 
         }
 
         async function loadOrderHistory(dateOverride) {
@@ -1160,7 +1247,7 @@
             } catch (e) { showToast('❌ โหลดประวัติไม่สำเร็จ'); }
         }
 
-        // ================= SUMMARY MONTHLY ORDER (ออเดอร์รวมรายเดือน) =================
+        // ================= SUMMARY MONTHLY ORDER =================
         function renderMonthlyOrderSummary() {
             const wrapper = document.getElementById('monthlyOrderTableWrapper');
             const { month, year } = getMonthYear();
