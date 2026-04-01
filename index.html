@@ -1945,7 +1945,61 @@
             return parsed;
         }
 
-        function consolidateOrders() {
+        // ======== MODE TOGGLE: วันนี้ / ทั้งเดือน ========
+        let _consolidateMode = 'day';
+
+        function setConsolidateMode(mode) {
+            _consolidateMode = mode;
+            const dayBtn = document.getElementById('modeBtn-day');
+            const monthBtn = document.getElementById('modeBtn-month');
+            if (mode === 'day') {
+                dayBtn.style.background = 'var(--accent-cyan)'; dayBtn.style.color = '#0d1b2a';
+                monthBtn.style.background = 'transparent'; monthBtn.style.color = 'var(--text-muted)';
+            } else {
+                monthBtn.style.background = 'var(--accent-purple)'; monthBtn.style.color = '#fff';
+                dayBtn.style.background = 'transparent'; dayBtn.style.color = 'var(--text-muted)';
+            }
+        }
+
+        async function runConsolidate() {
+            if (_consolidateMode === 'month') { await consolidateMonthly(); }
+            else { consolidateOrders(); }
+        }
+
+        async function consolidateMonthly() {
+            const selMonth = parseInt(document.getElementById('monthSelect').value);
+            const selYear2 = parseInt(document.getElementById('yearInput').value);
+            const selYearBE = 2500 + selYear2;
+            const selYearCE = selYearBE - 543;
+            const monthNames = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+            const historyIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
+            const daysWithData = historyIndex.filter(dateKey => {
+                const parts = dateKey.split('-');
+                if (parts.length !== 3) return false;
+                return parseInt(parts[0]) === selYearCE && parseInt(parts[1]) - 1 === selMonth;
+            }).sort();
+            if (daysWithData.length === 0) return showToast(`⚠️ ไม่มีประวัติในเดือน ${monthNames[selMonth]} ${selYearBE}`);
+            showToast(`⏳ กำลังรวมยอดทั้งเดือน ${monthNames[selMonth]} ${selYearBE}...`);
+            const mergedData = {};
+            PLATFORMS.forEach(p => mergedData[p] = []);
+            let loadedDays = 0;
+            for (const dateKey of daysWithData) {
+                let entry = null;
+                const localSaved = localStorage.getItem('ot_order_history_' + dateKey);
+                if (localSaved) { try { entry = JSON.parse(localSaved); } catch(e) {} }
+                if (!entry) { entry = await fetchFromCloud('ot_order_history_' + dateKey); }
+                if (!entry) continue;
+                loadedDays++;
+                PLATFORMS.forEach(p => { (entry.platformData[p] || []).forEach(({ item, qty }) => { mergedData[p].push({ item, qty }); }); });
+            }
+            if (loadedDays === 0) return showToast('⚠️ ไม่สามารถโหลดข้อมูลได้');
+            const origData = platformData;
+            platformData = mergedData;
+            consolidateOrders(`📆 สรุปทั้งเดือน ${monthNames[selMonth]} ${selYearBE} (${loadedDays} วัน)`);
+            platformData = origData;
+        }
+
+        function consolidateOrders(modeLabel) {
             const allItems = {}; let grandTotal = 0; const platformTotals = {}; const groupTotals = {};
             PLATFORMS.forEach(p => {
                 const items = platformData[p] || []; let pTotal = 0;
@@ -1961,7 +2015,22 @@
             if (grandTotal === 0) return showToast('⚠️ ยังไม่มีข้อมูล กรุณาอัปโหลดไฟล์ก่อน');
             document.getElementById('orderResults').style.display = 'block';
 
+            // แสดง mode label
+            const labelEl = document.getElementById('consolidateModeLabel');
+            if (labelEl) {
+                if (modeLabel) {
+                    labelEl.style.display = 'block';
+                    labelEl.innerHTML = `<span style="color:var(--accent-purple);font-weight:700">${modeLabel}</span>`;
+                } else {
+                    const dateVal = document.getElementById('orderDateInput').value || getTodayString();
+                    const [yr, mo, day] = dateVal.split('-');
+                    labelEl.style.display = 'block';
+                    labelEl.innerHTML = `<span style="color:var(--accent-cyan);font-weight:700">📅 สรุปยอดวันที่ ${day}/${mo}/${parseInt(yr)+543}</span>`;
+                }
+            }
+
             const activePlatforms = PLATFORMS.filter(p => (platformData[p] || []).length > 0);
+
             let summaryHTML = `<div class="order-stat-card"><div class="stat-label">รวมทั้งหมด</div><div class="stat-value" style="color:var(--accent-cyan)">${grandTotal.toLocaleString()}</div><div style="font-size:12px;color:var(--text-muted)">กล่อง</div></div>
                                <div class="order-stat-card"><div class="stat-label">จำนวนรายการ (SKU)</div><div class="stat-value" style="color:var(--accent-purple)">${Object.keys(allItems).length}</div><div style="font-size:12px;color:var(--text-muted)">รายการ</div></div>
                                <div class="order-stat-card"><div class="stat-label">แพลตฟอร์ม</div><div class="stat-value" style="color:var(--accent-green)">${activePlatforms.length}</div><div style="font-size:12px;color:var(--text-muted)">ช่องทาง</div></div>`;
@@ -2175,7 +2244,7 @@
                 return parseInt(parts[0]) === selYearCE && parseInt(parts[1]) - 1 === selMonth;
             }).sort();
 
-            const monthNames = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+            const monthNames = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
 
             if (daysWithData.length === 0) {
                 wrapper.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:16px;text-align:center">ไม่มีข้อมูลยอดขายที่บันทึกใน ${monthNames[selMonth]} ${selYearBE}</div>`;
@@ -2193,7 +2262,7 @@
             daysWithData.forEach(dateKey => {
                 const parts = dateKey.split('-');
                 const dayNum = parseInt(parts[2]);
-                const displayDate = `${dayNum}/${(selMonth+1).toString().padStart(2,'0')}/${selYear2}`;
+                const displayDate = `${dayNum}/${(selMonth + 1).toString().padStart(2, '0')}/${selYear2}`;
 
                 // อ่านจาก localStorage ก่อน (Cloud fallback จะ cache ไว้ที่นี่)
                 const saved = localStorage.getItem('ot_order_history_' + dateKey);
