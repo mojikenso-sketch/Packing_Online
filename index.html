@@ -630,10 +630,29 @@
             outline: none;
         }
 
-        .month-selector select option {
+        .month-selector select option, select option {
             background: var(--bg-secondary);
             color: var(--text-primary);
         }
+
+        .quick-input {
+            width: 45px;
+            padding: 4px;
+            text-align: center;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 11px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .quick-input:focus {
+            border-color: var(--accent-cyan);
+            background: rgba(255,255,255,0.1);
+        }
+        .quick-input::placeholder { color: rgba(255,255,255,0.2) }
 
         /* Category Modal */
         .modal-overlay {
@@ -1087,6 +1106,10 @@
                                     (เลือกได้หลายไฟล์)</button>
                                 <div class="upload-status" id="status-shopee">ยังไม่ได้อัปโหลด</div>
                                 <div class="upload-file-list" id="filelist-shopee"></div>
+                                <div style="display:flex;width:100%;gap:6px;margin-top:auto;padding-top:10px;">
+                                    <input type="number" id="pending-shopee" class="cell-input" style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0" placeholder="ค้างส่ง">
+                                    <input type="number" id="return-shopee" class="cell-input" style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0" placeholder="ของตีคืน">
+                                </div>
                             </div>
                             <div class="upload-card" id="upload-lazada">
                                 <div class="upload-platform-badge lazada-badge">🛍️ Lazada</div>
@@ -1097,6 +1120,10 @@
                                     (เลือกได้หลายไฟล์)</button>
                                 <div class="upload-status" id="status-lazada">ยังไม่ได้อัปโหลด</div>
                                 <div class="upload-file-list" id="filelist-lazada"></div>
+                                <div style="display:flex;width:100%;gap:6px;margin-top:auto;padding-top:10px;">
+                                    <input type="number" id="pending-lazada" class="cell-input" style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0" placeholder="ค้างส่ง">
+                                    <input type="number" id="return-lazada" class="cell-input" style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0" placeholder="ของตีคืน">
+                                </div>
                             </div>
                             <div class="upload-card" id="upload-flash">
                                 <div class="upload-platform-badge flash-badge">⚡ Flash</div>
@@ -1107,6 +1134,10 @@
                                     (เลือกได้หลายไฟล์)</button>
                                 <div class="upload-status" id="status-flash">ยังไม่ได้อัปโหลด</div>
                                 <div class="upload-file-list" id="filelist-flash"></div>
+                                <div style="display:flex;width:100%;gap:6px;margin-top:auto;padding-top:10px;">
+                                    <input type="number" id="pending-flash" class="cell-input" style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0" placeholder="ค้างส่ง">
+                                    <input type="number" id="return-flash" class="cell-input" style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0" placeholder="ของตีคืน">
+                                </div>
                             </div>
                             <div class="upload-card" id="upload-best">
                                 <div class="upload-platform-badge best-badge">🏆 Best</div>
@@ -1117,6 +1148,10 @@
                                     (เลือกได้หลายไฟล์)</button>
                                 <div class="upload-status" id="status-best">ยังไม่ได้อัปโหลด</div>
                                 <div class="upload-file-list" id="filelist-best"></div>
+                                <div style="display:flex;width:100%;gap:6px;margin-top:auto;padding-top:10px;">
+                                    <input type="number" id="pending-best" class="cell-input" style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0" placeholder="ค้างส่ง">
+                                    <input type="number" id="return-best" class="cell-input" style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0" placeholder="ของตีคืน">
+                                </div>
                             </div>
                         </div>
 
@@ -2198,7 +2233,7 @@
         function clearOrders() {
             if (!confirm('⚠️ ล้างข้อมูลออเดอร์ทั้งหมด?')) return;
             platformData = {}; platformFiles = {}; window.lastConsolidated = null;
-            PLATFORMS.forEach(p => { document.getElementById(`upload-${p}`).classList.remove('has-file'); document.getElementById(`status-${p}`).textContent = 'ยังไม่ได้อัปโหลด'; document.getElementById(`file-${p}`).value = ''; document.getElementById(`filelist-${p}`).innerHTML = ''; });
+            PLATFORMS.forEach(p => { document.getElementById(`upload-${p}`).classList.remove('has-file'); document.getElementById(`status-${p}`).textContent = 'ยังไม่ได้อัปโหลด'; document.getElementById(`file-${p}`).value = ''; document.getElementById(`filelist-${p}`).innerHTML = ''; document.getElementById(`pending-${p}`).value = ''; document.getElementById(`return-${p}`).value = ''; });
             document.getElementById('orderResults').style.display = 'none'; document.getElementById('btnExportOrder').style.display = 'none';
             if (orderCharts.product) orderCharts.product.destroy(); if (orderCharts.platform) orderCharts.platform.destroy(); if (orderCharts.group) orderCharts.group.destroy(); if (orderCharts.stacked) orderCharts.stacked.destroy();
             showToast('🗑️ ล้างข้อมูลออเดอร์แล้ว');
@@ -2213,8 +2248,14 @@
             const hasData = PLATFORMS.some(p => (platformData[p] || []).length > 0);
             if (!hasData) return showToast('⚠️ ยังไม่มีข้อมูลออเดอร์');
 
-            const historyEntry = { date: dateKey, savedAt: new Date().toISOString(), platformData: {} };
-            PLATFORMS.forEach(p => { if (platformData[p] && platformData[p].length > 0) historyEntry.platformData[p] = platformData[p].map(({ item, qty }) => ({ item, qty })); });
+            const historyEntry = { date: dateKey, savedAt: new Date().toISOString(), platformData: {}, pending: {}, returned: {} };
+            PLATFORMS.forEach(p => { 
+                if (platformData[p] && platformData[p].length > 0) historyEntry.platformData[p] = platformData[p].map(({ item, qty }) => ({ item, qty })); 
+                const pendingVal = parseInt(document.getElementById(`pending-${p}`).value);
+                if (!isNaN(pendingVal)) historyEntry.pending[p] = pendingVal;
+                const returnVal = parseInt(document.getElementById(`return-${p}`).value);
+                if (!isNaN(returnVal)) historyEntry.returned[p] = returnVal;
+            });
 
             showToast('⏳ กำลังบันทึกประวัติขึ้น Cloud...');
             const cloudKey = 'ot_order_history_' + dateKey;
@@ -2248,6 +2289,8 @@
                     document.getElementById(`status-${p}`).textContent = 'ยังไม่ได้อัปโหลด';
                     document.getElementById(`file-${p}`).value = '';
                     document.getElementById(`filelist-${p}`).innerHTML = '';
+                    document.getElementById(`pending-${p}`).value = '';
+                    document.getElementById(`return-${p}`).value = '';
                 });
                 document.getElementById('orderResults').style.display = 'none';
                 document.getElementById('btnExportOrder').style.display = 'none';
@@ -2261,6 +2304,9 @@
             try {
                 platformData = {}; platformFiles = {};
                 PLATFORMS.forEach(p => {
+                    document.getElementById(`pending-${p}`).value = (saved.pending && saved.pending[p] !== undefined) ? saved.pending[p] : '';
+                    document.getElementById(`return-${p}`).value = (saved.returned && saved.returned[p] !== undefined) ? saved.returned[p] : '';
+                    
                     if (saved.platformData[p]) {
                         platformData[p] = saved.platformData[p].map(item => ({ ...item, fileName: `ประวัติ ${dateKey}` }));
                         platformFiles[p] = [{ name: `ประวัติ ${dateKey}`, items: saved.platformData[p], totalQty: saved.platformData[p].reduce((s, r) => s + r.qty, 0) }];
@@ -2278,7 +2324,7 @@
         }
 
         // ================= SUMMARY MONTHLY ORDER =================
-        async function renderMonthlyOrderSummary() {
+        async function renderMonthlyOrderSummary(forceCloudSync = true) {
             const wrapper = document.getElementById('monthlyOrderTableWrapper');
             if (!wrapper) return;
 
@@ -2292,9 +2338,17 @@
 
             const monthNames = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
 
-            // ดึง history index จาก Cloud เสมอ (เพื่อให้เห็นข้อมูลที่คนอื่นบันทึก)
-            wrapper.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:16px;text-align:center">⏳ กำลังโหลดข้อมูลจาก Cloud...</div>`;
-            let historyIndex = await fetchFromCloud('ot_order_history_index') || [];
+            // ดึง history index จาก Cloud เสมอ (ยกเว้นแค่ re-render เร็วๆ แบบไม่ force)
+            if (forceCloudSync && !wrapper.innerHTML.includes('table')) {
+                wrapper.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:16px;text-align:center">⏳ กำลังโหลดข้อมูล...</div>`;
+            }
+            
+            let historyIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
+            if (forceCloudSync) {
+                const cloudIndex = await fetchFromCloud('ot_order_history_index') || [];
+                historyIndex = [...new Set([...cloudIndex, ...historyIndex])].sort().reverse();
+                localStorage.setItem('ot_order_history_index', JSON.stringify(historyIndex));
+            }
             // merge กับ localStorage เผื่อมี offline
             const localIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
             historyIndex = [...new Set([...historyIndex, ...localIndex])].sort().reverse();
@@ -2313,13 +2367,33 @@
                 return;
             }
 
-            let html = '<table><thead><tr><th>วันที่</th><th>ยอดรวม (กล่อง)</th>';
-            PLATFORMS.forEach(p => html += `<th>${PLATFORM_NAMES[p]}</th>`);
-            html += '</tr></thead><tbody>';
+            let html = `<table><thead>
+                <tr>
+                    <th rowspan="2">วันที่</th>
+                    <th rowspan="2">ยอดรวมขาย</th>
+                    <th rowspan="2" style="color:var(--accent-orange)">ค้างรวม</th>
+                    <th rowspan="2" style="color:var(--accent-red)">ตีคืนรวม</th>`;
+            PLATFORMS.forEach(p => html += `<th colspan="3" style="border-bottom:1px solid rgba(255,255,255,0.1);">${PLATFORM_NAMES[p]}</th>`);
+            html += `<th rowspan="2">จัดการ</th></tr><tr>`;
+            PLATFORMS.forEach(p => {
+                html += `<th style="font-size:11px;font-weight:normal;padding:6px">ยอดขาย</th>`;
+                html += `<th style="font-size:11px;font-weight:normal;color:var(--accent-orange);padding:6px">ค้าง</th>`;
+                html += `<th style="font-size:11px;font-weight:normal;color:var(--accent-red);padding:6px">คืน</th>`;
+            });
+            html += `</tr></thead><tbody>`;
 
             let monthGrandTotal = 0;
+            let monthGrandPendingTotal = 0;
+            let monthGrandReturnTotal = 0;
+
             const monthPlatformTotals = {};
-            PLATFORMS.forEach(p => monthPlatformTotals[p] = 0);
+            const monthPlatformPendingTotals = {};
+            const monthPlatformReturnTotals = {};
+            PLATFORMS.forEach(p => { 
+                monthPlatformTotals[p] = 0; 
+                monthPlatformPendingTotals[p] = 0;
+                monthPlatformReturnTotals[p] = 0;
+            });
             let hasAnyRow = false;
 
             for (const dateKey of daysWithData) {
@@ -2342,19 +2416,41 @@
 
                 try {
                     let dayTotal = 0;
+                    let dayPendingTotal = 0;
+                    let dayReturnTotal = 0;
                     let pCols = '';
                     PLATFORMS.forEach(p => {
                         const pQty = (entry.platformData[p] || []).reduce((s, r) => s + r.qty, 0);
+                        const pPending = (entry.pending && entry.pending[p]) ? entry.pending[p] : 0;
+                        const pReturn = (entry.returned && entry.returned[p]) ? entry.returned[p] : 0;
+                        
                         dayTotal += pQty;
+                        dayPendingTotal += pPending;
+                        dayReturnTotal += pReturn;
+
                         monthPlatformTotals[p] += pQty;
-                        pCols += `<td>${pQty > 0 ? pQty.toLocaleString() : '-'}</td>`;
+                        monthPlatformPendingTotals[p] += pPending;
+                        monthPlatformReturnTotals[p] += pReturn;
+
+                        pCols += `
+                            <td style="font-weight:600">${pQty > 0 ? pQty.toLocaleString() : '-'}</td>
+                            <td style="padding:4px"><input type="number" class="quick-input" value="${pPending || ''}" onchange="updatePendingReturn('${dateKey}', '${p}', 'pending', this.value)" placeholder="-"></td>
+                            <td style="padding:4px"><input type="number" class="quick-input" value="${pReturn || ''}" onchange="updatePendingReturn('${dateKey}', '${p}', 'returned', this.value)" placeholder="-"></td>
+                        `;
                     });
+                    
                     monthGrandTotal += dayTotal;
+                    monthGrandPendingTotal += dayPendingTotal;
+                    monthGrandReturnTotal += dayReturnTotal;
                     hasAnyRow = true;
+                    
                     html += `<tr>
                         <td style="text-align:left;font-weight:600;color:var(--accent-blue);white-space:nowrap">${displayDate}</td>
-                        <td class="cell-calc">${dayTotal.toLocaleString()}</td>
+                        <td class="cell-calc" style="font-weight:bold">${dayTotal.toLocaleString()}</td>
+                        <td class="cell-calc" style="color:var(--accent-orange)">${dayPendingTotal > 0 ? dayPendingTotal.toLocaleString() : '-'}</td>
+                        <td class="cell-calc" style="color:var(--accent-red)">${dayReturnTotal > 0 ? dayReturnTotal.toLocaleString() : '-'}</td>
                         ${pCols}
+                        <td><button class="btn btn-danger" style="padding:4px 8px;font-size:12px;" onclick="deleteOrderHistory('${dateKey}')">🗑️ ลบ</button></td>
                     </tr>`;
                 } catch (e) { }
             }
@@ -2364,16 +2460,77 @@
                 return;
             }
 
-            html += `<tr style="border-top:2px solid var(--accent-cyan);">
+            html += `<tr style="border-top:2px solid var(--accent-cyan); background:rgba(0,0,0,0.2);">
                      <td style="text-align:left;font-weight:800;color:var(--accent-cyan)">รวมทั้งเดือน</td>
-                     <td class="cell-calc" style="font-size:16px">${monthGrandTotal.toLocaleString()}</td>`;
+                     <td class="cell-calc" style="font-size:16px;font-weight:bold">${monthGrandTotal.toLocaleString()}</td>
+                     <td class="cell-calc" style="color:var(--accent-orange);font-weight:bold;">${monthGrandPendingTotal > 0 ? monthGrandPendingTotal.toLocaleString() : '-'}</td>
+                     <td class="cell-calc" style="color:var(--accent-red);font-weight:bold;">${monthGrandReturnTotal > 0 ? monthGrandReturnTotal.toLocaleString() : '-'}</td>`;
             PLATFORMS.forEach(p => {
-                html += `<td class="cell-calc">${monthPlatformTotals[p] > 0 ? monthPlatformTotals[p].toLocaleString() : '-'}</td>`;
+                html += `<td class="cell-calc" style="font-weight:600">${monthPlatformTotals[p] > 0 ? monthPlatformTotals[p].toLocaleString() : '-'}</td>`;
+                html += `<td class="cell-calc" style="color:var(--accent-orange);font-weight:600">${monthPlatformPendingTotals[p] > 0 ? monthPlatformPendingTotals[p].toLocaleString() : '-'}</td>`;
+                html += `<td class="cell-calc" style="color:var(--accent-red);font-weight:600">${monthPlatformReturnTotals[p] > 0 ? monthPlatformReturnTotals[p].toLocaleString() : '-'}</td>`;
             });
-            html += '</tr></tbody></table>';
+            html += '<td></td></tr></tbody></table>';
             wrapper.innerHTML = html;
         }
 
+        async function updatePendingReturn(dateKey, p, type, val) {
+            const num = parseInt(val) || 0;
+            let entry = JSON.parse(localStorage.getItem('ot_order_history_' + dateKey));
+            if (!entry) return;
+            if (!entry[type]) entry[type] = {};
+            entry[type][p] = num;
+            // เซฟลง LocalStorage ไว้ก่อน เพื่อความรวดเร็ว
+            localStorage.setItem('ot_order_history_' + dateKey, JSON.stringify(entry));
+            
+            // Push ขึ้น Cloud แบบเบื้องหลัง ไม่ให้ UI กระตุก
+            pushToCloud('ot_order_history_' + dateKey, entry);
+            
+            // สั่ง render ตารางใหม่เพื่ออัปเดตผลรวมแบบรวดเร็ว (ข้ามการโหลด index cloud)
+            renderMonthlyOrderSummary(false);
+        }
+
+        async function deleteOrderHistory(dateKey) {
+            if (!confirm(`⚠️ คุณแน่ใจหรือไม่ว่าต้องการลบประวัติยอดขายของวันที่ ${dateKey} ?\nข้อมูลจะถูกลบทั้งในเครื่องและบน Cloud`)) return;
+            showToast('⏳ กำลังลบประวัติ...');
+            
+            // 1. นำออกจาก LocalStorage
+            localStorage.removeItem('ot_order_history_' + dateKey);
+            
+            // 2. นำออกจาก index
+            let historyIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
+            historyIndex = historyIndex.filter(k => k !== dateKey);
+            localStorage.setItem('ot_order_history_index', JSON.stringify(historyIndex));
+            
+            // 3. อัปเดต index ไปยัง Cloud
+            await pushToCloud('ot_order_history_index', historyIndex);
+            
+            showToast(`🗑️ ลบประวัติวันที่ ${dateKey} สำเร็จ`);
+            
+            // โหลด UI ใหม่
+            renderHistoryList();
+            renderMonthlyOrderSummary();
+            
+            // ถ้าหน้าปัจจุบันคือวันที่ลบ ให้ clear หน้าจอ
+            if (document.getElementById('orderDateInput').value === dateKey) {
+                // Clear UI (but don't delete everything blindly)
+                platformData = {}; platformFiles = {};
+                PLATFORMS.forEach(p => { 
+                    document.getElementById(`upload-${p}`).classList.remove('has-file'); 
+                    document.getElementById(`status-${p}`).textContent = 'ยังไม่ได้อัปโหลด'; 
+                    document.getElementById(`file-${p}`).value = ''; 
+                    document.getElementById(`filelist-${p}`).innerHTML = ''; 
+                    document.getElementById(`pending-${p}`).value = ''; 
+                    document.getElementById(`return-${p}`).value = ''; 
+                });
+                document.getElementById('orderResults').style.display = 'none'; 
+                document.getElementById('btnExportOrder').style.display = 'none';
+                if (orderCharts.product) orderCharts.product.destroy(); 
+                if (orderCharts.platform) orderCharts.platform.destroy(); 
+                if (orderCharts.group) orderCharts.group.destroy(); 
+                if (orderCharts.stacked) orderCharts.stacked.destroy();
+            }
+        }
 
         // ======== RENDER HISTORY LIST ========
         async function renderHistoryList() {
