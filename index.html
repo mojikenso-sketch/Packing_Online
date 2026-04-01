@@ -1013,6 +1013,9 @@
                     <button class="tab-btn" onclick="switchTab('tab-order')" id="tabBtn-tab-order">
                         <span class="tab-emoji">📊</span> Order รายวัน
                     </button>
+                    <button class="tab-btn" onclick="switchTab('tab-monthly')" id="tabBtn-tab-monthly">
+                        <span class="tab-emoji">📆</span> สรุปยอดขายรายเดือน
+                    </button>
                 </div>
             </aside>
 
@@ -1179,17 +1182,26 @@
                         </div>
                     </div>
 
-                    <div class="section animate-in" style="margin-top: 24px;">
-                        <div class="section-header">
-                            <div class="section-title"><span>📆</span> สรุปยอดขายรายเดือน (อิงตามเดือนที่เลือกด้านบน)
+                </div>
+
+                <!-- ========== TAB 4: Monthly Summary ========== -->
+                <div class="tab-panel" id="tab-monthly">
+                    <div class="section animate-in">
+                        <div class="section-header" style="flex-wrap:wrap;gap:16px;">
+                            <div class="section-title"><span>📆</span> สรุปยอดขายรายเดือน</div>
+                            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                                <span style="font-size:13px;color:var(--text-secondary)">📅 เดือน / ปี:</span>
+                                <select id="monthSelect4" style="padding:8px 12px;background:rgba(79,195,247,0.1);border:1px solid var(--glass-border);border-radius:8px;color:var(--text-primary);font-family:inherit;font-size:14px;outline:none;"></select>
+                                <input type="number" id="yearInput4" min="60" max="99" style="width:70px;padding:8px 12px;background:rgba(79,195,247,0.1);border:1px solid var(--glass-border);border-radius:8px;color:var(--text-primary);font-family:inherit;font-size:14px;outline:none;" title="ปี พ.ศ. (2 หลัก)">
+                                <button class="btn btn-primary" onclick="renderMonthlyOrderSummary()" style="padding:8px 16px;font-size:13px;">🔄 โหลดข้อมูล</button>
+                                <span style="font-size:12px;color:var(--text-muted);">🔗 ลิงก์กับเดือน/ปีด้านบน</span>
                             </div>
-                            <div style="font-size:13px;color:var(--text-muted);">
-                                *ข้อมูลตารางนี้จะดึงจาก "ประวัติที่บันทึกแล้ว" หากบันทึกเพิ่มเติม ตารางนี้จะอัปเดตทันที
-                            </div>
+                        </div>
+                        <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">
+                            *ข้อมูลตารางนี้จะดึงจาก "ประวัติที่บันทึกแล้ว" หากบันทึกเพิ่มเติม ตารางนี้จะอัปเดตทันที
                         </div>
                         <div class="table-wrapper" id="monthlyOrderTableWrapper"></div>
                     </div>
-
                 </div>
             </main>
         </div>
@@ -1778,8 +1790,15 @@
         // โหลดข้อมูลก็ต่อเมื่อ Login ผ่านแล้ว
         function initDashboard() {
             const now = new Date();
-            document.getElementById('monthSelect').innerHTML = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'].map((m, i) => `<option value="${i}" ${i === now.getMonth() ? 'selected' : ''}>${m}</option>`).join('');
-            document.getElementById('yearInput').value = (now.getFullYear() + 543) % 100;
+            const monthNames = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+            const monthOptionsHTML = monthNames.map((m, i) => `<option value="${i}" ${i === now.getMonth() ? 'selected' : ''}>${m}</option>`).join('');
+            const currentYear2 = (now.getFullYear() + 543) % 100;
+
+            // Init selector หัวข้อ (header) และ Tab 4 ให้ตรงกัน
+            document.getElementById('monthSelect').innerHTML = monthOptionsHTML;
+            document.getElementById('yearInput').value = currentYear2;
+            document.getElementById('monthSelect4').innerHTML = monthOptionsHTML;
+            document.getElementById('yearInput4').value = currentYear2;
 
             initCharts();
             loadDataAndCategories();
@@ -1793,8 +1812,29 @@
                 renderMonthlyOrderSummary();
             });
 
-            document.getElementById('monthSelect').addEventListener('change', () => { loadDataAndCategories(); renderMonthlyOrderSummary(); });
-            document.getElementById('yearInput').addEventListener('change', () => { loadDataAndCategories(); renderMonthlyOrderSummary(); });
+            // ======== SYNC ทิศทาง: Header → Tab 4 ========
+            document.getElementById('monthSelect').addEventListener('change', () => {
+                document.getElementById('monthSelect4').value = document.getElementById('monthSelect').value;
+                loadDataAndCategories();
+                renderMonthlyOrderSummary();
+            });
+            document.getElementById('yearInput').addEventListener('change', () => {
+                document.getElementById('yearInput4').value = document.getElementById('yearInput').value;
+                loadDataAndCategories();
+                renderMonthlyOrderSummary();
+            });
+
+            // ======== SYNC ทิศทาง: Tab 4 → Header ========
+            document.getElementById('monthSelect4').addEventListener('change', () => {
+                document.getElementById('monthSelect').value = document.getElementById('monthSelect4').value;
+                loadDataAndCategories();
+                renderMonthlyOrderSummary();
+            });
+            document.getElementById('yearInput4').addEventListener('change', () => {
+                document.getElementById('yearInput').value = document.getElementById('yearInput4').value;
+                loadDataAndCategories();
+                renderMonthlyOrderSummary();
+            });
 
             // เมื่อเปลี่ยนวันที่ -> โหลดประวัติอัตโนมัติ
             document.getElementById('orderDateInput').addEventListener('change', () => { loadOrderHistory(); });
@@ -2200,7 +2240,23 @@
             const cloudKey = 'ot_order_history_' + dateKey;
             showToast('⏳ กำลังโหลดประวัติ...');
             const saved = await fetchFromCloud(cloudKey);
-            if (!saved) return showToast('⚠️ ไม่พบประวัติของวันที่ ' + dateKey);
+            if (!saved) {
+                // ❌ ไม่พบข้อมูล → เคลียร์ UI ทั้งหมดให้เป็น default ว่างเปล่า
+                platformData = {}; platformFiles = {};
+                PLATFORMS.forEach(p => {
+                    document.getElementById(`upload-${p}`).classList.remove('has-file');
+                    document.getElementById(`status-${p}`).textContent = 'ยังไม่ได้อัปโหลด';
+                    document.getElementById(`file-${p}`).value = '';
+                    document.getElementById(`filelist-${p}`).innerHTML = '';
+                });
+                document.getElementById('orderResults').style.display = 'none';
+                document.getElementById('btnExportOrder').style.display = 'none';
+                if (orderCharts.product) { orderCharts.product.destroy(); orderCharts.product = null; }
+                if (orderCharts.platform) { orderCharts.platform.destroy(); orderCharts.platform = null; }
+                if (orderCharts.group) { orderCharts.group.destroy(); orderCharts.group = null; }
+                if (orderCharts.stacked) { orderCharts.stacked.destroy(); orderCharts.stacked = null; }
+                return showToast('⚠️ ไม่พบประวัติของวันที่ ' + dateKey);
+            }
 
             try {
                 platformData = {}; platformFiles = {};
@@ -2275,7 +2331,7 @@
                 let entry = null;
                 const localSaved = localStorage.getItem('ot_order_history_' + dateKey);
                 if (localSaved) {
-                    try { entry = JSON.parse(localSaved); } catch(e) {}
+                    try { entry = JSON.parse(localSaved); } catch (e) { }
                 }
                 if (!entry) {
                     entry = await fetchFromCloud('ot_order_history_' + dateKey);
@@ -2341,7 +2397,7 @@
                 let entry = null;
                 const localSaved = localStorage.getItem('ot_order_history_' + dateKey);
                 if (localSaved) {
-                    try { entry = JSON.parse(localSaved); } catch(e) {}
+                    try { entry = JSON.parse(localSaved); } catch (e) { }
                 }
                 if (!entry) {
                     entry = await fetchFromCloud('ot_order_history_' + dateKey);
