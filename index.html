@@ -1229,6 +1229,7 @@
                                 <select id="monthSelect4" style="padding:8px 12px;background:rgba(79,195,247,0.1);border:1px solid var(--glass-border);border-radius:8px;color:var(--text-primary);font-family:inherit;font-size:14px;outline:none;"></select>
                                 <input type="number" id="yearInput4" min="60" max="99" style="width:70px;padding:8px 12px;background:rgba(79,195,247,0.1);border:1px solid var(--glass-border);border-radius:8px;color:var(--text-primary);font-family:inherit;font-size:14px;outline:none;" title="ปี พ.ศ. (2 หลัก)">
                                 <button class="btn btn-primary" onclick="renderMonthlyOrderSummary()" style="padding:8px 16px;font-size:13px;">🔄 โหลดข้อมูล</button>
+                                <button class="btn btn-secondary" onclick="forceSaveMonthlyToCloud()" style="padding:8px 16px;font-size:13px;background:linear-gradient(135deg, var(--accent-green), #4caf50);color:white;border:none;">💾 บันทึกขึ้น Cloud</button>
                                 <span style="font-size:12px;color:var(--text-muted);">🔗 ลิงก์กับเดือน/ปีด้านบน</span>
                             </div>
                         </div>
@@ -2488,6 +2489,33 @@
             
             // สั่ง render ตารางใหม่เพื่ออัปเดตผลรวมแบบรวดเร็ว (ข้ามการโหลด index cloud)
             renderMonthlyOrderSummary(false);
+        }
+
+        async function forceSaveMonthlyToCloud() {
+            showToast('⏳ กำลังบันทึกข้อมูลเดือนนี้ขึ้น Cloud ทั้งหมด...');
+            
+            const selMonth = parseInt(document.getElementById('monthSelect').value);
+            const selYear2 = parseInt(document.getElementById('yearInput').value); 
+            const selYearCE = 2500 + selYear2 - 543;
+            
+            let historyIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
+            const daysWithData = historyIndex.filter(dateKey => {
+                const parts = dateKey.split('-');
+                return parts.length === 3 && parseInt(parts[0]) === selYearCE && parseInt(parts[1]) - 1 === selMonth;
+            });
+            
+            let successCount = 0;
+            // เราอาจดึง Cloud index มา merge ด้วยเพื่อความชัวร์ (เหมือนปุ่ม โหลดข้อมูล)
+            await pushToCloud('ot_order_history_index', historyIndex);
+
+            for (const dateKey of daysWithData) {
+                const entry = JSON.parse(localStorage.getItem('ot_order_history_' + dateKey));
+                if (entry) {
+                    await pushToCloud('ot_order_history_' + dateKey, entry);
+                    successCount++;
+                }
+            }
+            showToast(`✅ บันทึกยอดค้างและตีคืน ${successCount} รายการ ขึ้น Cloud สำเร็จ!`);
         }
 
         async function deleteOrderHistory(dateKey) {
