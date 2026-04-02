@@ -630,7 +630,8 @@
             outline: none;
         }
 
-        .month-selector select option, select option {
+        .month-selector select option,
+        select option {
             background: var(--bg-secondary);
             color: var(--text-primary);
         }
@@ -639,7 +640,7 @@
             width: 45px;
             padding: 4px;
             text-align: center;
-            background: rgba(255,255,255,0.03);
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--glass-border);
             border-radius: 4px;
             color: var(--text-primary);
@@ -648,11 +649,15 @@
             outline: none;
             transition: all 0.2s;
         }
+
         .quick-input:focus {
             border-color: var(--accent-cyan);
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
         }
-        .quick-input::placeholder { color: rgba(255,255,255,0.2) }
+
+        .quick-input::placeholder {
+            color: rgba(255, 255, 255, 0.2)
+        }
 
         /* Category Modal */
         .modal-overlay {
@@ -1018,8 +1023,29 @@
             </div>
         </header>
 
-        <div class="summary-cards" id="summaryCardsContainer"></div>
+        <!-- Top Charts Grid (Shared half tracking) -->
+        <div class="charts-grid animate-in" style="margin-bottom: 24px;">
+            <!-- Latest Stock bar chart (Left) -->
+            <div class="chart-card" style="border-color: var(--glass-border); padding: 20px;">
+                <div class="chart-title"
+                    style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px; margin-bottom: 16px;">
+                    <span style="font-size: 16px;">📊 สต็อกคงเหลือล่าสุดในคลัง</span>
+                    <span id="rateSummaryTop"
+                        style="font-size:13px; color:var(--text-muted); font-weight:normal;"></span>
+                </div>
+                <div class="chart-container" style="height: 400px;">
+                    <canvas id="latestStockChart"></canvas>
+                </div>
+            </div>
 
+            <!-- Production Rate line chart (Right) -->
+            <div class="chart-card" style="border-color: var(--glass-border); padding: 20px;">
+                <div class="chart-title"
+                    style="font-size: 16px; margin-bottom: 16px; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px;">
+                    ⏱️ ขวด/วินาที/คน (ยิ่งน้อยยิ่งเร็ว)</div>
+                <div class="chart-container" style="height: 400px;"><canvas id="rateChart"></canvas></div>
+            </div>
+        </div>
         <div class="dashboard-layout">
             <aside class="sidebar animate-in">
                 <div class="tab-nav" id="mainTabNav">
@@ -1042,20 +1068,11 @@
                 <div class="tab-panel active" id="tab-stock">
                     <div class="section animate-in">
                         <div class="section-header">
-                            <div class="section-title"><span>🏪</span> Stock ในคลัง (กล่อง)</div>
+                            <div class="section-title"><span>🏪</span> Stock ในคลัง</div>
                         </div>
                         <div class="table-wrapper" id="warehouseTableWrapper"></div>
                     </div>
-                    <div class="charts-grid">
-                        <div class="chart-card">
-                            <div class="chart-title">🥧 สัดส่วน Stock ล่าสุด</div>
-                            <div class="chart-container"><canvas id="stockPieChart"></canvas></div>
-                        </div>
-                        <div class="chart-card">
-                            <div class="chart-title">⏱️ ขวด/วินาที/คน (ยิ่งน้อยยิ่งเร็ว)</div>
-                            <div class="chart-container"><canvas id="rateChart"></canvas></div>
-                        </div>
-                    </div>
+
                 </div>
 
                 <div class="tab-panel" id="tab-daily">
@@ -1107,8 +1124,12 @@
                                 <div class="upload-status" id="status-shopee">ยังไม่ได้อัปโหลด</div>
                                 <div class="upload-file-list" id="filelist-shopee"></div>
                                 <div style="display:flex;width:100%;gap:6px;margin-top:auto;padding-top:10px;">
-                                    <input type="number" id="pending-shopee" class="cell-input" style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0" placeholder="ค้างส่ง">
-                                    <input type="number" id="return-shopee" class="cell-input" style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0" placeholder="ของตีคืน">
+                                    <input type="number" id="pending-shopee" class="cell-input"
+                                        style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
+                                        placeholder="ค้างส่ง">
+                                    <input type="number" id="return-shopee" class="cell-input"
+                                        style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
+                                        placeholder="ของตีคืน">
                                 </div>
                             </div>
                             <div class="upload-card" id="upload-lazada">
@@ -1121,8 +1142,12 @@
                                 <div class="upload-status" id="status-lazada">ยังไม่ได้อัปโหลด</div>
                                 <div class="upload-file-list" id="filelist-lazada"></div>
                                 <div style="display:flex;width:100%;gap:6px;margin-top:auto;padding-top:10px;">
-                                    <input type="number" id="pending-lazada" class="cell-input" style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0" placeholder="ค้างส่ง">
-                                    <input type="number" id="return-lazada" class="cell-input" style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0" placeholder="ของตีคืน">
+                                    <input type="number" id="pending-lazada" class="cell-input"
+                                        style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
+                                        placeholder="ค้างส่ง">
+                                    <input type="number" id="return-lazada" class="cell-input"
+                                        style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
+                                        placeholder="ของตีคืน">
                                 </div>
                             </div>
                             <div class="upload-card" id="upload-flash">
@@ -1135,8 +1160,12 @@
                                 <div class="upload-status" id="status-flash">ยังไม่ได้อัปโหลด</div>
                                 <div class="upload-file-list" id="filelist-flash"></div>
                                 <div style="display:flex;width:100%;gap:6px;margin-top:auto;padding-top:10px;">
-                                    <input type="number" id="pending-flash" class="cell-input" style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0" placeholder="ค้างส่ง">
-                                    <input type="number" id="return-flash" class="cell-input" style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0" placeholder="ของตีคืน">
+                                    <input type="number" id="pending-flash" class="cell-input"
+                                        style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
+                                        placeholder="ค้างส่ง">
+                                    <input type="number" id="return-flash" class="cell-input"
+                                        style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
+                                        placeholder="ของตีคืน">
                                 </div>
                             </div>
                             <div class="upload-card" id="upload-best">
@@ -1149,8 +1178,12 @@
                                 <div class="upload-status" id="status-best">ยังไม่ได้อัปโหลด</div>
                                 <div class="upload-file-list" id="filelist-best"></div>
                                 <div style="display:flex;width:100%;gap:6px;margin-top:auto;padding-top:10px;">
-                                    <input type="number" id="pending-best" class="cell-input" style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0" placeholder="ค้างส่ง">
-                                    <input type="number" id="return-best" class="cell-input" style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0" placeholder="ของตีคืน">
+                                    <input type="number" id="pending-best" class="cell-input"
+                                        style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
+                                        placeholder="ค้างส่ง">
+                                    <input type="number" id="return-best" class="cell-input"
+                                        style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
+                                        placeholder="ของตีคืน">
                                 </div>
                             </div>
                         </div>
@@ -1226,10 +1259,16 @@
                             <div class="section-title"><span>📆</span> สรุปยอดขายรายเดือน</div>
                             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
                                 <span style="font-size:13px;color:var(--text-secondary)">📅 เดือน / ปี:</span>
-                                <select id="monthSelect4" style="padding:8px 12px;background:rgba(79,195,247,0.1);border:1px solid var(--glass-border);border-radius:8px;color:var(--text-primary);font-family:inherit;font-size:14px;outline:none;"></select>
-                                <input type="number" id="yearInput4" min="60" max="99" style="width:70px;padding:8px 12px;background:rgba(79,195,247,0.1);border:1px solid var(--glass-border);border-radius:8px;color:var(--text-primary);font-family:inherit;font-size:14px;outline:none;" title="ปี พ.ศ. (2 หลัก)">
-                                <button class="btn btn-primary" onclick="renderMonthlyOrderSummary()" style="padding:8px 16px;font-size:13px;">🔄 โหลดข้อมูล</button>
-                                <button class="btn btn-secondary" onclick="forceSaveMonthlyToCloud()" style="padding:8px 16px;font-size:13px;background:linear-gradient(135deg, var(--accent-green), #4caf50);color:white;border:none;">💾 บันทึกขึ้น Cloud</button>
+                                <select id="monthSelect4"
+                                    style="padding:8px 12px;background:rgba(79,195,247,0.1);border:1px solid var(--glass-border);border-radius:8px;color:var(--text-primary);font-family:inherit;font-size:14px;outline:none;"></select>
+                                <input type="number" id="yearInput4" min="60" max="99"
+                                    style="width:70px;padding:8px 12px;background:rgba(79,195,247,0.1);border:1px solid var(--glass-border);border-radius:8px;color:var(--text-primary);font-family:inherit;font-size:14px;outline:none;"
+                                    title="ปี พ.ศ. (2 หลัก)">
+                                <button class="btn btn-primary" onclick="renderMonthlyOrderSummary()"
+                                    style="padding:8px 16px;font-size:13px;">🔄 โหลดข้อมูล</button>
+                                <button class="btn btn-secondary" onclick="forceSaveMonthlyToCloud()"
+                                    style="padding:8px 16px;font-size:13px;background:linear-gradient(135deg, var(--accent-green), #4caf50);color:white;border:none;">💾
+                                    บันทึกขึ้น Cloud</button>
                                 <span style="font-size:12px;color:var(--text-muted);">🔗 ลิงก์กับเดือน/ปีด้านบน</span>
                             </div>
                         </div>
@@ -1613,7 +1652,14 @@
             html += '</tr></thead><tbody>';
 
             stockCategories.forEach(cat => {
-                html += `<tr class="row-stock"><td><span style="font-weight:700">${cat.name}</span></td><td class="cell-label">กล่อง</td>`;
+                const unitHtml = `
+                    <select class="unit-select" data-id="${cat.id}" onchange="changeCatUnit(this)" style="background:transparent;border:1px solid rgba(79,195,247,0.2);border-radius:4px;color:var(--text-muted);font-family:inherit;font-size:12px;outline:none;cursor:pointer;padding:2px 4px;">
+                        <option value="ขวด" ${(!cat.unit || cat.unit === 'ขวด' || cat.unit === 'กล่อง') ? 'selected' : ''}>ขวด</option>
+                        <option value="ซอง" ${cat.unit === 'ซอง' ? 'selected' : ''}>ซอง</option>
+                        <option value="กระป๋อง" ${cat.unit === 'กระป๋อง' ? 'selected' : ''}>กระป๋อง</option>
+                    </select>
+                `;
+                html += `<tr class="row-stock"><td><span style="font-weight:700">${cat.name}</span></td><td class="cell-label">${unitHtml}</td>`;
                 for (let i = 1; i <= DAYS; i++) {
                     const val = data[i][type][cat.id] || '';
                     html += `<td${i === _todayNum ? ' class="is-today-col"' : ''}><input class="cell-input" type="number" data-day="${i}" data-cat="${cat.id}" data-type="${type}" value="${val}" placeholder="0" onchange="onCatChange(this)"></td>`;
@@ -1621,10 +1667,10 @@
                 html += '</tr>';
             });
 
-            html += '<tr style="border-top: 2px solid var(--glass-border)"><td style="font-weight:700;color:var(--accent-cyan)">รวมทั้งหมด</td><td class="cell-label">กล่อง</td>';
+            html += '<tr style="border-top: 2px solid var(--glass-border)"><td style="font-weight:700;color:var(--accent-cyan)">รวมทั้งหมด</td><td class="cell-label">-</td>';
             for (let i = 1; i <= DAYS; i++) {
                 const total = stockCategories.reduce((sum, c) => sum + (parseFloat(data[i][type][c.id]) || 0), 0);
-                html += `<td class="cell-calc${i === _todayNum ? ' is-today-col' : ''}" id="${type}-total-${i}">${total || '-'}</td>`;
+                html += `<td class="cell-calc${i === _todayNum ? ' is-today-col' : ''}" id="${type}-total-${i}">${total > 0 ? parseFloat(total.toFixed(2)) : '-'}</td>`;
             }
             html += '</tr></tbody></table>';
             wrapper.innerHTML = html;
@@ -1644,14 +1690,28 @@
             const day = el.dataset.day, catId = el.dataset.cat, type = el.dataset.type;
             data[day][type][catId] = el.value;
             const total = stockCategories.reduce((sum, c) => sum + (parseFloat(data[day][type][c.id]) || 0), 0);
-            document.getElementById(`${type}-total-${day}`).textContent = total || '-';
+            document.getElementById(`${type}-total-${day}`).textContent = total > 0 ? parseFloat(total.toFixed(2)) : '-';
             updateSummaryAndCharts(); autoSaveLocal();
         }
 
-        function updateSummaryAndCharts() {
-            const container = document.getElementById('summaryCardsContainer');
-            let cardsHTML = '';
+        function changeCatUnit(el) {
+            const catId = el.dataset.id;
+            const newUnit = el.value;
+            const cat = stockCategories.find(c => c.id === catId);
+            if (cat) {
+                cat.unit = newUnit;
+                localStorage.setItem('ot_stock_categories', JSON.stringify(stockCategories));
+                
+                // Re-render both tables to reflect unit selection dynamically
+                // (Using requestAnimationFrame to avoid blocking the initial select visual update)
+                requestAnimationFrame(() => {
+                    renderDynamicTable('warehouseTableWrapper', 'warehouse');
+                    renderDynamicTable('stockTableWrapper', 'stock');
+                });
+            }
+        }
 
+        function updateSummaryAndCharts() {
             let latestWH = {};
             for (let i = DAYS; i >= 1; i--) {
                 const totalWH = stockCategories.reduce((sum, c) => sum + (parseFloat(data[i].warehouse[c.id]) || 0), 0);
@@ -1661,10 +1721,23 @@
                 }
             }
 
-            stockCategories.forEach((cat, index) => {
-                const val = latestWH[cat.id] || 0;
-                cardsHTML += `<div class="summary-card animate-in"><div class="card-label" style="font-size:16px">${cat.name}</div><div class="card-value" style="color:${colors[index % colors.length]}">${val.toLocaleString()}</div><div class="card-sub">ในคลังล่าสุด (กล่อง)</div></div>`;
-            });
+            // Create array of objects for sorting
+            let sortedStock = stockCategories.map((cat, index) => ({
+                name: cat.name,
+                val: latestWH[cat.id] || 0,
+                color: colors[index % colors.length]
+            }));
+
+            // Sort descending (มากสุดอยู่บน)
+            sortedStock.sort((a, b) => b.val - a.val);
+
+            // Update new horizontal bar chart
+            if (charts.latestStock) {
+                charts.latestStock.data.labels = sortedStock.map(c => c.name);
+                charts.latestStock.data.datasets[0].data = sortedStock.map(c => c.val);
+                charts.latestStock.data.datasets[0].backgroundColor = sortedStock.map(c => c.color);
+                charts.latestStock.update('none');
+            }
 
             let totalRateSum = 0, totalRateCount = 0;
             let latestRate = 0; let latestRateDay = '-';
@@ -1695,26 +1768,12 @@
             const avgRatePerHour = totalRateCount > 0 ? (totalRateSum / totalRateCount) : 0;
             const avgSecPerBottle = avgRatePerHour > 0 ? (3600 / avgRatePerHour) : 0;
 
-            cardsHTML += `
-                <div class="summary-card animate-in" style="border-top-color: var(--accent-red);">
-                    <div class="card-label" style="font-size:14px">⏱️ อัตราการผลิต (วิ/ขวด/คน)</div>
-                    <div class="card-value" style="color:var(--accent-red)">${latestRate > 0 ? latestRate.toFixed(1) : '0'}</div>
-                    <div class="card-sub" style="margin-top: 8px;">
-                        <span style="color:var(--text-primary); font-weight:600;">ล่าสุด: ${latestRateDay}</span><br>
-                        <span style="color:var(--accent-green); font-weight:600;">ไวสุด: ${bestRate !== Infinity ? bestRate.toFixed(1) : '0'} (${bestRateDay})</span><br>
-                        เฉลี่ยรวม: ${avgSecPerBottle > 0 ? avgSecPerBottle.toFixed(1) : '0'} วิ/ขวด/คน
-                    </div>
-                </div>
-            `;
-
-            container.innerHTML = cardsHTML;
-
-            if (charts.pie) {
-                charts.pie.data.labels = stockCategories.map(c => c.name);
-                charts.pie.data.datasets[0].data = stockCategories.map(c => latestWH[c.id] || 0);
-                charts.pie.data.datasets[0].backgroundColor = stockCategories.map((_, i) => colors[i % colors.length]);
-                charts.pie.update('none');
+            const rateElem = document.getElementById('rateSummaryTop');
+            if (rateElem) {
+                rateElem.innerHTML = `⏱️ อัตราการผลิตล่าสุด: <span style="color:var(--accent-red);font-weight:bold;">${latestRate > 0 ? latestRate.toFixed(1) : '0'}</span> วิ/ขวด (วันที่ ${latestRateDay}) &nbsp;|&nbsp; เฉลี่ยรวม: ${avgSecPerBottle > 0 ? avgSecPerBottle.toFixed(1) : '0'} วิ/ขวด`;
             }
+
+
 
             if (charts.rate) {
                 charts.rate.data.datasets[0].data = Array.from({ length: DAYS }, (_, i) => {
@@ -1732,16 +1791,41 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#9fa8da', font: { family: 'Inter', size: 12 } } } }, scales: { x: { ticks: { color: '#5c6bc0', font: { size: 10 } }, grid: { color: 'rgba(79,195,247,0.06)' } }, y: { ticks: { color: '#5c6bc0', font: { size: 11 } }, grid: { color: 'rgba(79,195,247,0.06)' } } } }
             });
 
-            charts.pie = new Chart(document.getElementById('stockPieChart'), {
-                type: 'doughnut',
-                data: { labels: [], datasets: [{ data: [], borderWidth: 2, borderColor: '#16213e' }] },
+            charts.latestStock = new Chart(document.getElementById('latestStockChart'), {
+                type: 'bar',
+                data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderRadius: 4 }] },
+                plugins: [{
+                    id: 'barValuePlugin',
+                    afterDatasetsDraw(chart) {
+                        const { ctx, data } = chart;
+                        ctx.save();
+                        chart.getDatasetMeta(0).data.forEach((datapoint, index) => {
+                            const value = data.datasets[0].data[index];
+                            if (value > 0) {
+                                ctx.font = '600 12px Inter, sans-serif';
+                                ctx.fillStyle = '#e8eaf6';
+                                ctx.textAlign = 'left';
+                                ctx.textBaseline = 'middle';
+                                ctx.fillText(value.toLocaleString(), datapoint.x + 6, datapoint.y);
+                            }
+                        });
+                        ctx.restore();
+                    }
+                }],
                 options: {
+                    indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
-                    layout: { padding: { top: 30, bottom: 30, left: 50, right: 50 } },
-                    plugins: { legend: { display: false } }
+                    layout: { padding: { right: 50 } },
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9fa8da' } },
+                        y: { grid: { display: false }, ticks: { autoSkip: false, color: '#9fa8da', font: { size: 12, family: 'Inter' } } }
+                    }
                 }
             });
+
+
         }
 
         function exportCSV() {
@@ -2250,8 +2334,8 @@
             if (!hasData) return showToast('⚠️ ยังไม่มีข้อมูลออเดอร์');
 
             const historyEntry = { date: dateKey, savedAt: new Date().toISOString(), platformData: {}, pending: {}, returned: {} };
-            PLATFORMS.forEach(p => { 
-                if (platformData[p] && platformData[p].length > 0) historyEntry.platformData[p] = platformData[p].map(({ item, qty }) => ({ item, qty })); 
+            PLATFORMS.forEach(p => {
+                if (platformData[p] && platformData[p].length > 0) historyEntry.platformData[p] = platformData[p].map(({ item, qty }) => ({ item, qty }));
                 const pendingVal = parseInt(document.getElementById(`pending-${p}`).value);
                 if (!isNaN(pendingVal)) historyEntry.pending[p] = pendingVal;
                 const returnVal = parseInt(document.getElementById(`return-${p}`).value);
@@ -2307,7 +2391,7 @@
                 PLATFORMS.forEach(p => {
                     document.getElementById(`pending-${p}`).value = (saved.pending && saved.pending[p] !== undefined) ? saved.pending[p] : '';
                     document.getElementById(`return-${p}`).value = (saved.returned && saved.returned[p] !== undefined) ? saved.returned[p] : '';
-                    
+
                     if (saved.platformData[p]) {
                         platformData[p] = saved.platformData[p].map(item => ({ ...item, fileName: `ประวัติ ${dateKey}` }));
                         platformFiles[p] = [{ name: `ประวัติ ${dateKey}`, items: saved.platformData[p], totalQty: saved.platformData[p].reduce((s, r) => s + r.qty, 0) }];
@@ -2343,7 +2427,7 @@
             if (forceCloudSync && !wrapper.innerHTML.includes('table')) {
                 wrapper.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:16px;text-align:center">⏳ กำลังโหลดข้อมูล...</div>`;
             }
-            
+
             let historyIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
             if (forceCloudSync) {
                 const cloudIndex = await fetchFromCloud('ot_order_history_index') || [];
@@ -2390,8 +2474,8 @@
             const monthPlatformTotals = {};
             const monthPlatformPendingTotals = {};
             const monthPlatformReturnTotals = {};
-            PLATFORMS.forEach(p => { 
-                monthPlatformTotals[p] = 0; 
+            PLATFORMS.forEach(p => {
+                monthPlatformTotals[p] = 0;
                 monthPlatformPendingTotals[p] = 0;
                 monthPlatformReturnTotals[p] = 0;
             });
@@ -2424,7 +2508,7 @@
                         const pQty = (entry.platformData[p] || []).reduce((s, r) => s + r.qty, 0);
                         const pPending = (entry.pending && entry.pending[p]) ? entry.pending[p] : 0;
                         const pReturn = (entry.returned && entry.returned[p]) ? entry.returned[p] : 0;
-                        
+
                         dayTotal += pQty;
                         dayPendingTotal += pPending;
                         dayReturnTotal += pReturn;
@@ -2439,12 +2523,12 @@
                             <td style="padding:4px"><input type="number" class="quick-input" value="${pReturn || ''}" onchange="updatePendingReturn('${dateKey}', '${p}', 'returned', this.value)" placeholder="-"></td>
                         `;
                     });
-                    
+
                     monthGrandTotal += dayTotal;
                     monthGrandPendingTotal += dayPendingTotal;
                     monthGrandReturnTotal += dayReturnTotal;
                     hasAnyRow = true;
-                    
+
                     html += `<tr>
                         <td style="text-align:left;font-weight:600;color:var(--accent-blue);white-space:nowrap">${displayDate}</td>
                         <td class="cell-calc" style="font-weight:bold">${dayTotal.toLocaleString()}</td>
@@ -2483,27 +2567,27 @@
             entry[type][p] = num;
             // เซฟลง LocalStorage ไว้ก่อน เพื่อความรวดเร็ว
             localStorage.setItem('ot_order_history_' + dateKey, JSON.stringify(entry));
-            
+
             // Push ขึ้น Cloud แบบเบื้องหลัง ไม่ให้ UI กระตุก
             pushToCloud('ot_order_history_' + dateKey, entry);
-            
+
             // สั่ง render ตารางใหม่เพื่ออัปเดตผลรวมแบบรวดเร็ว (ข้ามการโหลด index cloud)
             renderMonthlyOrderSummary(false);
         }
 
         async function forceSaveMonthlyToCloud() {
             showToast('⏳ กำลังบันทึกข้อมูลเดือนนี้ขึ้น Cloud ทั้งหมด...');
-            
+
             const selMonth = parseInt(document.getElementById('monthSelect').value);
-            const selYear2 = parseInt(document.getElementById('yearInput').value); 
+            const selYear2 = parseInt(document.getElementById('yearInput').value);
             const selYearCE = 2500 + selYear2 - 543;
-            
+
             let historyIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
             const daysWithData = historyIndex.filter(dateKey => {
                 const parts = dateKey.split('-');
                 return parts.length === 3 && parseInt(parts[0]) === selYearCE && parseInt(parts[1]) - 1 === selMonth;
             });
-            
+
             let successCount = 0;
             // เราอาจดึง Cloud index มา merge ด้วยเพื่อความชัวร์ (เหมือนปุ่ม โหลดข้อมูล)
             await pushToCloud('ot_order_history_index', historyIndex);
@@ -2521,41 +2605,41 @@
         async function deleteOrderHistory(dateKey) {
             if (!confirm(`⚠️ คุณแน่ใจหรือไม่ว่าต้องการลบประวัติยอดขายของวันที่ ${dateKey} ?\nข้อมูลจะถูกลบทั้งในเครื่องและบน Cloud`)) return;
             showToast('⏳ กำลังลบประวัติ...');
-            
+
             // 1. นำออกจาก LocalStorage
             localStorage.removeItem('ot_order_history_' + dateKey);
-            
+
             // 2. นำออกจาก index
             let historyIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
             historyIndex = historyIndex.filter(k => k !== dateKey);
             localStorage.setItem('ot_order_history_index', JSON.stringify(historyIndex));
-            
+
             // 3. อัปเดต index ไปยัง Cloud
             await pushToCloud('ot_order_history_index', historyIndex);
-            
+
             showToast(`🗑️ ลบประวัติวันที่ ${dateKey} สำเร็จ`);
-            
+
             // โหลด UI ใหม่
             renderHistoryList();
             renderMonthlyOrderSummary();
-            
+
             // ถ้าหน้าปัจจุบันคือวันที่ลบ ให้ clear หน้าจอ
             if (document.getElementById('orderDateInput').value === dateKey) {
                 // Clear UI (but don't delete everything blindly)
                 platformData = {}; platformFiles = {};
-                PLATFORMS.forEach(p => { 
-                    document.getElementById(`upload-${p}`).classList.remove('has-file'); 
-                    document.getElementById(`status-${p}`).textContent = 'ยังไม่ได้อัปโหลด'; 
-                    document.getElementById(`file-${p}`).value = ''; 
-                    document.getElementById(`filelist-${p}`).innerHTML = ''; 
-                    document.getElementById(`pending-${p}`).value = ''; 
-                    document.getElementById(`return-${p}`).value = ''; 
+                PLATFORMS.forEach(p => {
+                    document.getElementById(`upload-${p}`).classList.remove('has-file');
+                    document.getElementById(`status-${p}`).textContent = 'ยังไม่ได้อัปโหลด';
+                    document.getElementById(`file-${p}`).value = '';
+                    document.getElementById(`filelist-${p}`).innerHTML = '';
+                    document.getElementById(`pending-${p}`).value = '';
+                    document.getElementById(`return-${p}`).value = '';
                 });
-                document.getElementById('orderResults').style.display = 'none'; 
+                document.getElementById('orderResults').style.display = 'none';
                 document.getElementById('btnExportOrder').style.display = 'none';
-                if (orderCharts.product) orderCharts.product.destroy(); 
-                if (orderCharts.platform) orderCharts.platform.destroy(); 
-                if (orderCharts.group) orderCharts.group.destroy(); 
+                if (orderCharts.product) orderCharts.product.destroy();
+                if (orderCharts.platform) orderCharts.platform.destroy();
+                if (orderCharts.group) orderCharts.group.destroy();
                 if (orderCharts.stacked) orderCharts.stacked.destroy();
             }
         }
