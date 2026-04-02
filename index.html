@@ -590,7 +590,7 @@
 
         .charts-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
             gap: 24px;
         }
 
@@ -691,6 +691,20 @@
             gap: 10px;
             margin-bottom: 10px;
             align-items: center;
+            transition: opacity 0.2s;
+            background: var(--bg-card); /* To cover background behind dashed border */
+        }
+        
+        .cat-item.dragging {
+            opacity: 0.5;
+        }
+
+        .cat-item.over-top {
+            border-top: 2px dashed var(--accent-cyan);
+        }
+
+        .cat-item.over-bottom {
+            border-bottom: 2px dashed var(--accent-cyan);
         }
 
         .cat-item input {
@@ -1030,20 +1044,26 @@
                 <div class="chart-title"
                     style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px; margin-bottom: 16px;">
                     <span style="font-size: 16px;">📊 สต็อกคงเหลือล่าสุดในคลัง</span>
-                    <span id="rateSummaryTop"
-                        style="font-size:13px; color:var(--text-muted); font-weight:normal;"></span>
                 </div>
                 <div class="chart-container" style="height: 400px;">
                     <canvas id="latestStockChart"></canvas>
                 </div>
             </div>
 
-            <!-- Production Rate line chart (Right) -->
+            <!-- Production Rate line chart (Middle) -->
             <div class="chart-card" style="border-color: var(--glass-border); padding: 20px;">
-                <div class="chart-title"
+                <div class="chart-title" id="rateChartTitleTop"
                     style="font-size: 16px; margin-bottom: 16px; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px;">
                     ⏱️ ขวด/วินาที/คน (ยิ่งน้อยยิ่งเร็ว)</div>
                 <div class="chart-container" style="height: 400px;"><canvas id="rateChart"></canvas></div>
+            </div>
+
+            <!-- Monthly Sales bar chart (Right) -->
+            <div class="chart-card" style="border-color: var(--glass-border); padding: 20px;">
+                <div class="chart-title"
+                    style="font-size: 16px; margin-bottom: 16px; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px;">
+                    📊 สรุปยอดขายรายเดือน</div>
+                <div class="chart-container" style="height: 400px;"><canvas id="monthlySalesChart"></canvas></div>
             </div>
         </div>
         <div class="dashboard-layout">
@@ -1548,6 +1568,59 @@
         }
 
         // ================= CATEGORY MANAGER =================
+        let dragSrcCatEl = null;
+
+        function handleDragStartCat(e) {
+            dragSrcCatEl = this;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', this.innerHTML); // Required for Firefox
+            this.classList.add('dragging');
+        }
+
+        function handleDragOverCat(e) {
+            if (e.preventDefault) { e.preventDefault(); }
+            e.dataTransfer.dropEffect = 'move';
+            
+            const rect = this.getBoundingClientRect();
+            const relY = e.clientY - rect.top;
+            if (relY < rect.height / 2) {
+                this.classList.add('over-top');
+                this.classList.remove('over-bottom');
+            } else {
+                this.classList.add('over-bottom');
+                this.classList.remove('over-top');
+            }
+            return false;
+        }
+
+        function handleDragLeaveCat(e) {
+            this.classList.remove('over-top', 'over-bottom');
+        }
+
+        function handleDropCat(e) {
+            if (e.stopPropagation) { e.stopPropagation(); }
+            this.classList.remove('over-top', 'over-bottom');
+            
+            if (dragSrcCatEl !== this) {
+                const list = this.parentNode;
+                const rect = this.getBoundingClientRect();
+                const relY = e.clientY - rect.top;
+                
+                if (relY < rect.height / 2) {
+                    list.insertBefore(dragSrcCatEl, this);
+                } else {
+                    list.insertBefore(dragSrcCatEl, this.nextSibling);
+                }
+            }
+            return false;
+        }
+
+        function handleDragEndCat(e) {
+            this.classList.remove('dragging');
+            const items = document.querySelectorAll('#catList .cat-item');
+            items.forEach(item => item.classList.remove('over-top', 'over-bottom'));
+        }
+
         function openCategoryModal() {
             const list = document.getElementById('catList');
             list.innerHTML = '';
@@ -1555,12 +1628,25 @@
             document.getElementById('catModal').style.display = 'flex';
         }
         function closeCategoryModal() { document.getElementById('catModal').style.display = 'none'; }
+        
         function addCategoryRow(id = 'cat_' + Date.now(), name = '') {
             const list = document.getElementById('catList');
-            const div = document.createElement('div'); div.className = 'cat-item';
-            div.innerHTML = `<input type="hidden" class="cat-id" value="${id}">
-                             <input type="text" class="cat-name" value="${name}" placeholder="ชื่อประเภท (เช่น SO, กล่องเล็ก)">
-                             <button class="btn btn-danger" onclick="this.parentElement.remove()" style="padding:10px;">🗑️</button>`;
+            const div = document.createElement('div');
+            div.className = 'cat-item';
+            div.draggable = true;
+            
+            div.addEventListener('dragstart', handleDragStartCat, false);
+            div.addEventListener('dragover', handleDragOverCat, false);
+            div.addEventListener('dragleave', handleDragLeaveCat, false);
+            div.addEventListener('drop', handleDropCat, false);
+            div.addEventListener('dragend', handleDragEndCat, false);
+
+            div.innerHTML = `
+                <span style="cursor:grab; font-size:24px; color:var(--text-muted); user-select:none; padding: 0 5px;">☰</span>
+                <input type="hidden" class="cat-id" value="${id}">
+                <input type="text" class="cat-name" value="${name}" placeholder="ชื่อประเภท (เช่น SO, กล่องเล็ก)">
+                <button class="btn btn-danger" onclick="this.parentElement.remove()" style="padding:10px;">🗑️</button>
+            `;
             list.appendChild(div);
         }
         async function saveCategories() {
@@ -1634,7 +1720,7 @@
             for (let i = 1; i <= DAYS; i++) html += `<td${i === _todayNum ? ' class="is-today-col"' : ''}><input class="cell-input" type="number" step="0.5" data-day="${i}" data-key="otHours" value="${data[i].otHours}" placeholder="0" onchange="onProdChange(this)"></td>`;
             html += '</tr>';
 
-            html += '<tr class="row-header-group"><td colspan="2">อัตราการผลิต</td>'; for (let i = 1; i <= DAYS; i++) html += `<td${i === _todayNum ? ' class="is-today-col"' : ''}></td>`; html += '</tr>';
+            html += '<tr class="row-header-group"><td colspan="2">อัตราการผลิต<br><span style="font-size:10px;text-transform:none">(ค่ามาตรฐาน 45 ขวด/วิ/คน)</span></td>'; for (let i = 1; i <= DAYS; i++) html += `<td${i === _todayNum ? ' class="is-today-col"' : ''}></td>`; html += '</tr>';
             html += `<tr><td style="padding-left:24px">ขวด/คน/ชม.</td><td class="cell-label">ขวด/คน/ชม.</td>`;
             for (let i = 1; i <= DAYS; i++) html += `<td class="cell-calc${i === _todayNum ? ' is-today-col' : ''}" id="rate-${i}">${calcRate(i)}</td>`;
             html += '</tr>';
@@ -1701,7 +1787,7 @@
             if (cat) {
                 cat.unit = newUnit;
                 localStorage.setItem('ot_stock_categories', JSON.stringify(stockCategories));
-                
+
                 // Re-render both tables to reflect unit selection dynamically
                 // (Using requestAnimationFrame to avoid blocking the initial select visual update)
                 requestAnimationFrame(() => {
@@ -1768,18 +1854,39 @@
             const avgRatePerHour = totalRateCount > 0 ? (totalRateSum / totalRateCount) : 0;
             const avgSecPerBottle = avgRatePerHour > 0 ? (3600 / avgRatePerHour) : 0;
 
-            const rateElem = document.getElementById('rateSummaryTop');
-            if (rateElem) {
-                rateElem.innerHTML = `⏱️ อัตราการผลิตล่าสุด: <span style="color:var(--accent-red);font-weight:bold;">${latestRate > 0 ? latestRate.toFixed(1) : '0'}</span> วิ/ขวด (วันที่ ${latestRateDay}) &nbsp;|&nbsp; เฉลี่ยรวม: ${avgSecPerBottle > 0 ? avgSecPerBottle.toFixed(1) : '0'} วิ/ขวด`;
-            }
-
-
-
             if (charts.rate) {
-                charts.rate.data.datasets[0].data = Array.from({ length: DAYS }, (_, i) => {
-                    const r = calcRatePerSec(i + 1); return r === '-' ? 0 : parseFloat(r);
+                let exceedCount = 0;
+                const pointColors = [];
+                const pointRadii = [];
+                
+                const dataArr = Array.from({ length: DAYS }, (_, i) => {
+                    const r = calcRatePerSec(i + 1); 
+                    const val = r === '-' ? 0 : parseFloat(r);
+                    if (val > 45) {
+                        exceedCount++;
+                        pointColors.push('#00e5ff');
+                        pointRadii.push(5);
+                    } else {
+                        pointColors.push('#ffd740');
+                        pointRadii.push(3);
+                    }
+                    return val;
                 });
+                
+                charts.rate.data.datasets[0].data = dataArr;
+                charts.rate.data.datasets[0].pointBackgroundColor = pointColors;
+                charts.rate.data.datasets[0].pointBorderColor = pointColors;
+                charts.rate.data.datasets[0].pointRadius = pointRadii;
                 charts.rate.update('none');
+
+                const titleElem = document.getElementById('rateChartTitleTop');
+                if (titleElem) {
+                    if (exceedCount > 0) {
+                        titleElem.innerHTML = `⏱️ ขวด/วินาที/คน (<span style="color:var(--accent-red)">เกินค่ามาตรฐาน ${exceedCount} วัน</span>)`;
+                    } else {
+                        titleElem.innerHTML = `⏱️ ขวด/วินาที/คน (ยิ่งน้อยยิ่งเร็ว)`;
+                    }
+                }
             }
         }
 
@@ -1787,7 +1894,12 @@
             const labels = Array.from({ length: DAYS }, (_, i) => `${i + 1}`);
             charts.rate = new Chart(document.getElementById('rateChart'), {
                 type: 'line',
-                data: { labels, datasets: [{ label: 'วินาที/ขวด/คน', data: [], borderColor: '#ffd740', borderWidth: 2, tension: 0.4 }] },
+                data: {
+                    labels, datasets: [
+                        { label: 'วินาที/ขวด/คน', data: [], borderColor: '#ffd740', borderWidth: 2, tension: 0.4 },
+                        { label: 'ค่ามาตรฐาน 45', data: new Array(DAYS).fill(45), borderColor: '#ff5252', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, fill: false }
+                    ]
+                },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#9fa8da', font: { family: 'Inter', size: 12 } } } }, scales: { x: { ticks: { color: '#5c6bc0', font: { size: 10 } }, grid: { color: 'rgba(79,195,247,0.06)' } }, y: { ticks: { color: '#5c6bc0', font: { size: 11 } }, grid: { color: 'rgba(79,195,247,0.06)' } } } }
             });
 
@@ -1825,7 +1937,39 @@
                 }
             });
 
-
+            charts.monthlySales = new Chart(document.getElementById('monthlySalesChart'), {
+                type: 'bar',
+                data: { labels: [], datasets: [{ data: [], backgroundColor: Array.from({ length: 31 }, (_, i) => 'hsl(' + (i * 360 / 31) + ', 70%, 65%)'), borderRadius: 4 }] },
+                plugins: [{
+                    id: 'barValuePluginSales',
+                    afterDatasetsDraw(chart) {
+                        const { ctx, data } = chart;
+                        ctx.save();
+                        chart.getDatasetMeta(0).data.forEach((datapoint, index) => {
+                            const value = data.datasets[0].data[index];
+                            if (value > 0) {
+                                ctx.font = '600 12px Inter, sans-serif';
+                                ctx.fillStyle = '#e8eaf6';
+                                ctx.textAlign = 'left';
+                                ctx.textBaseline = 'middle';
+                                ctx.fillText(value.toLocaleString(), Math.max(datapoint.x + 6, 0), datapoint.y);
+                            }
+                        });
+                        ctx.restore();
+                    }
+                }],
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: { padding: { right: 50 } },
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9fa8da' } },
+                        y: { grid: { display: false }, ticks: { autoSkip: false, color: '#9fa8da', font: { size: 12, family: 'Inter' } } }
+                    }
+                }
+            });
         }
 
         function exportCSV() {
@@ -2481,6 +2625,8 @@
             });
             let hasAnyRow = false;
 
+            const dailySalesData = new Array(31).fill(0);
+
             for (const dateKey of daysWithData) {
                 const parts = dateKey.split('-');
                 const dayNum = parseInt(parts[2]);
@@ -2529,6 +2675,9 @@
                     monthGrandReturnTotal += dayReturnTotal;
                     hasAnyRow = true;
 
+                    // Add dayTotal to charting array
+                    dailySalesData[dayNum - 1] = dayTotal;
+
                     html += `<tr>
                         <td style="text-align:left;font-weight:600;color:var(--accent-blue);white-space:nowrap">${displayDate}</td>
                         <td class="cell-calc" style="font-weight:bold">${dayTotal.toLocaleString()}</td>
@@ -2538,6 +2687,12 @@
                         <td><button class="btn btn-danger" style="padding:4px 8px;font-size:12px;" onclick="deleteOrderHistory('${dateKey}')">🗑️ ลบ</button></td>
                     </tr>`;
                 } catch (e) { }
+            }
+
+            if (charts.monthlySales) {
+                charts.monthlySales.data.labels = Array.from({ length: 31 }, (_, i) => String(i + 1));
+                charts.monthlySales.data.datasets[0].data = dailySalesData;
+                charts.monthlySales.update('none');
             }
 
             if (!hasAnyRow) {
