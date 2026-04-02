@@ -1676,7 +1676,11 @@
             items.forEach(item => {
                 const id = item.querySelector('.cat-id').value;
                 const name = item.querySelector('.cat-name').value.trim();
-                if (name) newCategories.push({ id, name });
+                if (name) {
+                    const existingCat = stockCategories.find(c => c.id === id);
+                    const unit = existingCat && existingCat.unit ? existingCat.unit : 'ขวด';
+                    newCategories.push({ id, name, unit });
+                }
             });
             if (newCategories.length === 0) return alert('ต้องมีอย่างน้อย 1 ประเภทครับ');
 
@@ -1803,13 +1807,16 @@
             updateSummaryAndCharts(); autoSaveLocal();
         }
 
-        function changeCatUnit(el) {
+        async function changeCatUnit(el) {
             const catId = el.dataset.id;
             const newUnit = el.value;
             const cat = stockCategories.find(c => c.id === catId);
             if (cat) {
                 cat.unit = newUnit;
-                localStorage.setItem('ot_stock_categories', JSON.stringify(stockCategories));
+                localStorage.setItem(CAT_KEY, JSON.stringify(stockCategories));
+                showToast('⏳ กำลังอัปเดตหน่วยขึ้น Cloud...');
+                await pushToCloud(CAT_KEY, stockCategories);
+                showToast('✅ บันทึกหน่วยสำเร็จ!');
 
                 // Re-render both tables to reflect unit selection dynamically
                 // (Using requestAnimationFrame to avoid blocking the initial select visual update)
