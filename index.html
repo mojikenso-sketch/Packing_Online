@@ -2594,6 +2594,11 @@
             }).sort();
 
             if (daysWithData.length === 0) {
+                if (charts.monthlySales) {
+                    charts.monthlySales.data.labels = Array.from({ length: 31 }, (_, i) => String(i + 1));
+                    charts.monthlySales.data.datasets[0].data = new Array(31).fill(0);
+                    charts.monthlySales.update('none');
+                }
                 wrapper.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:16px;text-align:center">ไม่มีข้อมูลยอดขายที่บันทึกใน ${monthNames[selMonth]} ${selYearBE}</div>`;
                 return;
             }
