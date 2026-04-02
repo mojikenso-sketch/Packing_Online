@@ -1463,16 +1463,27 @@
         }
 
         // ================= CLOUD SYNC FUNCTIONS =================
-        async function fetchFromCloud(key) {
+        async function fetchFromCloud(key, forceNetwork = false) {
+            if (!forceNetwork) {
+                const localSaved = localStorage.getItem(key);
+                if (localSaved) {
+                    try { return JSON.parse(localSaved); } catch (e) { }
+                }
+            }
             try {
                 const res = await fetch(`${API_URL}?key=${key}`);
                 const result = await res.json();
-                return result.status === 'success' ? JSON.parse(result.value) : null;
+                if (result.status === 'success' && result.value) {
+                    const parsed = JSON.parse(result.value);
+                    localStorage.setItem(key, JSON.stringify(parsed)); // Update local cache
+                    return parsed;
+                }
             } catch (e) {
-                console.log("Cloud Error, fallback to LocalStorage", e);
-                const saved = localStorage.getItem(key);
-                return saved ? JSON.parse(saved) : null;
+                console.log("Cloud Error", e);
             }
+            // If network fails (or returned null) and we didn't return early, try local one last time
+            const lastSaved = localStorage.getItem(key);
+            return lastSaved ? JSON.parse(lastSaved) : null;
         }
 
         async function pushToCloud(key, valObj) {
@@ -2499,7 +2510,8 @@
             }
 
             sorted.forEach(([item, info]) => {
-                const regex = /(\d+)\s*(ขวด|ซอง|กระป๋อง|ชิ้น|กล่อง|แผง|ชุด|หลอด|ก้อน|ลัง)/g;
+                // ตัวคูณเฉพาะหน่วยย่อย (ขวด,ซอง,...) ไม่เอา กล่อง/ลัง เพราะเป็นหน่วยหลักอยู่แล้ว
+                const regex = /[(（]?\s*(\d+)\s*(ขวด|ซอง|กระป๋อง|ชิ้น|แผง|ชุด|หลอด|ก้อน)\s*[)）]?/g;
                 let match;
                 let itemUnitMap = {};
                 let hasMatch = false;
@@ -2511,6 +2523,7 @@
                     if (!itemUnitMap[unit]) itemUnitMap[unit] = 0;
                     itemUnitMap[unit] += qty;
                 }
+                // ถ้าไม่พบหน่วยย่อย ให้ถือว่า 1 ชิ้นต่อ 1 กล่อง
                 if (!hasMatch) itemUnitMap['ชิ้น'] = 1;
 
                 if (!unitTotalsByGroup[info.group]) unitTotalsByGroup[info.group] = {};
@@ -2524,7 +2537,10 @@
                     if (!unitGrandTotal[unit]) unitGrandTotal[unit] = 0;
                     unitGrandTotal[unit] += totalForUnit;
                 }
-                info.unitString = formatUnitObj(rowUnitMap); // เก็บข้อความไว้ใช้ตอนสร้างตาราง
+                // สรุปตัวคูณออกมาโชว์ (ถ้ามีการคูณ)
+                const multipliers = Object.entries(itemUnitMap).map(([u, m]) => m > 1 ? `x${m} ${u}` : '').filter(v => v).join(', ');
+                info.multiplierTag = multipliers ? `<div style="font-size:10px;color:var(--text-muted)">(${multipliers})</div>` : '';
+                info.unitString = formatUnitObj(rowUnitMap); 
             });
 
             // --- โค้ดใหม่: สร้างตารางและเพิ่มคอลัมน์ ---
@@ -2544,7 +2560,7 @@
                 }
                 idx++;
 
-                tableHTML += `<tr><td>${idx}</td><td><span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(79,195,247,0.1);color:var(--text-secondary)">${info.group}</span></td><td style="text-align:left;font-weight:600">${item}</td><td class="cell-calc">${info.total.toLocaleString()}</td><td class="cell-calc" style="color:var(--accent-green); font-size:13px;">${info.unitString}</td>`;
+                tableHTML += `<tr><td>${idx}</td><td><span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(79,195,247,0.1);color:var(--text-secondary)">${info.group}</span></td><td style="text-align:left;font-weight:600">${item} ${info.multiplierTag || ''}</td><td class="cell-calc">${info.total.toLocaleString()}</td><td class="cell-calc" style="color:var(--accent-green); font-size:13px;">${info.unitString}</td>`;
                 activePlatforms.forEach(p => { const val = info.platforms[p] || 0; tableHTML += `<td>${val ? val.toLocaleString() : '-'}</td>`; });
                 tableHTML += '</tr>';
             });
