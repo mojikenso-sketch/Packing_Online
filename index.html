@@ -1069,7 +1069,8 @@
         </div>
 
         <!-- Second Row Charts Grid -->
-        <div class="charts-grid animate-in" id="monthlySecondRowCharts" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 24px;">
+        <div class="charts-grid animate-in" id="monthlySecondRowCharts"
+            style="grid-template-columns: repeat(2, 1fr); margin-bottom: 24px;">
             <!-- Category Sales chart -->
             <div class="chart-card" style="border-color: var(--glass-border); padding: 20px;">
                 <div class="chart-title"
@@ -1083,7 +1084,8 @@
                 <div class="chart-title"
                     style="font-size: 16px; margin-bottom: 16px; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px;">
                     📊 ยอดขายแยกตามสินค้า Top 15 (กล่อง)</div>
-                <div class="chart-container" style="height: 350px;"><canvas id="topProductsSalesChartMonth"></canvas></div>
+                <div class="chart-container" style="height: 350px;"><canvas id="topProductsSalesChartMonth"></canvas>
+                </div>
             </div>
         </div>
 
@@ -1316,6 +1318,7 @@
                         <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">
                             *ข้อมูลตารางนี้จะดึงจาก "ประวัติที่บันทึกแล้ว" หากบันทึกเพิ่มเติม ตารางนี้จะอัปเดตทันที
                         </div>
+                        <div id="monthlySummaryRow" class="order-summary-row" style="margin-bottom:24px;"></div>
                         <div class="table-wrapper" id="monthlyOrderTableWrapper"></div>
                     </div>
                 </div>
@@ -1984,8 +1987,8 @@
 
             charts.monthlySales = new Chart(document.getElementById('monthlySalesChart'), {
                 type: 'bar',
-                data: { 
-                    labels: Array.from({ length: 31 }, (_, i) => String(i + 1)), 
+                data: {
+                    labels: Array.from({ length: 31 }, (_, i) => String(i + 1)),
                     datasets: pKeys.map(p => ({
                         label: pNames[p],
                         data: new Array(31).fill(0),
@@ -2012,7 +2015,7 @@
                                     y = meta.y;
                                 }
                             });
-                            
+
                             if (totalValue > 0 && maxX > 0) {
                                 const pend = data.pendingData && data.pendingData[index] ? data.pendingData[index] : 0;
                                 const ret = data.returnData && data.returnData[index] ? data.returnData[index] : 0;
@@ -2540,7 +2543,7 @@
                 // สรุปตัวคูณออกมาโชว์ (ถ้ามีการคูณ)
                 const multipliers = Object.entries(itemUnitMap).map(([u, m]) => m > 1 ? `x${m} ${u}` : '').filter(v => v).join(', ');
                 info.multiplierTag = multipliers ? `<div style="font-size:10px;color:var(--text-muted)">(${multipliers})</div>` : '';
-                info.unitString = formatUnitObj(rowUnitMap); 
+                info.unitString = formatUnitObj(rowUnitMap);
             });
 
             // --- โค้ดใหม่: สร้างตารางและเพิ่มคอลัมน์ ---
@@ -2922,6 +2925,13 @@
                 wrapper.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:16px;text-align:center">ไม่พบข้อมูลใน Cloud สำหรับ ${monthNames[selMonth]} ${selYearBE}</div>`;
                 return;
             }
+
+            let summaryHTML = `
+                <div class="order-stat-card"><div class="stat-label">ยอดขายรวมทั้งเดือน</div><div class="stat-value" style="color:var(--accent-cyan)">${monthGrandTotal.toLocaleString()}</div><div style="font-size:12px;color:var(--text-muted)">กล่อง (จากประวัติ ${daysWithData.length} วัน)</div></div>
+                <div class="order-stat-card"><div class="stat-label">ค้างรวมทั้งเดือน</div><div class="stat-value" style="color:var(--accent-orange)">${monthGrandPendingTotal.toLocaleString()}</div><div style="font-size:12px;color:var(--text-muted)">กล่อง</div></div>
+                <div class="order-stat-card"><div class="stat-label">ตีคืนรวมทั้งเดือน</div><div class="stat-value" style="color:var(--accent-red)">${monthGrandReturnTotal.toLocaleString()}</div><div style="font-size:12px;color:var(--text-muted)">กล่อง</div></div>
+            `;
+            document.getElementById('monthlySummaryRow').innerHTML = summaryHTML;
 
             html += `<tr style="border-top:2px solid var(--accent-cyan); background:rgba(0,0,0,0.2);">
                      <td style="text-align:left;font-weight:800;color:var(--accent-cyan)">รวมทั้งเดือน</td>
