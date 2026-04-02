@@ -1740,9 +1740,11 @@
             stockCategories.forEach(cat => {
                 const unitHtml = `
                     <select class="unit-select" data-id="${cat.id}" onchange="changeCatUnit(this)" style="background:transparent;border:1px solid rgba(79,195,247,0.2);border-radius:4px;color:var(--text-muted);font-family:inherit;font-size:12px;outline:none;cursor:pointer;padding:2px 4px;">
-                        <option value="ขวด" ${(!cat.unit || cat.unit === 'ขวด' || cat.unit === 'กล่อง') ? 'selected' : ''}>ขวด</option>
+                        <option value="ขวด" ${(!cat.unit || cat.unit === 'ขวด') ? 'selected' : ''}>ขวด</option>
                         <option value="ซอง" ${cat.unit === 'ซอง' ? 'selected' : ''}>ซอง</option>
                         <option value="กระป๋อง" ${cat.unit === 'กระป๋อง' ? 'selected' : ''}>กระป๋อง</option>
+                        <option value="ลัง" ${cat.unit === 'ลัง' ? 'selected' : ''}>ลัง</option>
+                        <option value="กล่อง" ${cat.unit === 'กล่อง' ? 'selected' : ''}>กล่อง</option>
                     </select>
                 `;
                 html += `<tr class="row-stock"><td><span style="font-weight:700">${cat.name}</span></td><td class="cell-label">${unitHtml}</td>`;
@@ -2365,7 +2367,7 @@
             }
 
             sorted.forEach(([item, info]) => {
-                const regex = /(\d+)\s*(ขวด|ซอง|กระป๋อง|ชิ้น|กล่อง|แผง|ชุด|หลอด|ก้อน)/g;
+                const regex = /(\d+)\s*(ขวด|ซอง|กระป๋อง|ชิ้น|กล่อง|แผง|ชุด|หลอด|ก้อน|ลัง)/g;
                 let match;
                 let itemUnitMap = {};
                 let hasMatch = false;
@@ -2878,7 +2880,7 @@
             activePlatforms.forEach(p => csv += `${PLATFORM_NAMES[p]},`); csv += '\n';
 
             sorted.forEach(([item, info], index) => {
-                const match = item.match(/(\d+)\s*(ขวด|ซอง|กระป๋อง|ชิ้น)/);
+                const match = item.match(/(\d+)\s*(ขวด|ซอง|กระป๋อง|ชิ้น|กล่อง|แผง|ชุด|หลอด|ก้อน|ลัง)/);
                 const multiplier = match ? parseInt(match[1]) : 1;
                 const unitTotal = info.total * multiplier;
 
