@@ -2011,11 +2011,14 @@
             }
 
             // Create array of objects for sorting (รายสินค้า)
-            let sortedStock = stockCategories.map((cat, index) => ({
-                name: cat.name,
-                val: latestWH[cat.id] || 0,
-                color: colors[index % colors.length]
-            }));
+            let sortedStock = stockCategories.map((cat, index) => {
+                const groupInfo = PRODUCT_GROUPS[cat.group] || PRODUCT_GROUPS['ผสม/อื่นๆ'];
+                return {
+                    name: cat.name,
+                    val: latestWH[cat.id] || 0,
+                    color: groupInfo ? groupInfo.color : colors[index % colors.length]
+                };
+            });
 
             // Sort descending (มากสุดอยู่บน)
             sortedStock.sort((a, b) => b.val - a.val);
@@ -2815,7 +2818,19 @@
                 const commonChartOpts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#9fa8da', font: { family: 'Inter', size: 12 } } } }, scales: { x: { ticks: { color: '#5c6bc0', font: { size: 10 } }, grid: { color: 'rgba(79,195,247,0.06)' } }, y: { ticks: { color: '#5c6bc0', font: { size: 11 } }, grid: { color: 'rgba(79,195,247,0.06)' } } } };
 
                 if (orderCharts.product) orderCharts.product.destroy();
-                orderCharts.product = new Chart(document.getElementById('orderProductChart'), { type: 'bar', data: { labels: top15.map(([item]) => item.length > 25 ? item.substring(0, 25) + '...' : item), datasets: [{ label: 'กล่อง', data: top15.map(([, info]) => info.total), backgroundColor: pColors, borderRadius: 6 }] }, options: { ...commonChartOpts, indexAxis: 'y', plugins: { legend: { display: false } } } });
+                orderCharts.product = new Chart(document.getElementById('orderProductChart'), { 
+                    type: 'bar', 
+                    data: { 
+                        labels: top15.map(([item]) => item.length > 25 ? item.substring(0, 25) + '...' : item), 
+                        datasets: [{ 
+                            label: 'กล่อง', 
+                            data: top15.map(([, info]) => info.total), 
+                            backgroundColor: top15.map(([, info]) => PRODUCT_GROUPS[info.group] ? PRODUCT_GROUPS[info.group].color : 'rgba(79, 195, 247, 0.8)'),
+                            borderRadius: 6 
+                        }] 
+                    }, 
+                    options: { ...commonChartOpts, indexAxis: 'y', plugins: { legend: { display: false } } } 
+                });
 
                 if (orderCharts.platform) orderCharts.platform.destroy();
                 orderCharts.platform = new Chart(document.getElementById('orderPlatformChart'), { type: 'doughnut', data: { labels: activePlatforms.map(p => PLATFORM_NAMES[p]), datasets: [{ data: activePlatforms.map(p => platformTotals[p]), backgroundColor: activePlatforms.map(p => PLATFORM_COLORS[p]), borderColor: '#16213e', borderWidth: 2, hoverOffset: 10 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#9fa8da', font: { family: 'Inter', size: 13 }, padding: 20 } } } } });
