@@ -1466,27 +1466,28 @@
         }
 
         // ================= CLOUD SYNC FUNCTIONS =================
-        async function fetchFromCloud(key, forceNetwork = false) {
-            if (!forceNetwork) {
-                const localSaved = localStorage.getItem(key);
-                if (localSaved) {
-                    try { return JSON.parse(localSaved); } catch (e) { }
+        async function fetchFromCloud(key, forceNetwork = true) {
+            // Priority: Cloud (Network) -> Local Storage
+            if (forceNetwork) {
+                try {
+                    const res = await fetch(`${API_URL}?key=${key}`);
+                    const result = await res.json();
+                    if (result.status === 'success' && result.value) {
+                        const parsed = JSON.parse(result.value);
+                        localStorage.setItem(key, JSON.stringify(parsed)); // Update local cache
+                        return parsed;
+                    }
+                } catch (e) {
+                    console.log("Cloud Fetch Error, falling back to LocalStorage:", e);
                 }
             }
-            try {
-                const res = await fetch(`${API_URL}?key=${key}`);
-                const result = await res.json();
-                if (result.status === 'success' && result.value) {
-                    const parsed = JSON.parse(result.value);
-                    localStorage.setItem(key, JSON.stringify(parsed)); // Update local cache
-                    return parsed;
-                }
-            } catch (e) {
-                console.log("Cloud Error", e);
+
+            // Fallback to local storage if network fails or if specified
+            const localSaved = localStorage.getItem(key);
+            if (localSaved) {
+                try { return JSON.parse(localSaved); } catch (e) { }
             }
-            // If network fails (or returned null) and we didn't return early, try local one last time
-            const lastSaved = localStorage.getItem(key);
-            return lastSaved ? JSON.parse(lastSaved) : null;
+            return null;
         }
 
         async function pushToCloud(key, valObj) {
@@ -1568,6 +1569,9 @@
             setTimeout(() => {
                 for (let key in charts) { if (charts[key]) charts[key].resize(); }
                 for (let key in orderCharts) { if (orderCharts[key]) orderCharts[key].resize(); }
+                if (tabId === 'tab-orders') {
+                    syncHistoryIndex().then(() => renderHistoryList());
+                }
                 scrollToToday();
             }, 100);
         }
@@ -2259,7 +2263,7 @@
         // ดึง history index จาก Cloud และ merge กับ localStorage
         async function syncHistoryIndex() {
             try {
-                const cloudIndex = await fetchFromCloud('ot_order_history_index');
+                const cloudIndex = await fetchFromCloud('ot_order_history_index', true);
                 if (cloudIndex && Array.isArray(cloudIndex)) {
                     const localIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
                     // Merge: รวมทั้งสองแล้ว deduplicate และ sort
@@ -2731,7 +2735,7 @@
 
             let historyIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
             if (forceCloudSync) {
-                const cloudIndex = await fetchFromCloud('ot_order_history_index') || [];
+                const cloudIndex = await fetchFromCloud('ot_order_history_index', true) || [];
                 historyIndex = [...new Set([...cloudIndex, ...historyIndex])].sort().reverse();
                 localStorage.setItem('ot_order_history_index', JSON.stringify(historyIndex));
             }
@@ -2820,17 +2824,8 @@
                 const dayNum = parseInt(parts[2]);
                 const displayDate = `${dayNum}/${(selMonth + 1).toString().padStart(2, '0')}/${selYear2}`;
 
-                // อ่านจาก localStorage ก่อน ถ้าไม่มีค่อยดึงจาก Cloud
-                let entry = null;
-                const localSaved = localStorage.getItem('ot_order_history_' + dateKey);
-                if (localSaved) {
-                    try { entry = JSON.parse(localSaved); } catch (e) { }
-                }
-                if (!entry) {
-                    entry = await fetchFromCloud('ot_order_history_' + dateKey);
-                    // cache ลง localStorage เพื่อครั้งถัดไป
-                    if (entry) localStorage.setItem('ot_order_history_' + dateKey, JSON.stringify(entry));
-                }
+                // บังคับอ่านจาก Cloud เสมอเพื่อให้เห็นข้อมูลล่าสุดของทุกคน
+                let entry = await fetchFromCloud('ot_order_history_' + dateKey, true);
                 if (!entry) continue;
 
                 try {
@@ -2956,7 +2951,7 @@
 
         async function updatePendingReturn(dateKey, p, type, val) {
             const num = parseInt(val) || 0;
-            let entry = JSON.parse(localStorage.getItem('ot_order_history_' + dateKey));
+            let entry = await fetchFromCloud('ot_order_history_' + dateKey, true);
             if (!entry) return;
             if (!entry[type]) entry[type] = {};
             entry[type][p] = num;
@@ -3045,7 +3040,7 @@
             if (!container) return;
 
             // ดึง index จาก Cloud เสมอ เพื่อให้เห็นข้อมูลของทุกคน
-            let historyIndex = await fetchFromCloud('ot_order_history_index') || [];
+            let historyIndex = await fetchFromCloud('ot_order_history_index', true) || [];
             const localIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
             historyIndex = [...new Set([...historyIndex, ...localIndex])].sort().reverse();
             localStorage.setItem('ot_order_history_index', JSON.stringify(historyIndex));
@@ -3057,16 +3052,8 @@
 
             let html = '';
             for (const dateKey of historyIndex) {
-                // อ่านจาก localStorage ก่อน ถ้าไม่มีดึงจาก Cloud
-                let entry = null;
-                const localSaved = localStorage.getItem('ot_order_history_' + dateKey);
-                if (localSaved) {
-                    try { entry = JSON.parse(localSaved); } catch (e) { }
-                }
-                if (!entry) {
-                    entry = await fetchFromCloud('ot_order_history_' + dateKey);
-                    if (entry) localStorage.setItem('ot_order_history_' + dateKey, JSON.stringify(entry));
-                }
+                // บังคับอ่านจาก Cloud เสมอเพื่อให้เห็นข้อมูลล่าสุดของทุกคน
+                let entry = await fetchFromCloud('ot_order_history_' + dateKey, true);
                 if (!entry) continue;
 
                 try {
