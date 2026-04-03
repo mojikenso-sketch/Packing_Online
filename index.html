@@ -1921,6 +1921,10 @@
                 charts.rate.data.datasets[0].pointBackgroundColor = pointColors;
                 charts.rate.data.datasets[0].pointBorderColor = pointColors;
                 charts.rate.data.datasets[0].pointRadius = pointRadii;
+                
+                // ยืนยันค่ามาตรฐาน 45 ทุกครั้งที่อัปเดต เพื่อป้องกันปัญหาเส้นหายหรือขยับ
+                charts.rate.data.datasets[1].data = new Array(DAYS).fill(45);
+                
                 charts.rate.update('none');
 
                 const titleElem = document.getElementById('rateChartTitleTop');
@@ -1944,7 +1948,7 @@
                         { label: 'ค่ามาตรฐาน 45', data: new Array(DAYS).fill(45), borderColor: '#ff5252', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, fill: false }
                     ]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#9fa8da', font: { family: 'Inter', size: 12 } } } }, scales: { x: { ticks: { color: '#5c6bc0', font: { size: 10 } }, grid: { color: 'rgba(79,195,247,0.06)' } }, y: { ticks: { color: '#5c6bc0', font: { size: 11 } }, grid: { color: 'rgba(79,195,247,0.06)' } } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#9fa8da', font: { family: 'Inter', size: 12 } } } }, scales: { x: { ticks: { color: '#5c6bc0', font: { size: 10 } }, grid: { color: 'rgba(79,195,247,0.06)' } }, y: { min: 0, suggestedMax: 50, ticks: { color: '#5c6bc0', font: { size: 11 } }, grid: { color: 'rgba(79,195,247,0.06)' } } } }
             });
 
             charts.latestStock = new Chart(document.getElementById('latestStockChart'), {
@@ -2219,9 +2223,9 @@
             document.getElementById('orderDateInput').value = getTodayString();
 
             // Sync history index จาก Cloud ก่อน แล้วค่อย render (async)
-            syncHistoryIndex().then(() => {
-                renderHistoryList();
-                renderMonthlyOrderSummary();
+            syncHistoryIndex().then(async () => {
+                await renderHistoryList();
+                await renderMonthlyOrderSummary();
             });
 
             // ======== SYNC ทิศทาง: Header → Tab 4 ========
@@ -2891,7 +2895,10 @@
                 });
                 charts.monthlySales.data.pendingData = pendingDailyData;
                 charts.monthlySales.data.returnData = returnDailyData;
-                charts.monthlySales.update('none');
+                
+                // ใช้ update() ปกติแทน 'none' สำหรับครั้งแรกเพื่อให้ Chart.js คำนวณ Layout ใหม่ทั้งหมด
+                charts.monthlySales.update();
+                charts.monthlySales.resize();
             }
 
             if (charts.categorySalesMonth) {
