@@ -1039,7 +1039,7 @@
         </header>
 
         <!-- Top Charts Grid (Shared half tracking) -->
-        <div class="charts-grid animate-in" style="margin-bottom: 24px;">
+        <div class="charts-grid animate-in" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 24px;">
             <!-- Latest Stock bar chart (Left) -->
             <div class="chart-card" style="border-color: var(--glass-border); padding: 20px;">
                 <div class="chart-title"
@@ -1049,14 +1049,6 @@
                 <div class="chart-container" style="height: 400px;">
                     <canvas id="latestStockChart"></canvas>
                 </div>
-            </div>
-
-            <!-- Production Rate line chart (Middle) -->
-            <div class="chart-card" style="border-color: var(--glass-border); padding: 20px;">
-                <div class="chart-title" id="rateChartTitleTop"
-                    style="font-size: 16px; margin-bottom: 16px; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px;">
-                    ⏱️ ขวด/วินาที/คน (ยิ่งน้อยยิ่งเร็ว)</div>
-                <div class="chart-container" style="height: 400px;"><canvas id="rateChart"></canvas></div>
             </div>
 
             <!-- Monthly Sales bar chart (Right) -->
@@ -1070,7 +1062,7 @@
 
         <!-- Second Row Charts Grid -->
         <div class="charts-grid animate-in" id="monthlySecondRowCharts"
-            style="grid-template-columns: repeat(2, 1fr); margin-bottom: 24px;">
+            style="grid-template-columns: repeat(3, 1fr); margin-bottom: 24px;">
             <!-- Category Sales chart -->
             <div class="chart-card" style="border-color: var(--glass-border); padding: 20px;">
                 <div class="chart-title"
@@ -1086,6 +1078,14 @@
                     📊 ยอดขายแยกตามสินค้า Top 15 (กล่อง)</div>
                 <div class="chart-container" style="height: 350px;"><canvas id="topProductsSalesChartMonth"></canvas>
                 </div>
+            </div>
+
+            <!-- Production Rate line chart (Far Right) -->
+            <div class="chart-card" style="border-color: var(--glass-border); padding: 20px;">
+                <div class="chart-title" id="rateChartTitleTop"
+                    style="font-size: 16px; margin-bottom: 16px; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px;">
+                    ⏱️ ขวด/วินาที/คน (ยิ่งน้อยยิ่งเร็ว)</div>
+                <div class="chart-container" style="height: 350px;"><canvas id="rateChart"></canvas></div>
             </div>
         </div>
 
