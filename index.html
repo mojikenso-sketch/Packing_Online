@@ -2921,20 +2921,20 @@
 
             if (charts.categorySalesMonth) {
                 const groupOrder = Object.keys(PRODUCT_GROUPS);
-                const gLabels = [];
-                const gData = [];
-                const gColors = [];
-                groupOrder.forEach(g => {
-                    const val = monthGroupTotals[g] || 0;
-                    if (val > 0) {
-                        gLabels.push(PRODUCT_GROUPS[g].label);
-                        gData.push(val);
-                        gColors.push(PRODUCT_GROUPS[g].color);
-                    }
-                });
-                charts.categorySalesMonth.data.labels = gLabels;
-                charts.categorySalesMonth.data.datasets[0].data = gData;
-                charts.categorySalesMonth.data.datasets[0].backgroundColor = gColors;
+                let sortedGroups = groupOrder.map(g => {
+                    return {
+                        label: PRODUCT_GROUPS[g].label,
+                        val: monthGroupTotals[g] || 0,
+                        color: PRODUCT_GROUPS[g].color
+                    };
+                }).filter(g => g.val > 0);
+
+                // เรียงจากมากไปน้อย (descending)
+                sortedGroups.sort((a, b) => b.val - a.val);
+
+                charts.categorySalesMonth.data.labels = sortedGroups.map(g => g.label);
+                charts.categorySalesMonth.data.datasets[0].data = sortedGroups.map(g => g.val);
+                charts.categorySalesMonth.data.datasets[0].backgroundColor = sortedGroups.map(g => g.color);
                 charts.categorySalesMonth.update('none');
             }
 
