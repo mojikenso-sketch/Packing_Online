@@ -1718,10 +1718,11 @@
             items.forEach(item => {
                 const id = item.querySelector('.cat-id').value;
                 const name = item.querySelector('.cat-name').value.trim();
+                const group = item.querySelector('.cat-group').value;
                 if (name) {
                     const existingCat = stockCategories.find(c => c.id === id);
                     const unit = existingCat && existingCat.unit ? existingCat.unit : 'ขวด';
-                    newCategories.push({ id, name, unit });
+                    newCategories.push({ id, name, unit, group });
                 }
             });
             if (newCategories.length === 0) return alert('ต้องมีอย่างน้อย 1 ประเภทครับ');
@@ -2365,14 +2366,15 @@
         const PLATFORM_COLORS = { shopee: 'rgba(255, 87, 34, 0.8)', lazada: 'rgba(123, 127, 246, 0.8)', flash: 'rgba(255, 193, 7, 0.8)', best: 'rgba(233, 30, 99, 0.8)' };
 
         const PRODUCT_GROUPS = {
-            'SO': { emoji: '🧴', color: 'rgba(79, 195, 247, 0.8)', label: 'SO' },
-            'E1H': { emoji: '🫧', color: 'rgba(105, 240, 174, 0.8)', label: 'E1H' },
-            'Ricely': { emoji: '🌾', color: 'rgba(255, 215, 64, 0.8)', label: 'Ricely' },
-            'STN': { emoji: '🧪', color: 'rgba(179, 136, 255, 0.8)', label: 'STN' },
-            'SIN': { emoji: '🧴', color: 'rgba(255, 171, 64, 0.8)', label: 'SIN' },
-            'NDC': { emoji: '📦', color: 'rgba(0, 229, 255, 0.8)', label: 'NDC' },
-            'CRD': { emoji: '🎁', color: 'rgba(233, 30, 99, 0.8)', label: 'CRD' },
-            'DUO SET': { emoji: '🎯', color: 'rgba(76, 175, 80, 0.8)', label: 'DUO SET' },
+            'คิง 10,000 ppm.': { emoji: '🌿', color: 'rgba(79, 195, 247, 0.8)', label: 'คิง น้ำมันรำข้าว 10,000 ppm.' },
+            'King 13,500 ppm.': { emoji: '🫧', color: 'rgba(105, 240, 174, 0.8)', label: 'King น้ำมันรำข้าว 13,500 ppm.' },
+            'ไรซ์ลี่ 15,000 ppm.': { emoji: '🌾', color: 'rgba(255, 215, 64, 0.8)', label: 'ไรซ์ลี่ 15,000 ppm.' },
+            'ชอร์ตเทนนิ่ง 700 กรัม': { emoji: '🧈', color: 'rgba(179, 136, 255, 0.8)', label: 'King ชอร์ตเทนนิ่ง 700 กรัม' },
+            'ชอร์ตเทนนิ่ง 5 กก.': { emoji: '📦', color: 'rgba(0, 229, 255, 0.8)', label: 'King ชอร์ตเทนนิ่ง 5 กก.' },
+            'ครีมไรซ์ลี่ 200 กรัม': { emoji: '🍦', color: 'rgba(233, 30, 99, 0.8)', label: 'ครีมไรซ์ลี่ 200 กรัม' },
+            'ไรซ์ลี่ งาดำ': { emoji: '☕', color: 'rgba(76, 175, 80, 0.8)', label: 'เครื่องดื่มงาดำ ไรซ์ลี่' },
+            'ไรซ์ลี่ ธัญญาหาร': { emoji: '🥣', color: 'rgba(255, 171, 64, 0.8)', label: 'เครื่องดื่มธัญญาหาร ไรซ์ลี่' },
+            'DUO SET': { emoji: '🎯', color: 'rgba(255, 82, 82, 0.8)', label: 'DUO SET' },
             'ผสม/อื่นๆ': { emoji: '🔀', color: 'rgba(158, 158, 158, 0.8)', label: 'ผสม/อื่นๆ' },
         };
 
@@ -2382,19 +2384,34 @@
 
         function detectProductGroup(itemName) {
             const name = itemName.trim();
-            if (name.includes('+')) {
-                if (name.toUpperCase().includes('DUO SET') || name.toUpperCase().includes('DUO')) return 'DUO SET';
-                return 'ผสม/อื่นๆ';
-            }
             const upper = name.toUpperCase();
-            if (upper.startsWith('SO ') || upper === 'SO') return 'SO';
-            if (upper.startsWith('E1H ') || upper.startsWith('E1H') && (upper.length === 3 || !upper[3].match(/[A-Z]/i))) return 'E1H';
-            if (upper.startsWith('RICELY')) return 'Ricely';
-            if (upper.startsWith('STN ') || upper.startsWith('STN') && (upper.length === 3 || !upper[3].match(/[A-Z]/i))) return 'STN';
-            if (upper.startsWith('SIN ') || upper.startsWith('SIN') && (upper.length === 3 || !upper[3].match(/[A-Z]/i))) return 'SIN';
-            if (upper.startsWith('NDC ') || upper.startsWith('NDC') && (upper.length === 3 || !upper[3].match(/[A-Z]/i))) return 'NDC';
-            if (upper.startsWith('CRD ') || upper.startsWith('CRD') && (upper.length === 3 || !upper[3].match(/[A-Z]/i))) return 'CRD';
-            if (upper.includes('DUO SET') || upper.includes('DUO')) return 'DUO SET';
+            
+            // Duo Set ตรวจสอบก่อน
+            if (upper.includes('DUO SET') || upper.includes('DUO') || name.includes('+')) return 'DUO SET';
+            
+            // น้ำมันรำข้าวพรีเมียม
+            if (name.includes('10,000') || name.includes('10000')) return 'คิง 10,000 ppm.';
+            if (name.includes('13,500') || name.includes('13500')) return 'King 13,500 ppm.';
+            if (upper.includes('RICELY') && name.includes('15,000')) return 'ไรซ์ลี่ 15,000 ppm.';
+            
+            // ชอร์ตเทนนิ่ง
+            if (upper.includes('SHORTENING') || name.includes('ชอร์ตเทนนิ่ง')) {
+                if (name.includes('700')) return 'ชอร์ตเทนนิ่ง 700 กรัม';
+                if (name.includes('5 ') || name.includes('5ก') || name.includes('5 กก')) return 'ชอร์ตเทนนิ่ง 5 กก.';
+            }
+            
+            // ครีมและเครื่องดื่ม
+            if (name.includes('ครีม')) return 'ครีมไรซ์ลี่ 200 กรัม';
+            if (name.includes('เครื่องดื่ม') || upper.includes('BEVERAGE')) {
+                if (name.includes('งาดำ')) return 'ไรซ์ลี่ งาดำ';
+                if (name.includes('ธัญญาหาร')) return 'ไรซ์ลี่ ธัญญาหาร';
+            }
+            
+            // เกณฑ์เดิมบางส่วน (Fallback)
+            if (upper.startsWith('SO ')) return 'คิง 10,000 ppm.';
+            if (upper.startsWith('E1H ')) return 'King 13,500 ppm.';
+            if (upper.startsWith('RICELY')) return 'ไรซ์ลี่ 15,000 ppm.';
+            
             return 'ผสม/อื่นๆ';
         }
 
