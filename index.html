@@ -2414,10 +2414,10 @@
             const monthBtn = document.getElementById('modeBtn-month');
             if (mode === 'day') {
                 dayBtn.style.background = 'var(--accent-cyan)'; dayBtn.style.color = '#0d1b2a';
-                monthBtn.style.background = 'transparent'; monthBtn.style.color = 'var(--text-muted)';
+                monthBtn.style.background = 'transparent'; monthBtn.style.color = '#var(--text-muted)';
             } else {
                 monthBtn.style.background = 'var(--accent-purple)'; monthBtn.style.color = '#fff';
-                dayBtn.style.background = 'transparent'; dayBtn.style.color = 'var(--text-muted)';
+                dayBtn.style.background = 'transparent'; dayBtn.style.color = '#var(--text-muted)';
             }
         }
 
@@ -2651,15 +2651,15 @@
             const cloudKey = 'ot_order_history_' + dateKey;
             await pushToCloud(cloudKey, historyEntry);
 
-            // อัปเดต index ทั้ง localStorage และ Cloud เพื่อให้ทุก session เห็นข้อมูลตรงกัน
-            let historyIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
-            if (!historyIndex.includes(dateKey)) {
-                historyIndex.push(dateKey);
-                historyIndex.sort().reverse();
-                localStorage.setItem('ot_order_history_index', JSON.stringify(historyIndex));
-            }
-            // Push index ขึ้น Cloud ด้วย (สำคัญ! ทำให้ session อื่นเห็นครบ)
-            await pushToCloud('ot_order_history_index', historyIndex);
+            // อัปเดต Index แบบ Fetch-Merge-Push (ป้องกันการบันทึกทับจนข้อมูลคนอื่นหาย)
+            let cloudIndex = await fetchFromCloud('ot_order_history_index', true) || [];
+            let localIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
+            
+            // รวมทั้ง Cloud, Local และตัวใหม่เข้าด้วยกัน
+            let newIndex = [...new Set([...cloudIndex, ...localIndex, dateKey])].sort().reverse();
+            
+            localStorage.setItem('ot_order_history_index', JSON.stringify(newIndex));
+            await pushToCloud('ot_order_history_index', newIndex);
 
             showToast(`✅ บันทึกประวัติยอดขาย ${dateKey} สำเร็จ!`);
             renderHistoryList();
@@ -2670,7 +2670,7 @@
             const dateKey = dateOverride || getOrderDateKey();
             const cloudKey = 'ot_order_history_' + dateKey;
             showToast('⏳ กำลังโหลดประวัติ...');
-            const saved = await fetchFromCloud(cloudKey);
+            const saved = await fetchFromCloud(cloudKey, true); // Force network read
             if (!saved) {
                 // ❌ ไม่พบข้อมูล → เคลียร์ UI ทั้งหมดให้เป็น default ว่างเปล่า
                 platformData = {}; platformFiles = {};
@@ -2691,6 +2691,13 @@
                 return showToast('⚠️ ไม่พบประวัติของวันที่ ' + dateKey);
             }
 
+            // ตรวจสอบว่าวันที่นี้อยู่ใน Index หรือไม่ (ถ้าไม่มี ให้ซ่อมแซมแอบเติมเข้าไปอัตโนมัติ)
+            let localIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
+            if (!localIndex.includes(dateKey)) {
+                console.log(`Auto-Repair: Adding ${dateKey} back to history index...`);
+                repairHistoryIndex(dateKey);
+            }
+
             try {
                 platformData = {}; platformFiles = {};
                 PLATFORMS.forEach(p => {
@@ -2709,8 +2716,24 @@
                 });
                 document.getElementById('orderDateInput').value = dateKey;
                 consolidateOrders();
+                renderHistoryList(); // อัปเดตรายการด้านล่าง
                 showToast(`📂 โหลดประวัติ ${dateKey} สำเร็จ!`);
             } catch (e) { showToast('❌ โหลดประวัติไม่สำเร็จ'); }
+        }
+
+        async function repairHistoryIndex(dateKey) {
+            try {
+                let cloudIndex = await fetchFromCloud('ot_order_history_index', true) || [];
+                if (!cloudIndex.includes(dateKey)) {
+                    cloudIndex.push(dateKey);
+                    cloudIndex.sort().reverse();
+                    await pushToCloud('ot_order_history_index', cloudIndex);
+                    const localIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
+                    const merged = [...new Set([...localIndex, ...cloudIndex])].sort().reverse();
+                    localStorage.setItem('ot_order_history_index', JSON.stringify(merged));
+                    renderHistoryList();
+                }
+            } catch (e) { console.log('Repair logic skipped (network issue):', e); }
         }
 
         // ================= SUMMARY MONTHLY ORDER =================
