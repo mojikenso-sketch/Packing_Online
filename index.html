@@ -1845,15 +1845,24 @@
 
             stockCategories.forEach(cat => {
                 const multiplier = getConversionMultiplier(cat);
-                const unitHtml = `
-                    <select class="unit-select" data-id="${cat.id}" onchange="changeCatUnit(this)" style="background:transparent;border:1px solid rgba(79,195,247,0.2);border-radius:4px;color:var(--text-muted);font-family:inherit;font-size:12px;outline:none;cursor:pointer;padding:2px 4px;">
-                        <option value="ขวด" ${(!cat.unit || cat.unit === 'ขวด') ? 'selected' : ''}>ขวด</option>
-                        <option value="ซอง" ${cat.unit === 'ซอง' ? 'selected' : ''}>ซอง</option>
-                        <option value="กระป๋อง" ${cat.unit === 'กระป๋อง' ? 'selected' : ''}>กระป๋อง</option>
-                        <option value="ลัง" ${cat.unit === 'ลัง' ? 'selected' : ''}>ลัง</option>
-                        <option value="กล่อง" ${cat.unit === 'กล่อง' ? 'selected' : ''}>กล่อง</option>
-                    </select>
-                `;
+                let unitHtml = '';
+                
+                if (currentStockViewUnit === 'ลัง') {
+                    // หากอยู่ในโหมด ลัง ให้แสดงข้อความสะท้อนโหมดนั้นออกมาเลย
+                    unitHtml = `<span style="font-size:12px; color:var(--accent-purple); font-weight:600;">ลัง</span>`;
+                } else {
+                    // โหมดขวด/ชิ้นปกติ ให้แสดง Dropdown เหมือนเดิม
+                    unitHtml = `
+                        <select class="unit-select" data-id="${cat.id}" onchange="changeCatUnit(this)" style="background:transparent;border:1px solid rgba(79,195,247,0.2);border-radius:4px;color:var(--text-muted);font-family:inherit;font-size:12px;outline:none;cursor:pointer;padding:2px 4px;">
+                            <option value="ขวด" ${(!cat.unit || cat.unit === 'ขวด') ? 'selected' : ''}>ขวด</option>
+                            <option value="ซอง" ${cat.unit === 'ซอง' ? 'selected' : ''}>ซอง</option>
+                            <option value="กระป๋อง" ${cat.unit === 'กระป๋อง' ? 'selected' : ''}>กระป๋อง</option>
+                            <option value="ลัง" ${cat.unit === 'ลัง' ? 'selected' : ''}>ลัง</option>
+                            <option value="กล่อง" ${cat.unit === 'กล่อง' ? 'selected' : ''}>กล่อง</option>
+                        </select>
+                    `;
+                }
+                
                 html += `<tr class="row-stock"><td><span style="font-weight:700">${cat.name}</span></td><td class="cell-label">${unitHtml}</td>`;
                 for (let i = 1; i <= DAYS; i++) {
                     const rawVal = parseFloat(data[i][type][cat.id]) || 0;
