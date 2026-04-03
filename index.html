@@ -1885,14 +1885,27 @@
             stockCategories.forEach(cat => {
                 const group = cat.group || 'ผสม/อื่นๆ';
                 const val = latestWH[cat.id] || 0;
-                stockGroupTotals[group] = (stockGroupTotals[group] || 0) + val;
+                
+                // กระจายยอด DUO SET ลงกลุ่มย่อย
+                if (group === 'DUO SET') {
+                    DUO_SPLIT.forEach(g => {
+                        stockGroupTotals[g] = (stockGroupTotals[g] || 0) + val;
+                    });
+                } else {
+                    stockGroupTotals[group] = (stockGroupTotals[group] || 0) + val;
+                }
             });
 
-            const sortedStockGroups = Object.keys(PRODUCT_GROUPS).map(g => ({
-                label: PRODUCT_GROUPS[g].label,
-                val: stockGroupTotals[g] || 0,
-                color: PRODUCT_GROUPS[g].color
-            })).filter(g => g.val > 0).sort((a, b) => b.val - a.val);
+            // กรองกลุ่ม DUO SET ออกไม่ให้โชว์ในกราฟ และเรียงลำดับ
+            const sortedStockGroups = Object.keys(PRODUCT_GROUPS)
+                .filter(g => g !== 'DUO SET') // ลบ DUO SET ออกจากการแสดงผล
+                .map(g => ({
+                    label: PRODUCT_GROUPS[g].label,
+                    val: stockGroupTotals[g] || 0,
+                    color: PRODUCT_GROUPS[g].color
+                }))
+                .filter(g => g.val > 0)
+                .sort((a, b) => b.val - a.val);
 
             if (charts.stockGroup) {
                 charts.stockGroup.data.labels = sortedStockGroups.map(g => g.label);
