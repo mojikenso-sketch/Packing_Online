@@ -1122,7 +1122,20 @@
                     <div class="section animate-in">
                         <div class="section-header">
                             <div class="section-title"><span>🏪</span> Stock ในคลัง</div>
+                            <div class="unit-toggle-group" style="display:flex; background:rgba(0,0,0,0.2); border-radius:10px; padding:4px; border:1px solid var(--glass-border);">
+                                <button class="unit-toggle-btn active" data-unit="ขวด" onclick="setStockViewUnit('ขวด')" 
+                                    style="padding:6px 16px; border:none; border-radius:8px; background:transparent; color:var(--text-muted); font-weight:600; cursor:pointer; transition:all 0.3s;">ขวด/หน่วย</button>
+                                <button class="unit-toggle-btn" data-unit="ลัง" onclick="setStockViewUnit('ลัง')" 
+                                    style="padding:6px 16px; border:none; border-radius:8px; background:transparent; color:var(--text-muted); font-weight:600; cursor:pointer; transition:all 0.3s;">ลัง</button>
+                            </div>
                         </div>
+                        <style>
+                            .unit-toggle-btn.active {
+                                background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan)) !important;
+                                color: var(--bg-primary) !important;
+                                box-shadow: 0 4px 12px rgba(79, 195, 247, 0.2);
+                            }
+                        </style>
                         <div class="table-wrapper" id="warehouseTableWrapper"></div>
                     </div>
 
@@ -1465,6 +1478,31 @@
         let stockCategories = DEFAULT_CATEGORIES;
         let data = {};
         let charts = {};
+        let currentStockViewUnit = 'ขวด'; // Global unit toggle for Stock ('ขวด' or 'ลัง')
+
+        function getConversionMultiplier(cat) {
+            if (!cat) return 12;
+            const name = (cat.name || '').toLowerCase();
+            // พิเศษ: ไขน้ำมันรำข้าว 5กก. -> 1 ลัง = 1 ลัง
+            if (name.includes('5กก') || name.includes('5 กก')) return 1;
+            // ถ้าหน่วยที่ตั้งไว้เป็น "กล่อง" (กล่องเล็ก) -> 1 ลัง = 6 กล่อง
+            if (cat.unit === 'กล่อง') return 6;
+            // อื่นๆ (ขวด, ซอง, กระป๋อง) -> 1 ลัง = 12 หน่วย
+            return 12;
+        }
+
+        function setStockViewUnit(unit) {
+            currentStockViewUnit = unit;
+            // อัปเดต UI ปุ่ม
+            document.querySelectorAll('.unit-toggle-btn').forEach(btn => {
+                if (btn.dataset.unit === unit) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+            // Re-render ตารางที่เกี่ยวข้อง
+            renderDynamicTable('warehouseTableWrapper', 'warehouse');
+            renderDynamicTable('stockTableWrapper', 'stock');
+        }
+
         const _currentDate = new Date();
         const _todayNum = _currentDate.getDate();
         const colors = ['#4fc3f7', '#69f0ae', '#b388ff', '#ffd740', '#ff5252', '#00e5ff', '#ffab40'];
@@ -1806,6 +1844,7 @@
             html += '</tr></thead><tbody>';
 
             stockCategories.forEach(cat => {
+                const multiplier = getConversionMultiplier(cat);
                 const unitHtml = `
                     <select class="unit-select" data-id="${cat.id}" onchange="changeCatUnit(this)" style="background:transparent;border:1px solid rgba(79,195,247,0.2);border-radius:4px;color:var(--text-muted);font-family:inherit;font-size:12px;outline:none;cursor:pointer;padding:2px 4px;">
                         <option value="ขวด" ${(!cat.unit || cat.unit === 'ขวด') ? 'selected' : ''}>ขวด</option>
@@ -1817,16 +1856,37 @@
                 `;
                 html += `<tr class="row-stock"><td><span style="font-weight:700">${cat.name}</span></td><td class="cell-label">${unitHtml}</td>`;
                 for (let i = 1; i <= DAYS; i++) {
-                    const val = data[i][type][cat.id] || '';
-                    html += `<td${i === _todayNum ? ' class="is-today-col"' : ''}><input class="cell-input" type="number" data-day="${i}" data-cat="${cat.id}" data-type="${type}" value="${val}" placeholder="0" onchange="onCatChange(this)"></td>`;
+                    const rawVal = parseFloat(data[i][type][cat.id]) || 0;
+                    let displayedVal = '';
+                    if (rawVal > 0) {
+                        if (currentStockViewUnit === 'ลัง') {
+                            const val = rawVal / multiplier;
+                            displayedVal = Number.isInteger(val) ? val : parseFloat(val.toFixed(2));
+                        } else {
+                            displayedVal = rawVal;
+                        }
+                    }
+                    html += `<td${i === _todayNum ? ' class="is-today-col"' : ''}><input class="cell-input" type="number" step="any" data-day="${i}" data-cat="${cat.id}" data-type="${type}" value="${displayedVal}" placeholder="0" onchange="onCatChange(this)"></td>`;
                 }
                 html += '</tr>';
             });
 
             html += '<tr style="border-top: 2px solid var(--glass-border)"><td style="font-weight:700;color:var(--accent-cyan)">รวมทั้งหมด</td><td class="cell-label">-</td>';
             for (let i = 1; i <= DAYS; i++) {
-                const total = stockCategories.reduce((sum, c) => sum + (parseFloat(data[i][type][c.id]) || 0), 0);
-                html += `<td class="cell-calc${i === _todayNum ? ' is-today-col' : ''}" id="${type}-total-${i}">${total > 0 ? parseFloat(total.toFixed(2)) : '-'}</td>`;
+                // คำนวณยอดรวมขวดก่อนเสมอ
+                const totalBottles = stockCategories.reduce((sum, c) => sum + (parseFloat(data[i][type][c.id]) || 0), 0);
+                let displayedTotal = '-';
+                if (totalBottles > 0) {
+                    if (currentStockViewUnit === 'ลัง') {
+                        // การแสดงยอดรวมเป็น "ลัง" อาจจะไม่เป๊ะหากแต่ละแถวตัวคูณไม่เท่ากัน 
+                        // แต่ในที่นี้เราจะใช้ค่าเฉลี่ยหรือยอดขวดรวมหาร 12 (ซึ่งเป็นลังมาตรฐาน) เพื่อความง่าย
+                        const val = totalBottles / 12;
+                        displayedTotal = Number.isInteger(val) ? val : parseFloat(val.toFixed(2));
+                    } else {
+                        displayedTotal = parseFloat(totalBottles.toFixed(2));
+                    }
+                }
+                html += `<td class="cell-calc${i === _todayNum ? ' is-today-col' : ''}" id="${type}-total-${i}">${displayedTotal}</td>`;
             }
             html += '</tr></tbody></table>';
             wrapper.innerHTML = html;
@@ -1844,9 +1904,30 @@
 
         function onCatChange(el) {
             const day = el.dataset.day, catId = el.dataset.cat, type = el.dataset.type;
-            data[day][type][catId] = el.value;
-            const total = stockCategories.reduce((sum, c) => sum + (parseFloat(data[day][type][c.id]) || 0), 0);
-            document.getElementById(`${type}-total-${day}`).textContent = total > 0 ? parseFloat(total.toFixed(2)) : '-';
+            const cat = stockCategories.find(c => c.id === catId);
+            const multiplier = getConversionMultiplier(cat);
+            const inputVal = parseFloat(el.value) || 0;
+
+            // แปลงค่ากลับเป็นหน่วยหลัก (ขวด) ก่อนบันทึก
+            let savedVal = inputVal;
+            if (currentStockViewUnit === 'ลัง') {
+                savedVal = inputVal * multiplier;
+            }
+
+            data[day][type][catId] = savedVal;
+            
+            // อัปเดตยอดรวมท้ายตาราง
+            const totalBottles = stockCategories.reduce((sum, c) => sum + (parseFloat(data[day][type][c.id]) || 0), 0);
+            let displayedTotal = '-';
+            if (totalBottles > 0) {
+                if (currentStockViewUnit === 'ลัง') {
+                    const val = totalBottles / 12;
+                    displayedTotal = Number.isInteger(val) ? val : parseFloat(val.toFixed(2));
+                } else {
+                    displayedTotal = parseFloat(totalBottles.toFixed(2));
+                }
+            }
+            document.getElementById(`${type}-total-${day}`).textContent = displayedTotal;
             updateSummaryAndCharts(); autoSaveLocal();
         }
 
@@ -1885,7 +1966,7 @@
             stockCategories.forEach(cat => {
                 const group = cat.group || 'ผสม/อื่นๆ';
                 const val = latestWH[cat.id] || 0;
-                
+
                 // กระจายยอด DUO SET ลงกลุ่มย่อย
                 if (group === 'DUO SET') {
                     DUO_SPLIT.forEach(g => {
@@ -1984,10 +2065,10 @@
                 charts.rate.data.datasets[0].pointBackgroundColor = pointColors;
                 charts.rate.data.datasets[0].pointBorderColor = pointColors;
                 charts.rate.data.datasets[0].pointRadius = pointRadii;
-                
+
                 // ยืนยันค่ามาตรฐาน 45 ทุกครั้งที่อัปเดต เพื่อป้องกันปัญหาเส้นหายหรือขยับ
                 charts.rate.data.datasets[1].data = new Array(DAYS).fill(45);
-                
+
                 charts.rate.update('none');
 
                 const titleElem = document.getElementById('rateChartTitleTop');
@@ -2394,40 +2475,40 @@
         let platformData = {};
         let platformFiles = {};
         let orderCharts = {};
-        
+
         // กฎการแยกส่วนประกอบ DUO SET
         const DUO_SPLIT = ['คิง 10,000 ppm.', 'King 13,500 ppm.'];
 
         function detectProductGroup(itemName) {
             const name = itemName.trim();
             const upper = name.toUpperCase();
-            
+
             // Duo Set ตรวจสอบก่อน
             if (upper.includes('DUO SET') || upper.includes('DUO') || name.includes('+')) return 'DUO SET';
-            
+
             // น้ำมันรำข้าวพรีเมียม
             if (name.includes('10,000') || name.includes('10000')) return 'คิง 10,000 ppm.';
             if (name.includes('13,500') || name.includes('13500')) return 'King 13,500 ppm.';
             if (upper.includes('RICELY') && name.includes('15,000')) return 'ไรซ์ลี่ 15,000 ppm.';
-            
+
             // ชอร์ตเทนนิ่ง
             if (upper.includes('SHORTENING') || name.includes('ชอร์ตเทนนิ่ง')) {
                 if (name.includes('700')) return 'ชอร์ตเทนนิ่ง 700 กรัม';
                 if (name.includes('5 ') || name.includes('5ก') || name.includes('5 กก')) return 'ชอร์ตเทนนิ่ง 5 กก.';
             }
-            
+
             // ครีมและเครื่องดื่ม
             if (name.includes('ครีม')) return 'ครีมไรซ์ลี่ 200 กรัม';
             if (name.includes('เครื่องดื่ม') || upper.includes('BEVERAGE')) {
                 if (name.includes('งาดำ')) return 'ไรซ์ลี่ งาดำ';
                 if (name.includes('ธัญญาหาร')) return 'ไรซ์ลี่ ธัญญาหาร';
             }
-            
+
             // เกณฑ์เดิมบางส่วน (Fallback)
             if (upper.startsWith('SO ')) return 'คิง 10,000 ppm.';
             if (upper.startsWith('E1H ')) return 'King 13,500 ppm.';
             if (upper.startsWith('RICELY')) return 'ไรซ์ลี่ 15,000 ppm.';
-            
+
             return 'ผสม/อื่นๆ';
         }
 
@@ -2579,8 +2660,8 @@
                     const normalizedItem = normalizeItemName(item); const group = detectProductGroup(normalizedItem);
                     if (!allItems[normalizedItem]) allItems[normalizedItem] = { total: 0, platforms: {}, group };
                     allItems[normalizedItem].total += qty; allItems[normalizedItem].platforms[p] = (allItems[normalizedItem].platforms[p] || 0) + qty;
-                    pTotal += qty; grandTotal += qty; 
-                    
+                    pTotal += qty; grandTotal += qty;
+
                     // กระจายยอดกลุ่มสินค้า (De-bundling DUO SET)
                     if (group === 'DUO SET') {
                         DUO_SPLIT.forEach(g => {
@@ -2775,10 +2856,10 @@
             // อัปเดต Index แบบ Fetch-Merge-Push (ป้องกันการบันทึกทับจนข้อมูลคนอื่นหาย)
             let cloudIndex = await fetchFromCloud('ot_order_history_index', true) || [];
             let localIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
-            
+
             // รวมทั้ง Cloud, Local และตัวใหม่เข้าด้วยกัน
             let newIndex = [...new Set([...cloudIndex, ...localIndex, dateKey])].sort().reverse();
-            
+
             localStorage.setItem('ot_order_history_index', JSON.stringify(newIndex));
             await pushToCloud('ot_order_history_index', newIndex);
 
@@ -3034,7 +3115,7 @@
                 });
                 charts.monthlySales.data.pendingData = pendingDailyData;
                 charts.monthlySales.data.returnData = returnDailyData;
-                
+
                 // ใช้ update() ปกติแทน 'none' สำหรับครั้งแรกเพื่อให้ Chart.js คำนวณ Layout ใหม่ทั้งหมด
                 charts.monthlySales.update();
                 charts.monthlySales.resize();
