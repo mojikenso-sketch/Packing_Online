@@ -1155,6 +1155,12 @@
                     <div class="section animate-in">
                         <div class="section-header">
                             <div class="section-title"><span>🏗️</span> สร้าง Stock รายวัน (กล่อง)</div>
+                            <div class="unit-toggle-group" style="display:flex; background:rgba(0,0,0,0.2); border-radius:10px; padding:4px; border:1px solid var(--glass-border);">
+                                <button class="unit-toggle-btn active" data-unit="ขวด" onclick="setStockViewUnit('ขวด')" 
+                                    style="padding:6px 16px; border:none; border-radius:8px; background:transparent; color:var(--text-muted); font-weight:600; cursor:pointer; transition:all 0.3s;">ขวด/หน่วย</button>
+                                <button class="unit-toggle-btn" data-unit="ลัง" onclick="setStockViewUnit('ลัง')" 
+                                    style="padding:6px 16px; border:none; border-radius:8px; background:transparent; color:var(--text-muted); font-weight:600; cursor:pointer; transition:all 0.3s;">ลัง</button>
+                            </div>
                         </div>
                         <div class="table-wrapper" id="stockTableWrapper"></div>
                     </div>
