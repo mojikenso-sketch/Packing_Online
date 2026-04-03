@@ -2381,6 +2381,9 @@
         let platformData = {};
         let platformFiles = {};
         let orderCharts = {};
+        
+        // กฎการแยกส่วนประกอบ DUO SET
+        const DUO_SPLIT = ['คิง 10,000 ppm.', 'King 13,500 ppm.'];
 
         function detectProductGroup(itemName) {
             const name = itemName.trim();
@@ -2563,7 +2566,16 @@
                     const normalizedItem = normalizeItemName(item); const group = detectProductGroup(normalizedItem);
                     if (!allItems[normalizedItem]) allItems[normalizedItem] = { total: 0, platforms: {}, group };
                     allItems[normalizedItem].total += qty; allItems[normalizedItem].platforms[p] = (allItems[normalizedItem].platforms[p] || 0) + qty;
-                    pTotal += qty; grandTotal += qty; groupTotals[group] = (groupTotals[group] || 0) + qty;
+                    pTotal += qty; grandTotal += qty; 
+                    
+                    // กระจายยอดกลุ่มสินค้า (De-bundling DUO SET)
+                    if (group === 'DUO SET') {
+                        DUO_SPLIT.forEach(g => {
+                            groupTotals[g] = (groupTotals[g] || 0) + qty;
+                        });
+                    } else {
+                        groupTotals[group] = (groupTotals[group] || 0) + qty;
+                    }
                 });
                 platformTotals[p] = pTotal;
             });
