@@ -1054,7 +1054,7 @@
             <div class="chart-card" style="border-color: var(--glass-border); padding: 20px;">
                 <div class="chart-title"
                     style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px; margin-bottom: 16px;">
-                    <span style="font-size: 16px;">📊 สต็อกคงเหลือล่าสุดในคลัง</span>
+                    <span style="font-size: 16px;">📊 สต็อกคงเหลือล่าสุดในคลัง(ขวด,ซอง,กระป๋อง,กล่อง)</span>
                 </div>
                 <div class="chart-container" style="height: 400px;">
                     <canvas id="latestStockChart"></canvas>
@@ -3259,29 +3259,32 @@
         }
 
         async function deleteOrderHistory(dateKey) {
-            if (!confirm(`⚠️ คุณแน่ใจหรือไม่ว่าต้องการลบประวัติยอดขายของวันที่ ${dateKey} ?\nข้อมูลจะถูกลบทั้งในเครื่องและบน Cloud`)) return;
-            showToast('⏳ กำลังลบประวัติ...');
+            if (!confirm(`⚠️ แน่ใจหรือไม่ว่าต้องการลบประวัติของวันที่ ${dateKey} ?\n\nข้อมูลจะถูกลบทิ้งจากทั้งในเครื่องและบน Cloud (ทุกคนจะเห็นว่าถูกลบแล้ว)`)) return;
+            
+            showToast('⏳ กำลังลบประวัติออกจาก Cloud...');
 
-            // 1. นำออกจาก LocalStorage
+            // 1. นำออกจาก LocalStorage (ลบในเครื่องเรา)
             localStorage.removeItem('ot_order_history_' + dateKey);
 
-            // 2. นำออกจาก index
+            // 2. เคลียร์ข้อมูลทิ้งจาก Cloud (ส่งค่า null ไปทับเพื่อให้ข้อมูลบน Cloud หายไป)
+            await pushToCloud('ot_order_history_' + dateKey, null); 
+
+            // 3. นำวันที่นี้ออกจากสารบบ Index
             let historyIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
             historyIndex = historyIndex.filter(k => k !== dateKey);
             localStorage.setItem('ot_order_history_index', JSON.stringify(historyIndex));
 
-            // 3. อัปเดต index ไปยัง Cloud
+            // 4. อัปเดตสารบบ Index ไปยัง Cloud
             await pushToCloud('ot_order_history_index', historyIndex);
 
             showToast(`🗑️ ลบประวัติวันที่ ${dateKey} สำเร็จ`);
 
-            // โหลด UI ใหม่
+            // โหลดหน้าจอใหม่ให้เป็นปัจจุบัน
             renderHistoryList();
             renderMonthlyOrderSummary();
 
-            // ถ้าหน้าปัจจุบันคือวันที่ลบ ให้ clear หน้าจอ
+            // ถ้าหน้าจอกำลังแสดงผลข้อมูลของวันที่เพิ่งโดนลบไป ให้รีเซ็ตหน้าจอเป็นค่าว่าง
             if (document.getElementById('orderDateInput').value === dateKey) {
-                // Clear UI (but don't delete everything blindly)
                 platformData = {}; platformFiles = {};
                 PLATFORMS.forEach(p => {
                     document.getElementById(`upload-${p}`).classList.remove('has-file');
@@ -3335,6 +3338,7 @@
                         </div>
                         <div style="display:flex;gap:6px">
                             <button class="btn btn-secondary" onclick="loadOrderHistory('${dateKey}')" style="padding:6px 12px;font-size:12px">📂 โหลด</button>
+                            <button class="btn btn-danger" onclick="deleteOrderHistory('${dateKey}')" style="padding:6px 12px;font-size:12px">🗑️ ลบ</button>
                         </div>
                     </div>`;
                 } catch (e) { }
