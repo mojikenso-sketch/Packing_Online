@@ -2688,22 +2688,21 @@
             PLATFORMS.forEach(p => {
                 const items = platformData[p] || []; let pTotal = 0;
                 items.forEach(({ item, qty }) => {
-                    const normalizedItem = normalizeItemName(item); const group = detectProductGroup(normalizedItem);
-                    // หากเป็นกลุ่ม DUO SET ให้ใช้ชื่อกลุ่มเป็นคีย์เพื่อรวมยอดกันในกราฟสินค้า
-                    const itemKey = (group === 'DUO SET') ? 'DUO SET' : normalizedItem;
-                    
-                    if (!allItems[itemKey]) allItems[itemKey] = { total: 0, platforms: {}, group };
-                    allItems[itemKey].total += qty; allItems[itemKey].platforms[p] = (allItems[itemKey].platforms[p] || 0) + qty;
-                    pTotal += qty; grandTotal += qty;
-
-                    // กระจายยอดกลุ่มสินค้า (De-bundling DUO SET)
-                    if (group === 'DUO SET') {
-                        DUO_SPLIT.forEach(g => {
-                            groupTotals[g] = (groupTotals[g] || 0) + qty;
-                        });
-                    } else {
+                    // ======= 💡 1. สับประโยคด้วยเครื่องหมาย + เพื่อแยกรวมทีละชิ้น =======
+                    const subItems = item.split('+');
+                    subItems.forEach(sub => {
+                        const normalizedItem = normalizeItemName(sub); 
+                        const group = detectProductGroup(normalizedItem);
+                        const itemKey = normalizedItem;
+                        
+                        if (!allItems[itemKey]) allItems[itemKey] = { total: 0, platforms: {}, group };
+                        allItems[itemKey].total += qty; 
+                        allItems[itemKey].platforms[p] = (allItems[itemKey].platforms[p] || 0) + qty;
+                        
+                        pTotal += qty; 
+                        grandTotal += qty;
                         groupTotals[group] = (groupTotals[group] || 0) + qty;
-                    }
+                    });
                 });
                 platformTotals[p] = pTotal;
             });
@@ -2820,7 +2819,12 @@
             let breakdownHTML = '';
             activePlatforms.forEach(p => {
                 const items = platformData[p] || []; const pItems = {};
-                items.forEach(({ item, qty }) => { const n = normalizeItemName(item); pItems[n] = (pItems[n] || 0) + qty; });
+                items.forEach(({ item, qty }) => { 
+                    item.split('+').forEach(sub => {
+                        const n = normalizeItemName(sub); 
+                        pItems[n] = (pItems[n] || 0) + qty; 
+                    });
+                });
                 const pSorted = Object.entries(pItems).sort((a, b) => b[1] - a[1]);
                 breakdownHTML += `<div class="platform-section"><div class="platform-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'"><span><span class="upload-platform-badge ${p}-badge">${PLATFORM_NAMES[p]}</span> — ${platformTotals[p].toLocaleString()} กล่อง (${pSorted.length} รายการ)</span><span style="color:var(--text-muted)">▼</span></div><div class="platform-content"><table><thead><tr><th>#</th><th style="text-align:left">รายการ</th><th>จำนวน (กล่อง)</th></tr></thead><tbody>`;
                 pSorted.forEach(([item, qty], i) => { breakdownHTML += `<tr><td>${i + 1}</td><td style="text-align:left">${item}</td><td>${qty.toLocaleString()}</td></tr>`; });
@@ -3106,17 +3110,21 @@
                     let pCols = '';
                     PLATFORMS.forEach(p => {
                         const items = entry.platformData[p] || [];
+                        let pQty = 0; // สร้างตัวแปรเก็บยอดรวมของที่แตกเซตแล้ว
                         items.forEach(({ item, qty }) => {
-                            const nItem = normalizeItemName(item);
-                            const group = detectProductGroup(nItem);
-                            // หากเป็นกลุ่ม DUO SET ให้รวมยอดเป็นก้อนเดียวในกราฟสินค้า
-                            const itemKey = (group === 'DUO SET') ? 'DUO SET' : nItem;
+                            // ======= 💡 2. สับประโยคด้วยเครื่องหมาย + เพื่อแยกรวมทีละชิ้น =======
+                            const subItems = item.split('+');
+                            subItems.forEach(sub => {
+                                const nItem = normalizeItemName(sub);
+                                const group = detectProductGroup(nItem);
+                                const itemKey = nItem;
 
-                            if (!allMonthItems[itemKey]) allMonthItems[itemKey] = { total: 0, group: group };
-                            allMonthItems[itemKey].total += qty;
-                            monthGroupTotals[group] = (monthGroupTotals[group] || 0) + qty;
+                                if (!allMonthItems[itemKey]) allMonthItems[itemKey] = { total: 0, group: group };
+                                allMonthItems[itemKey].total += qty;
+                                monthGroupTotals[group] = (monthGroupTotals[group] || 0) + qty;
+                                pQty += qty;
+                            });
                         });
-                        const pQty = items.reduce((s, r) => s + r.qty, 0);
                         const pPending = (entry.pending && entry.pending[p]) ? entry.pending[p] : 0;
                         const pReturn = (entry.returned && entry.returned[p]) ? entry.returned[p] : 0;
 
