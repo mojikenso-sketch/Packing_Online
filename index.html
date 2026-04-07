@@ -2261,14 +2261,25 @@
                         ctx.save();
                         chart.getDatasetMeta(0).data.forEach((datapoint, index) => {
                             const value = data.datasets[0].data[index];
+                            // ดึงข้อความหน่วยย่อยมาแสดง (ถ้ามี)
+                            const unitStr = data.datasets[0].unitStrings ? data.datasets[0].unitStrings[index] : null;
+                            
                             if (value > 0) {
                                 ctx.font = '600 12px Inter, sans-serif';
                                 ctx.fillStyle = '#e8eaf6';
                                 ctx.textAlign = 'left';
                                 ctx.textBaseline = 'middle';
-                                ctx.fillText(value.toLocaleString(), Math.max(datapoint.x + 6, 0), datapoint.y);
+                                
+                                // สร้างข้อความ เช่น "1,208 (14,496 ขวด)"
+                                let text = value.toLocaleString();
+                                if (unitStr) text += ` (${unitStr})`; // นำมาต่อท้าย
+                                
+                                ctx.fillText(text, Math.max(datapoint.x + 6, 0), datapoint.y);
                             }
                         });
+                        ctx.restore();
+                    }
+                }],
                         ctx.restore();
                     }
                 }],
@@ -3147,6 +3158,36 @@
                 } catch (e) { }
             }
 
+            // ================= เพิ่มโค้ดคำนวณหน่วยย่อยรายเดือน (ขวด/ซอง) แทรกตรงนี้ =================
+            const monthUnitTotalsByGroup = {};
+            Object.entries(allMonthItems).forEach(([item, info]) => {
+                const regex = /[(（]?\s*(\d+)\s*(ขวด|ซอง|กระป๋อง|ชิ้น|แผง|ชุด|หลอด|ก้อน)\s*[)）]?/g;
+                let match;
+                let itemUnitMap = {};
+                let hasMatch = false;
+
+                while ((match = regex.exec(item)) !== null) {
+                    hasMatch = true;
+                    const qty = parseInt(match[1]);
+                    const unit = match[2];
+                    itemUnitMap[unit] = (itemUnitMap[unit] || 0) + qty;
+                }
+                if (!hasMatch) itemUnitMap['ชิ้น'] = 1;
+
+                if (!monthUnitTotalsByGroup[info.group]) monthUnitTotalsByGroup[info.group] = {};
+                for (let unit in itemUnitMap) {
+                    const totalForUnit = itemUnitMap[unit] * info.total;
+                    monthUnitTotalsByGroup[info.group][unit] = (monthUnitTotalsByGroup[info.group][unit] || 0) + totalForUnit;
+                }
+            });
+
+            // ฟังก์ชันช่วยจัดรูปแบบข้อความ เช่น "14,496 ขวด"
+            function formatMonthUnitObj(obj) {
+                if (!obj || Object.keys(obj).length === 0) return '';
+                return Object.entries(obj).map(([u, v]) => `${v.toLocaleString()} ${u}`).join(', ');
+            }
+            // ====================================================================
+
             if (charts.monthlySales) {
                 charts.monthlySales.data.labels = Array.from({ length: 31 }, (_, i) => String(i + 1));
                 PLATFORMS.forEach((p, idx) => {
@@ -3166,6 +3207,7 @@
                 const groupOrder = Object.keys(PRODUCT_GROUPS);
                 let sortedGroups = groupOrder.map(g => {
                     return {
+                        originalGroup: g, // <- โค้ดที่เพิ่มเข้ามาใหม่
                         label: PRODUCT_GROUPS[g].label,
                         val: monthGroupTotals[g] || 0,
                         color: PRODUCT_GROUPS[g].color
@@ -3178,6 +3220,10 @@
                 charts.categorySalesMonth.data.labels = sortedGroups.map(g => g.label);
                 charts.categorySalesMonth.data.datasets[0].data = sortedGroups.map(g => g.val);
                 charts.categorySalesMonth.data.datasets[0].backgroundColor = sortedGroups.map(g => g.color);
+                
+                // <- โค้ดที่เพิ่มเข้ามาใหม่: ส่งข้อมูลข้อความ "(xx ขวด)" ไปให้กราฟ 
+                charts.categorySalesMonth.data.datasets[0].unitStrings = sortedGroups.map(g => formatMonthUnitObj(monthUnitTotalsByGroup[g.originalGroup]));
+
                 charts.categorySalesMonth.update('none');
             }
 
