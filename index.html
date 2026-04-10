@@ -1201,7 +1201,7 @@
                                         placeholder="ค้างส่ง">
                                     <input type="number" id="return-shopee" class="cell-input"
                                         style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
-                                        placeholder="ของตีคืน">
+                                        placeholder="ของยกเลิก">
                                 </div>
                             </div>
                             <div class="upload-card" id="upload-lazada">
@@ -1219,7 +1219,7 @@
                                         placeholder="ค้างส่ง">
                                     <input type="number" id="return-lazada" class="cell-input"
                                         style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
-                                        placeholder="ของตีคืน">
+                                        placeholder="ของยกเลิก">
                                 </div>
                             </div>
                             <div class="upload-card" id="upload-flash">
@@ -1237,7 +1237,7 @@
                                         placeholder="ค้างส่ง">
                                     <input type="number" id="return-flash" class="cell-input"
                                         style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
-                                        placeholder="ของตีคืน">
+                                        placeholder="ของยกเลิก">
                                 </div>
                             </div>
                             <div class="upload-card" id="upload-best">
@@ -1255,7 +1255,7 @@
                                         placeholder="ค้างส่ง">
                                     <input type="number" id="return-best" class="cell-input"
                                         style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
-                                        placeholder="ของตีคืน">
+                                        placeholder="ของยกเลิก">
                                 </div>
                             </div>
                         </div>
@@ -2223,7 +2223,7 @@
                                 if (pend > 0 || ret > 0) {
                                     text += ` (`;
                                     const parts = [];
-                                    if (ret > 0) parts.push(`คืน=${ret.toLocaleString()}`);
+                                    if (ret > 0) parts.push(`ยกเลิก=${ret.toLocaleString()}`);
                                     if (pend > 0) parts.push(`ค้าง=${pend.toLocaleString()}`);
                                     text += parts.join(', ') + `)`;
                                 }
@@ -3046,13 +3046,13 @@
                     <th rowspan="2">วันที่</th>
                     <th rowspan="2">ยอดรวมขาย</th>
                     <th rowspan="2" style="color:var(--accent-orange)">ค้างรวม</th>
-                    <th rowspan="2" style="color:var(--accent-red)">ตีคืนรวม</th>`;
+                    <th rowspan="2" style="color:var(--accent-red)">ยกเลิกรวม</th>`;
             PLATFORMS.forEach(p => html += `<th colspan="3" style="border-bottom:1px solid rgba(255,255,255,0.1);">${PLATFORM_NAMES[p]}</th>`);
             html += `<th rowspan="2">จัดการ</th></tr><tr>`;
             PLATFORMS.forEach(p => {
                 html += `<th style="font-size:11px;font-weight:normal;padding:6px">ยอดขาย</th>`;
                 html += `<th style="font-size:11px;font-weight:normal;color:var(--accent-orange);padding:6px">ค้าง</th>`;
-                html += `<th style="font-size:11px;font-weight:normal;color:var(--accent-red);padding:6px">คืน</th>`;
+                html += `<th style="font-size:11px;font-weight:normal;color:var(--accent-red);padding:6px">ยกเลิก</th>`;
             });
             html += `</tr></thead><tbody>`;
 
@@ -3197,7 +3197,7 @@
             let summaryHTML = `
                 <div class="order-stat-card"><div class="stat-label">ยอดขายรวมทั้งเดือน</div><div class="stat-value" style="color:var(--accent-cyan)">${monthGrandTotal.toLocaleString()}</div><div style="font-size:12px;color:var(--text-muted)">กล่อง (จากประวัติ ${daysWithData.length} วัน)</div></div>
                 <div class="order-stat-card"><div class="stat-label">ค้างรวมทั้งเดือน</div><div class="stat-value" style="color:var(--accent-orange)">${monthGrandPendingTotal.toLocaleString()}</div><div style="font-size:12px;color:var(--text-muted)">กล่อง</div></div>
-                <div class="order-stat-card"><div class="stat-label">ตีคืนรวมทั้งเดือน</div><div class="stat-value" style="color:var(--accent-red)">${monthGrandReturnTotal.toLocaleString()}</div><div style="font-size:12px;color:var(--text-muted)">กล่อง</div></div>
+                <div class="order-stat-card"><div class="stat-label">ยกเลิกรวมทั้งเดือน</div><div class="stat-value" style="color:var(--accent-red)">${monthGrandReturnTotal.toLocaleString()}</div><div style="font-size:12px;color:var(--text-muted)">กล่อง</div></div>
             `;
             document.getElementById('monthlySummaryRow').innerHTML = summaryHTML;
 
@@ -3255,7 +3255,7 @@
                     successCount++;
                 }
             }
-            showToast(`✅ บันทึกยอดค้างและตีคืน ${successCount} รายการ ขึ้น Cloud สำเร็จ!`);
+            showToast(`✅ บันทึกยอดค้างและยกเลิก ${successCount} รายการ ขึ้น Cloud สำเร็จ!`);
         }
 
         async function deleteOrderHistory(dateKey) {
