@@ -2142,6 +2142,7 @@
             });
 
             // 2. กราฟ Rate (พร้อม Tooltip จำนวนคน และ OT)
+            // 2. กราฟ Rate (พร้อม Tooltip จำนวนคน, OT และ หมายเหตุ)
             charts.rate = new Chart(document.getElementById('rateChart'), {
                 type: 'line',
                 data: {
@@ -2162,9 +2163,11 @@
                                     const day = context.dataIndex + 1; 
                                     const workers = data[day] && data[day].workers ? data[day].workers : '-';
                                     const ot = data[day] && data[day].otHours ? data[day].otHours : '-';
+                                    const remark = data[day] && data[day].remark ? data[day].remark : '-'; // ดึงหมายเหตุมาแสดง
                                     return [
                                         `👥 จำนวนคน: ${workers} คน`,
-                                        `⏳ เวลา OT: ${ot} ชม.`
+                                        `⏳ เวลา OT: ${ot} ชม.`,
+                                        `📝 หมายเหตุ: ${remark}`
                                     ];
                                 }
                             }
