@@ -2475,9 +2475,7 @@
 
             // แถว: ความเห็น
             html += `<tr><td style="font-weight:700; color:var(--accent-yellow);">ความเห็น</td><td class="cell-label">ข้อความ</td>`;
-            for (let i = 1; i <= DAYS; i++) html += `<td${i === _todayNum ? ' class="is-today-col"' : ''}><input class="cell-input" type="text" data-day="${i}" data-key="remark" value="${data[i].remark || ''}" placeholder="..." style="width: 150px; text-align: left; padding: 7px 10px;" onchange="onProdChange(this)"></td>`;
-            html += '</tr>';
-
+            for (let i = 1; i <= DAYS; i++) html += `<td${i === _todayNum ? ' class="is-today-col"' : ''}><input class="cell-input" type="text" data-day="${i}" data-key="remark" value="${data[i].remark || ''}" placeholder="..." style="width: 150px; height: 45px; text-align: left; padding: 10px 12px;" onchange="onProdChange(this)"></td>`;html += '</tr>';
             html += '</tbody></table>';
             wrapper.innerHTML = html;
         }
