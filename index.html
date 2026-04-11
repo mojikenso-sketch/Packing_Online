@@ -2106,7 +2106,7 @@
         function initCharts() {
             const labels = Array.from({ length: DAYS }, (_, i) => `${i + 1}`);
 
-            // 1. กราฟสต็อกแยกตามกลุ่ม (New)
+            // 1. กราฟสต็อกแยกตามกลุ่ม
             charts.stockGroup = new Chart(document.getElementById('stockGroupChart'), {
                 type: 'bar',
                 data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderRadius: 4 }] },
@@ -2132,7 +2132,8 @@
                                 ctx.fillStyle = '#e8eaf6';
                                 ctx.textAlign = 'left';
                                 ctx.textBaseline = 'middle';
-                                ctx.fillText(value.toLocaleString(), datapoint.x + 6, datapoint.y);
+                                // บังคับลงพิกเซลเต็มด้วย Math.round
+                                ctx.fillText(value.toLocaleString(), Math.round(datapoint.x + 6), Math.round(datapoint.y));
                             }
                         });
                         ctx.restore();
@@ -2176,7 +2177,7 @@
                 }
             });
 
-            // 3. กราฟ Latest Stock (ตัวที่เผลอทำหายไป กลับมาแล้วครับ!)
+            // 3. กราฟ Latest Stock
             charts.latestStock = new Chart(document.getElementById('latestStockChart'), {
                 type: 'bar',
                 data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderRadius: 4 }] },
@@ -2192,7 +2193,8 @@
                                 ctx.fillStyle = '#e8eaf6';
                                 ctx.textAlign = 'left';
                                 ctx.textBaseline = 'middle';
-                                ctx.fillText(value.toLocaleString(), datapoint.x + 6, datapoint.y);
+                                // บังคับลงพิกเซลเต็มด้วย Math.round
+                                ctx.fillText(value.toLocaleString(), Math.round(datapoint.x + 6), Math.round(datapoint.y));
                             }
                         });
                         ctx.restore();
@@ -2211,7 +2213,7 @@
                 }
             });
 
-            // 4. กราฟ Monthly Sales (พร้อมตัวหนังสือ ตีกลับ)
+            // 4. กราฟ Monthly Sales 
             const pKeys = ['shopee', 'lazada', 'flash', 'best'];
             const pNames = { shopee: 'Shopee', lazada: 'Lazada', flash: 'Flash', best: 'Best' };
             const pColors = { shopee: 'rgba(255, 87, 34, 0.8)', lazada: 'rgba(123, 127, 246, 0.8)', flash: 'rgba(255, 193, 7, 0.8)', best: 'rgba(233, 30, 99, 0.8)' };
@@ -2267,7 +2269,8 @@
                                 ctx.fillStyle = '#e8eaf6';
                                 ctx.textAlign = 'left';
                                 ctx.textBaseline = 'middle';
-                                ctx.fillText(text, maxX + 6, y);
+                                // บังคับลงพิกเซลเต็มด้วย Math.round
+                                ctx.fillText(text, Math.round(maxX + 6), Math.round(y));
                             }
                         }
                         ctx.restore();
@@ -2302,7 +2305,8 @@
                                 ctx.fillStyle = '#e8eaf6';
                                 ctx.textAlign = 'left';
                                 ctx.textBaseline = 'middle';
-                                ctx.fillText(value.toLocaleString(), Math.max(datapoint.x + 6, 0), datapoint.y);
+                                // บังคับลงพิกเซลเต็มด้วย Math.round
+                                ctx.fillText(value.toLocaleString(), Math.round(Math.max(datapoint.x + 6, 0)), Math.round(datapoint.y));
                             }
                         });
                         ctx.restore();
@@ -2337,7 +2341,8 @@
                                 ctx.fillStyle = '#e8eaf6';
                                 ctx.textAlign = 'left';
                                 ctx.textBaseline = 'middle';
-                                ctx.fillText(value.toLocaleString(), Math.max(datapoint.x + 6, 0), datapoint.y);
+                                // บังคับลงพิกเซลเต็มด้วย Math.round
+                                ctx.fillText(value.toLocaleString(), Math.round(Math.max(datapoint.x + 6, 0)), Math.round(datapoint.y));
                             }
                         });
                         ctx.restore();
