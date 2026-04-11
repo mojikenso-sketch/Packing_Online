@@ -3237,23 +3237,39 @@
             wrapper.innerHTML = html;
         }
 
+        // 1. ฟังก์ชันตอนพิมพ์ช่องตัวเลข (เซฟแค่ในเครื่อง & เปลี่ยนสีปุ่มเตือน)
         async function updatePendingReturn(dateKey, p, type, val) {
             const num = parseInt(val) || 0;
-            let entry = await fetchFromCloud('ot_order_history_' + dateKey, true);
+            
+            // อ่านจากในเครื่องเท่านั้น (ไม่ดึง Cloud ทำให้ไวมาก)
+            let entry = JSON.parse(localStorage.getItem('ot_order_history_' + dateKey));
             if (!entry) return;
+
             if (!entry[type]) entry[type] = {};
             entry[type][p] = num;
-            // เซฟลง LocalStorage ไว้ก่อน เพื่อความรวดเร็ว
+            
+            // เซฟลงเครื่องพักไว้ก่อน (Draft)
             localStorage.setItem('ot_order_history_' + dateKey, JSON.stringify(entry));
 
-            // Push ขึ้น Cloud แบบเบื้องหลัง ไม่ให้ UI กระตุก
-            pushToCloud('ot_order_history_' + dateKey, entry);
-
-            // สั่ง render ตารางใหม่เพื่ออัปเดตผลรวมแบบรวดเร็ว (ข้ามการโหลด index cloud)
+            // อัปเดตตารางและกราฟทันที (false = ไม่อ่าน Cloud ซ้ำ)
             renderMonthlyOrderSummary(false);
+
+            // หาปุ่ม "บันทึกขึ้น Cloud" ตัวเดิมที่มีอยู่ แล้วเปลี่ยนเป็นสีแดงเตือน
+            const btn = document.querySelector('button[onclick="forceSaveMonthlyToCloud()"]');
+            if (btn) {
+                btn.style.background = 'linear-gradient(135deg, #ff5252, #d32f2f)';
+                btn.innerHTML = '⚠️ กดเพื่อบันทึกขึ้น Cloud';
+            }
         }
 
+        // 2. ฟังก์ชันของปุ่มเซฟ (โยนขึ้น Cloud ทีเดียว & เปลี่ยนปุ่มกลับเป็นสีเขียว)
         async function forceSaveMonthlyToCloud() {
+            const btn = document.querySelector('button[onclick="forceSaveMonthlyToCloud()"]');
+            if (btn) {
+                btn.innerHTML = '⏳ กำลังบันทึก...';
+                btn.style.pointerEvents = 'none'; // ล็อกปุ่มกันกดเบิ้ล
+            }
+
             showToast('⏳ กำลังบันทึกข้อมูลเดือนนี้ขึ้น Cloud ทั้งหมด...');
 
             const selMonth = parseInt(document.getElementById('monthSelect').value);
@@ -3267,9 +3283,10 @@
             });
 
             let successCount = 0;
-            // เราอาจดึง Cloud index มา merge ด้วยเพื่อความชัวร์ (เหมือนปุ่ม โหลดข้อมูล)
+            // อัปเดต Index สารบบเผื่อไว้ก่อน
             await pushToCloud('ot_order_history_index', historyIndex);
 
+            // ลูปเอาข้อมูลที่ Draft ไว้ในเครื่อง ยิงขึ้น Cloud ให้หมด
             for (const dateKey of daysWithData) {
                 const entry = JSON.parse(localStorage.getItem('ot_order_history_' + dateKey));
                 if (entry) {
@@ -3277,7 +3294,15 @@
                     successCount++;
                 }
             }
-            showToast(`✅ บันทึกยอดค้างส่งและยกเลิก ${successCount} รายการ ขึ้น Cloud สำเร็จ!`);
+            
+            // คืนค่าปุ่มกลับเป็นสีเขียวปกติ
+            if (btn) {
+                btn.style.background = 'linear-gradient(135deg, var(--accent-green), #4caf50)';
+                btn.innerHTML = '💾 บันทึกขึ้น Cloud';
+                btn.style.pointerEvents = 'auto'; // ปลดล็อกปุ่ม
+            }
+
+            showToast(`✅ บันทึกยอดค้าง ยกเลิก ตีกลับ ${successCount} วัน ขึ้น Cloud สำเร็จ!`);
         }
 
         async function deleteOrderHistory(dateKey) {
