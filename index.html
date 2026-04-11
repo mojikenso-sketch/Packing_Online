@@ -2147,40 +2147,36 @@
                         { label: 'ค่ามาตรฐาน 45', data: new Array(DAYS).fill(45), borderColor: '#ff5252', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, fill: false }
                     ]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#9fa8da', font: { family: 'Inter', size: 12 } } } }, scales: { x: { ticks: { color: '#5c6bc0', font: { size: 10 } }, grid: { color: 'rgba(79,195,247,0.06)' } }, y: { min: 0, suggestedMax: 50, ticks: { color: '#5c6bc0', font: { size: 11 } }, grid: { color: 'rgba(79,195,247,0.06)' } } } }
-            });
-
-            charts.latestStock = new Chart(document.getElementById('latestStockChart'), {
-                type: 'bar',
-                data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderRadius: 4 }] },
-                plugins: [{
-                    id: 'barValuePlugin',
-                    afterDatasetsDraw(chart) {
-                        const { ctx, data } = chart;
-                        ctx.save();
-                        chart.getDatasetMeta(0).data.forEach((datapoint, index) => {
-                            const value = data.datasets[0].data[index];
-                            if (value > 0) {
-                                ctx.font = '600 12px Inter, sans-serif';
-                                ctx.fillStyle = '#e8eaf6';
-                                ctx.textAlign = 'left';
-                                ctx.textBaseline = 'middle';
-                                ctx.fillText(value.toLocaleString(), datapoint.x + 6, datapoint.y);
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { 
+                            labels: { color: '#9fa8da', font: { family: 'Inter', size: 12 } } 
+                        },
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    // ถ้าชี้โดนเส้นปะสีแดง (ค่ามาตรฐาน) ไม่ต้องแสดงข้อมูลคนและ OT เพิ่ม
+                                    if (context.datasetIndex === 1) return null; 
+                                    
+                                    const day = context.dataIndex + 1; // ดึงวันที่ (1-31)
+                                    const workers = data[day] && data[day].workers ? data[day].workers : '-';
+                                    const ot = data[day] && data[day].otHours ? data[day].otHours : '-';
+                                    
+                                    // คืนค่าเป็น Array เพื่อให้แสดงผลขึ้นบรรทัดใหม่
+                                    return [
+                                        `👥 จำนวนคน: ${workers} คน`,
+                                        `⏳ เวลา OT: ${ot} ชม.`
+                                    ];
+                                }
                             }
-                        });
-                        ctx.restore();
-                    }
-                }],
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    layout: { padding: { right: 50 } },
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9fa8da' } },
-                        y: { grid: { display: false }, ticks: { autoSkip: false, color: '#9fa8da', font: { size: 12, family: 'Inter' } } }
-                    }
+                        }
+                    }, 
+                    scales: { 
+                        x: { ticks: { color: '#5c6bc0', font: { size: 10 } }, grid: { color: 'rgba(79,195,247,0.06)' } }, 
+                        y: { min: 0, suggestedMax: 50, ticks: { color: '#5c6bc0', font: { size: 11 } }, grid: { color: 'rgba(79,195,247,0.06)' } } 
+                    } 
                 }
             });
 
