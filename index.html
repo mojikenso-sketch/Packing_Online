@@ -3105,7 +3105,7 @@
                 const dayNum = parseInt(parts[2]);
                 const displayDate = `${dayNum}/${(selMonth + 1).toString().padStart(2, '0')}/${selYear2}`;
 
-                let entry = await fetchFromCloud('ot_order_history_' + dateKey, true);
+                let entry = await fetchFromCloud('ot_order_history_' + dateKey, forceCloudSync);
                 if (!entry) continue;
 
                 try {
@@ -3310,6 +3310,9 @@
             }
 
             showToast(`✅ บันทึกยอดค้าง ยกเลิก ตีกลับ ${successCount} วัน ขึ้น Cloud สำเร็จ!`);
+            
+            // อัปเดตหน้าตารางอีกครั้งเพื่อให้ชัวร์ว่าข้อมูลนิ่ง (โดยไม่ดึงจาก Cloud ซ้ำ)
+            renderMonthlyOrderSummary(false);
         }
 
         async function deleteOrderHistory(dateKey) {
