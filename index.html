@@ -2198,7 +2198,8 @@
                         backgroundColor: pColors[p]
                     })),
                     pendingData: new Array(31).fill(0),
-                    returnData: new Array(31).fill(0)
+                    returnData: new Array(31).fill(0),
+                    bounceData: new Array(31).fill(0) // <-- เพิ่มอาร์เรย์เก็บค่าตีกลับ
                 },
                 plugins: [{
                     id: 'barValuePluginSales',
@@ -2222,12 +2223,15 @@
                             if (totalValue > 0 && maxX > 0) {
                                 const pend = data.pendingData && data.pendingData[index] ? data.pendingData[index] : 0;
                                 const ret = data.returnData && data.returnData[index] ? data.returnData[index] : 0;
+                                const bnc = data.bounceData && data.bounceData[index] ? data.bounceData[index] : 0; // <-- ดึงค่าตีกลับมาใช้
+
                                 let text = totalValue.toLocaleString();
-                                if (pend > 0 || ret > 0) {
+                                if (pend > 0 || ret > 0 || bnc > 0) { // <-- ถ้ามีค่าใดค่าหนึ่งให้ใส่วงเล็บ
                                     text += ` (`;
                                     const parts = [];
                                     if (ret > 0) parts.push(`ยกเลิก=${ret.toLocaleString()}`);
-                                    if (pend > 0) parts.push(`ค้างส่ง=${pend.toLocaleString()}`);
+                                    if (pend > 0) parts.push(`ค้าง=${pend.toLocaleString()}`);
+                                    if (bnc > 0) parts.push(`ตีกลับ=${bnc.toLocaleString()}`); // <-- เพิ่มตัวหนังสือตีกลับ
                                     text += parts.join(', ') + `)`;
                                 }
 
