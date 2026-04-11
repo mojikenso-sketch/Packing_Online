@@ -2331,6 +2331,12 @@
                 data: { labels: [], datasets: [{ data: [], backgroundColor: 'rgba(79, 195, 247, 0.8)', borderRadius: 4 }] },
                 plugins: [{
                     id: 'barValuePluginSalesTop',
+                    a// 6. กราฟ Top 15 (อัปเกรด Tooltip)
+            charts.topProductsSalesMonth = new Chart(document.getElementById('topProductsSalesChartMonth'), {
+                type: 'bar',
+                data: { labels: [], datasets: [{ data: [], backgroundColor: 'rgba(79, 195, 247, 0.8)', borderRadius: 4 }] },
+                plugins: [{
+                    id: 'barValuePluginSalesTop',
                     afterDatasetsDraw(chart) {
                         const { ctx, data } = chart;
                         ctx.save();
@@ -2341,7 +2347,6 @@
                                 ctx.fillStyle = '#e8eaf6';
                                 ctx.textAlign = 'left';
                                 ctx.textBaseline = 'middle';
-                                // บังคับลงพิกเซลเต็มด้วย Math.round
                                 ctx.fillText(value.toLocaleString(), Math.round(Math.max(datapoint.x + 6, 0)), Math.round(datapoint.y));
                             }
                         });
@@ -2353,7 +2358,55 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     layout: { padding: { right: 50 } },
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    // 1. ดึงชื่อสินค้า และจำนวนกล่อง
+                                    const itemName = context.label;
+                                    const boxQty = context.raw;
+                                    
+                                    // 2. คำนวณตัวคูณเพื่อแตกเป็นหน่วยย่อย (ขวด/ซอง)
+                                    // ปกติ DUO SET จะหมายถึง 2 ขวดเสมอ (SO 1 + E1H 1)
+                                    let multiplier = 1;
+                                    let unitName = 'ชิ้น';
+                                    
+                                    if (itemName.includes('DUO SET')) {
+                                        multiplier = 2;
+                                        unitName = 'ขวด';
+                                    } else {
+                                        const match = itemName.match(/(\d+)\s*(ขวด|ซอง|กระป๋อง|ชิ้น|กล่อง|แผง|ชุด|หลอด|ก้อน)/);
+                                        if (match) {
+                                            multiplier = parseInt(match[1]);
+                                            unitName = match[2];
+                                        }
+                                    }
+                                    
+                                    const totalUnit = boxQty * multiplier;
+
+                                    // 3. หาจำนวนวันล่าสุดที่มีการบันทึกในเดือนนี้
+                                    // ดึงจาก Select Month/Year เพื่อหาว่ากำลังดูเดือนไหนอยู่
+                                    const selMonth = parseInt(document.getElementById('monthSelect').value);
+                                    const selYearCE = 2500 + parseInt(document.getElementById('yearInput').value) - 543;
+                                    
+                                    const historyIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
+                                    const daysWithData = historyIndex.filter(dateKey => {
+                                        const parts = dateKey.split('-');
+                                        return parts.length === 3 && parseInt(parts[0]) === selYearCE && parseInt(parts[1]) - 1 === selMonth;
+                                    });
+                                    
+                                    const totalDays = daysWithData.length > 0 ? daysWithData.length : 1; // ป้องกันหาร 0
+                                    const avgPerDay = (totalUnit / totalDays).toFixed(2);
+
+                                    return [
+                                        `📦 แตกย่อย: ${totalUnit.toLocaleString()} ${unitName}`,
+                                        `📈 เฉลี่ย: ${avgPerDay} ${unitName}/วัน (จาก ${totalDays} วัน)`
+                                    ];
+                                }
+                            }
+                        }
+                    },
                     scales: {
                         x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9fa8da' } },
                         y: { grid: { display: false }, ticks: { autoSkip: false, color: '#9fa8da', font: { size: 12, family: 'Inter' } } }
