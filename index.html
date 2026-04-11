@@ -3095,6 +3095,7 @@
             };
             const pendingDailyData = new Array(31).fill(0);
             const returnDailyData = new Array(31).fill(0);
+            const bounceDailyData = new Array(31).fill(0); // <-- เพิ่มบรรทัดนี้
 
             const allMonthItems = {};
             const monthGroupTotals = {};
@@ -3158,6 +3159,7 @@
                     
                     pendingDailyData[dayNum - 1] = dayPendingTotal;
                     returnDailyData[dayNum - 1] = dayReturnTotal;
+                    bounceDailyData[dayNum - 1] = dayBounceTotal; // <-- เพิ่มบรรทัดนี้
                     hasAnyRow = true;
 
                     html += `<tr>
@@ -3181,6 +3183,7 @@
                 });
                 charts.monthlySales.data.pendingData = pendingDailyData;
                 charts.monthlySales.data.returnData = returnDailyData;
+                charts.monthlySales.data.bounceData = bounceDailyData; // <-- เพิ่มบรรทัดนี้
 
                 charts.monthlySales.update();
                 charts.monthlySales.resize();
