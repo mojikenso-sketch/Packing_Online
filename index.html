@@ -2588,9 +2588,9 @@
         const PLATFORM_COLORS = { shopee: 'rgba(255, 87, 34, 0.8)', lazada: 'rgba(123, 127, 246, 0.8)', flash: 'rgba(255, 193, 7, 0.8)', best: 'rgba(233, 30, 99, 0.8)' };
 
         const PRODUCT_GROUPS = {
-            'คิง 10,000 ppm.': { emoji: '🌿', color: 'rgba(79, 195, 247, 0.8)', label: 'คิง น้ำมันรำข้าว 10,000 ppm.' },
-            'King 13,500 ppm.': { emoji: '🫧', color: 'rgba(105, 240, 174, 0.8)', label: 'King น้ำมันรำข้าว 13,500 ppm.' },
-            'ไรซ์ลี่ 15,000 ppm.': { emoji: '🌾', color: 'rgba(255, 215, 64, 0.8)', label: 'ไรซ์ลี่ 15,000 ppm.' },
+            'SO': { emoji: '🌿', color: 'rgba(79, 195, 247, 0.8)', label: 'SO' },
+            'E1H': { emoji: '🫧', color: 'rgba(105, 240, 174, 0.8)', label: 'E1H' },
+            'Ricely': { emoji: '🌾', color: 'rgba(255, 215, 64, 0.8)', label: 'Ricely' },
             'ไขน้ำมันรำข้าว 700ก.': { emoji: '🧈', color: 'rgba(179, 136, 255, 0.8)', label: 'ไขน้ำมันรำข้าว 700ก.' },
             'ไขน้ำมันรำข้าว 5กก.': { emoji: '📦', color: 'rgba(0, 229, 255, 0.8)', label: 'ไขน้ำมันรำข้าว 5กก.' },
             'ครีมเทียม 200ก.': { emoji: '🍦', color: 'rgba(233, 30, 99, 0.8)', label: 'ครีมเทียม 200ก.' },
@@ -2605,7 +2605,8 @@
         let orderCharts = {};
 
         // กฎการแยกส่วนประกอบ DUO SET
-        const DUO_SPLIT = ['คิง 10,000 ppm.', 'King 13,500 ppm.'];
+        // กฎการแยกส่วนประกอบ DUO SET
+        const DUO_SPLIT = ['SO', 'E1H'];
         
         // ฟังก์ชันสำหรับแปลงชื่อสินค้าจากหลายแพลตฟอร์มให้เป็น "ชื่อมาตรฐาน" เดียวกัน
         function standardizeProductName(rawName) {
@@ -2620,19 +2621,18 @@
 
             let baseName = name;
             
-            // ดัก "งาดำ" ก่อน "ออริจินอล/CRD" เสมอ ป้องกันการทับซ้อน
             if (upper.includes('งาดำ') || upper.includes('BLACK SESAME')) {
                 baseName = 'ซีเรียลดริ๊งค์งาดำ';
             } else if (upper.includes('ครีม') || upper.includes('NDC')) {
                 baseName = 'ครีมเทียม 200ก.';
             } else if (upper.includes('ธัญญาหาร') || upper.includes('ออริจินอล') || upper.includes('ออริจินัล') || upper.includes('CEREAL') || upper.includes('CRD')) {
                 baseName = 'ซีเรียลดริ๊งค์ออริจินอล';
-            } else if (upper.includes('10000') || upper.includes('10,000')) {
-                baseName = 'คิง น้ำมันรำข้าว 10,000 ppm.';
-            } else if (upper.includes('13500') || upper.includes('13,500')) {
-                baseName = 'King น้ำมันรำข้าว 13,500 ppm.';
+            } else if (upper.includes('10000') || upper.includes('10,000') || upper.startsWith('SO')) {
+                baseName = 'SO';
+            } else if (upper.includes('13500') || upper.includes('13,500') || upper.startsWith('E1H')) {
+                baseName = 'E1H';
             } else if (upper.includes('15000') || upper.includes('15,000') || upper.includes('RICELY') || name.includes('ไรซ์ลี่')) {
-                baseName = 'ไรซ์ลี่ 15,000 ppm.';
+                baseName = 'Ricely';
             } else if (upper.includes('SHORTENING') || upper.includes('ชอร์ตเทนนิ่ง') || upper.includes('STN') || name.includes('ไขน้ำมันรำข้าว')) {
                 if (upper.includes('5 ') || upper.includes('5ก') || upper.includes('5 กก')) baseName = 'ไขน้ำมันรำข้าว 5กก.';
                 else baseName = 'ไขน้ำมันรำข้าว 700ก.';
@@ -2653,26 +2653,25 @@
             const name = itemName.trim();
             const upper = name.toUpperCase();
 
+            // เช็คจากชื่อที่แปลงมาแล้ว
             if (name.includes('ผสม(SO 1 ขวด+E1H 1 ขวด)')) return 'ผสม(SO 1 ขวด+E1H 1 ขวด)';
-            if (name.includes('คิง น้ำมันรำข้าว 10,000 ppm.')) return 'คิง 10,000 ppm.';
-            if (name.includes('King น้ำมันรำข้าว 13,500 ppm.')) return 'King 13,500 ppm.';
-            if (name.includes('ไรซ์ลี่ 15,000 ppm.')) return 'ไรซ์ลี่ 15,000 ppm.';
+            if (name.startsWith('SO')) return 'SO';
+            if (name.startsWith('E1H')) return 'E1H';
+            if (name.startsWith('Ricely')) return 'Ricely';
             if (name.includes('ไขน้ำมันรำข้าว 5กก.')) return 'ไขน้ำมันรำข้าว 5กก.';
             if (name.includes('ไขน้ำมันรำข้าว 700ก.')) return 'ไขน้ำมันรำข้าว 700ก.';
             if (name.includes('ครีมเทียม 200ก.')) return 'ครีมเทียม 200ก.';
             if (name.includes('ซีเรียลดริ๊งค์งาดำ')) return 'ซีเรียลดริ๊งค์งาดำ';
             if (name.includes('ซีเรียลดริ๊งค์ออริจินอล')) return 'ซีเรียลดริ๊งค์ออริจินอล';
 
+            // เผื่อหลุด (Fallback)
             if (upper.includes('SO 1') && upper.includes('E1H 1')) return 'ผสม(SO 1 ขวด+E1H 1 ขวด)';
-            if (upper.includes('10000') || upper.includes('10,000') || upper.startsWith('SO ')) return 'คิง 10,000 ppm.';
-            if (upper.includes('13500') || upper.includes('13,500') || upper.startsWith('E1H ')) return 'King 13,500 ppm.';
-            
             if (upper.includes('งาดำ') || upper.includes('BLACK SESAME')) return 'ซีเรียลดริ๊งค์งาดำ';
             if (upper.includes('ครีม') || upper.includes('NDC')) return 'ครีมเทียม 200ก.';
             if (upper.includes('ธัญญาหาร') || upper.includes('ออริจินอล') || upper.includes('ออริจินัล') || upper.includes('CEREAL') || upper.includes('CRD')) return 'ซีเรียลดริ๊งค์ออริจินอล';
-            
-            if (upper.includes('RICELY') || name.includes('ไรซ์ลี่') || upper.includes('15000') || upper.includes('15,000')) return 'ไรซ์ลี่ 15,000 ppm.';
-
+            if (upper.includes('10000') || upper.includes('10,000') || upper.startsWith('SO ')) return 'SO';
+            if (upper.includes('13500') || upper.includes('13,500') || upper.startsWith('E1H ')) return 'E1H';
+            if (upper.includes('RICELY') || name.includes('ไรซ์ลี่') || upper.includes('15000')) return 'Ricely';
             if (upper.includes('SHORTENING') || name.includes('ชอร์ตเทนนิ่ง') || upper.includes('STN') || name.includes('ไขน้ำมันรำข้าว')) {
                 if (name.includes('5 ') || name.includes('5ก') || name.includes('5 กก')) return 'ไขน้ำมันรำข้าว 5กก.';
                 return 'ไขน้ำมันรำข้าว 700ก.';
