@@ -2341,13 +2341,30 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     layout: { padding: { right: 50 } },
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    const label = context.label;
+                                    const breakdown = context.chart.data.breakdownData;
+                                    if (breakdown && breakdown[label]) {
+                                        const items = breakdown[label];
+                                        const lines = ['','🔍 รายละเอียดในกลุ่มนี้:'];
+                                        items.slice(0, 10).forEach(i => {
+                                            lines.push(`- ${i.name}: ${i.total.toLocaleString()} กล่อง`);
+                                        });
+                                        if (items.length > 10) {
+                                            lines.push(`... และอื่นๆ อีก ${items.length - 10} รายการ`);
+                                        }
+                                        return lines;
+                                    }
+                                    return null;
+                                }
+                            }
+                        }
+                    },
                     scales: {
-                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9fa8da' } },
-                        y: { grid: { display: false }, ticks: { autoSkip: false, color: '#9fa8da', font: { size: 12, family: 'Inter' } } }
-                    }
-                }
-            });
 
             // 6. กราฟ Top 15 (อัปเกรด Tooltip)
             charts.topProductsSalesMonth = new Chart(document.getElementById('topProductsSalesChartMonth'), {
