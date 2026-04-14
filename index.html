@@ -1571,7 +1571,17 @@
             const dataKey = `${STORAGE_PREFIX}${month}_${year}`;
 
             const catSaved = await fetchFromCloud(CAT_KEY);
-            if (catSaved) stockCategories = catSaved;
+            if (catSaved) {
+                stockCategories = catSaved;
+                // Auto-migrate old group names to new ones to prevent missing colors/missing bars
+                let migrated = false;
+                stockCategories.forEach(c => {
+                    if (c.group === 'คิง 10,000 ppm.') { c.group = 'SO'; migrated = true; }
+                    if (c.group === 'King 13,500 ppm.') { c.group = 'E1H'; migrated = true; }
+                    if (c.group === 'ไรซ์ลี่ 15,000 ppm.') { c.group = 'Ricely'; migrated = true; }
+                });
+                if (migrated) pushToCloud(CAT_KEY, stockCategories);
+            }
 
             const dataSaved = await fetchFromCloud(dataKey);
             if (dataSaved) {
@@ -2605,31 +2615,33 @@
         let orderCharts = {};
 
         // กฎการแยกส่วนประกอบ DUO SET
-        // กฎการแยกส่วนประกอบ DUO SET
         const DUO_SPLIT = ['SO', 'E1H'];
-        
+
         // ฟังก์ชันสำหรับแปลงชื่อสินค้าจากหลายแพลตฟอร์มให้เป็น "ชื่อมาตรฐาน" เดียวกัน
         function standardizeProductName(rawName) {
             const name = rawName.trim();
             const upper = name.toUpperCase();
             
-            const hasSO1 = upper.includes('SO 1') || upper.includes('SO1');
-            const hasE1H1 = upper.includes('E1H 1') || upper.includes('E1H1');
+            const hasSO1 = upper.includes('SO 1') || upper.includes('SO1') || upper.includes('SO 1ขวด');
+            const hasE1H1 = upper.includes('E1H 1') || upper.includes('E1H1') || upper.includes('E1H 1ขวด');
             if ((hasSO1 && hasE1H1) || upper.includes('DUO')) {
                 return 'ผสม(SO 1 ขวด+E1H 1 ขวด)'; 
             }
 
             let baseName = name;
             
-            if (upper.includes('งาดำ') || upper.includes('BLACK SESAME')) {
+            if (upper.includes('งาดำ') || upper.includes('BLACK SESAME') || (upper.includes('CRD') && upper.includes('งาดำ'))) {
                 baseName = 'ซีเรียลดริ๊งค์งาดำ';
             } else if (upper.includes('ครีม') || upper.includes('NDC')) {
                 baseName = 'ครีมเทียม 200ก.';
             } else if (upper.includes('ธัญญาหาร') || upper.includes('ออริจินอล') || upper.includes('ออริจินัล') || upper.includes('CEREAL') || upper.includes('CRD')) {
                 baseName = 'ซีเรียลดริ๊งค์ออริจินอล';
-            } else if (upper.includes('10000') || upper.includes('10,000') || upper.startsWith('SO')) {
-                baseName = 'SO';
-            } else if (upper.includes('13500') || upper.includes('13,500') || upper.startsWith('E1H')) {
+            } else if (upper.includes('10000') || upper.includes('10,000') || upper.includes('SO')) {
+                // ต้องมีเว้นวรรคหรือขึ้นต้นด้วย SO ป้องกันการดักคำอื่นผิดพลาด
+                if (upper.includes('SO ') || upper.startsWith('SO') || upper.includes('10000') || upper.includes('10,000')) {
+                     baseName = 'SO';
+                }
+            } else if (upper.includes('13500') || upper.includes('13,500') || upper.includes('E1H')) {
                 baseName = 'E1H';
             } else if (upper.includes('15000') || upper.includes('15,000') || upper.includes('RICELY') || name.includes('ไรซ์ลี่')) {
                 baseName = 'Ricely';
@@ -2648,32 +2660,31 @@
             return baseName;
         }
 
-        // ฟังก์ชันจัดกลุ่ม
+        // ฟังก์ชันสำหรับตรวจจับกลุ่มสินค้า
         function detectProductGroup(itemName) {
-            const name = itemName.trim();
-            const upper = name.toUpperCase();
+            const upper = itemName.toUpperCase();
+            
+            // เช็คตรงๆ จากชื่อที่โดน Standardize มาแล้ว
+            if (upper.includes('ผสม(SO 1 ขวด+E1H 1 ขวด)')) return 'ผสม(SO 1 ขวด+E1H 1 ขวด)';
+            if (upper.startsWith('SO')) return 'SO';
+            if (upper.startsWith('E1H')) return 'E1H';
+            if (upper.startsWith('RICELY')) return 'Ricely';
+            if (upper.includes('ไขน้ำมันรำข้าว 5กก.')) return 'ไขน้ำมันรำข้าว 5กก.';
+            if (upper.includes('ไขน้ำมันรำข้าว 700ก.')) return 'ไขน้ำมันรำข้าว 700ก.';
+            if (upper.includes('ครีมเทียม 200ก.')) return 'ครีมเทียม 200ก.';
+            if (upper.includes('ซีเรียลดริ๊งค์งาดำ')) return 'ซีเรียลดริ๊งค์งาดำ';
+            if (upper.includes('ซีเรียลดริ๊งค์ออริจินอล')) return 'ซีเรียลดริ๊งค์ออริจินอล';
 
-            // เช็คจากชื่อที่แปลงมาแล้ว
-            if (name.includes('ผสม(SO 1 ขวด+E1H 1 ขวด)')) return 'ผสม(SO 1 ขวด+E1H 1 ขวด)';
-            if (name.startsWith('SO')) return 'SO';
-            if (name.startsWith('E1H')) return 'E1H';
-            if (name.startsWith('Ricely')) return 'Ricely';
-            if (name.includes('ไขน้ำมันรำข้าว 5กก.')) return 'ไขน้ำมันรำข้าว 5กก.';
-            if (name.includes('ไขน้ำมันรำข้าว 700ก.')) return 'ไขน้ำมันรำข้าว 700ก.';
-            if (name.includes('ครีมเทียม 200ก.')) return 'ครีมเทียม 200ก.';
-            if (name.includes('ซีเรียลดริ๊งค์งาดำ')) return 'ซีเรียลดริ๊งค์งาดำ';
-            if (name.includes('ซีเรียลดริ๊งค์ออริจินอล')) return 'ซีเรียลดริ๊งค์ออริจินอล';
-
-            // เผื่อหลุด (Fallback)
+            // กฎดักเผื่อหลุด 
             if (upper.includes('SO 1') && upper.includes('E1H 1')) return 'ผสม(SO 1 ขวด+E1H 1 ขวด)';
-            if (upper.includes('งาดำ') || upper.includes('BLACK SESAME')) return 'ซีเรียลดริ๊งค์งาดำ';
+            if (upper.includes('งาดำ') || upper.includes('BLACK SESAME') || (upper.includes('CRD') && upper.includes('งาดำ'))) return 'ซีเรียลดริ๊งค์งาดำ';
             if (upper.includes('ครีม') || upper.includes('NDC')) return 'ครีมเทียม 200ก.';
             if (upper.includes('ธัญญาหาร') || upper.includes('ออริจินอล') || upper.includes('ออริจินัล') || upper.includes('CEREAL') || upper.includes('CRD')) return 'ซีเรียลดริ๊งค์ออริจินอล';
-            if (upper.includes('10000') || upper.includes('10,000') || upper.startsWith('SO ')) return 'SO';
-            if (upper.includes('13500') || upper.includes('13,500') || upper.startsWith('E1H ')) return 'E1H';
-            if (upper.includes('RICELY') || name.includes('ไรซ์ลี่') || upper.includes('15000')) return 'Ricely';
-            if (upper.includes('SHORTENING') || name.includes('ชอร์ตเทนนิ่ง') || upper.includes('STN') || name.includes('ไขน้ำมันรำข้าว')) {
-                if (name.includes('5 ') || name.includes('5ก') || name.includes('5 กก')) return 'ไขน้ำมันรำข้าว 5กก.';
+            if (upper.includes('10000') || upper.includes('10,000') || upper.includes('SO ') || upper === 'SO') return 'SO';
+            if (upper.includes('13500') || upper.includes('13,500') || upper.includes('E1H')) return 'E1H';
+            if (upper.includes('RICELY') || itemName.includes('ไรซ์ลี่') || upper.includes('15000') || upper.includes('15,000')) return 'Ricely';
+            if (upper.includes('SHORTENING') || itemName.includes('ชอร์ตเทนนิ่ง') || upper.includes('STN') || itemName.includes('ไขน้ำมันรำข้าว')) {
+                if (itemName.includes('5 ') || itemName.includes('5ก') || itemName.includes('5 กก')) return 'ไขน้ำมันรำข้าว 5กก.';
                 return 'ไขน้ำมันรำข้าว 700ก.';
             }
 
@@ -2827,7 +2838,6 @@
                 items.forEach(({ item, qty }) => {
                     const stdItem = standardizeProductName(item); 
                     const group = detectProductGroup(stdItem);
-                    // ใช้ชื่อมาตรฐานที่จัดระเบียบแล้วเป็น Key หลักในการนับยอด
                     const itemKey = stdItem;
                     
                     if (!allItems[itemKey]) allItems[itemKey] = { total: 0, platforms: {}, group };
@@ -2975,7 +2985,7 @@
                 orderCharts.product = new Chart(document.getElementById('orderProductChart'), { 
                     type: 'bar', 
                     data: { 
-                        labels: top15.map(([item]) => item),
+                        labels: top15.map(([item]) => item), 
                         datasets: [{ 
                             label: 'กล่อง', 
                             data: top15.map(([, info]) => info.total), 
