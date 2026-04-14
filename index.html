@@ -2345,7 +2345,9 @@
                                         const items = breakdown[label];
                                         
                                         // 1. คำนวณขวดย่อย/ชิ้นย่อย
+                                        // 1. คำนวณขวดย่อย/ชิ้นย่อย
                                         let unitSums = {};
+                                        let totalSubUnits = 0; // ตัวแปรเก็บยอดแตกรวม
                                         items.forEach(i => {
                                             let multiplier = 1;
                                             let uName = 'ชิ้น';
@@ -2358,7 +2360,9 @@
                                                     uName = match[2];
                                                 }
                                             }
-                                            unitSums[uName] = (unitSums[uName] || 0) + (i.total * multiplier);
+                                            const subTotal = i.total * multiplier;
+                                            unitSums[uName] = (unitSums[uName] || 0) + subTotal;
+                                            totalSubUnits += subTotal;
                                         });
                                         const unitString = Object.entries(unitSums).map(([u, v]) => `${v.toLocaleString()} ${u}`).join(', ');
 
@@ -2371,7 +2375,9 @@
                                             return parts.length === 3 && parseInt(parts[0]) === selYearCE && parseInt(parts[1]) - 1 === selMonth;
                                         });
                                         const totalDays = daysWithData.length > 0 ? daysWithData.length : 1;
-                                        const avgPerDayBox = (boxQty / totalDays).toFixed(2);
+                                        
+                                        // คำนวณเฉลี่ยแบบใหม่: (ยอดแตกรวม / 12) / จำนวนวัน
+                                        const avgPerDayBox = ((totalSubUnits / 12) / totalDays).toFixed(2);
 
                                         const lines = [
                                             `📦 แตกย่อยรวม: ${unitString}`,
@@ -2464,11 +2470,13 @@
                                     });
                                     
                                     const totalDays = daysWithData.length > 0 ? daysWithData.length : 1; // ป้องกันหาร 0
-                                    const avgPerDay = (totalUnit / totalDays).toFixed(2);
+                                    
+                                    // คำนวณเฉลี่ยแบบใหม่: (ยอดแตกรวม / 12) / จำนวนวัน
+                                    const avgPerDayBox = ((totalUnit / 12) / totalDays).toFixed(2);
 
                                     return [
                                         `📦 แตกย่อย: ${totalUnit.toLocaleString()} ${unitName}`,
-                                        `📈 เฉลี่ย: ${avgPerDay} ${unitName}/วัน (จาก ${totalDays} วัน)`
+                                        `📈 เฉลี่ย: ${avgPerDayBox} กล่อง/วัน (จาก ${totalDays} วัน)`
                                     ];
                                 }
                             }
