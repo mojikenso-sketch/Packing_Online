@@ -1985,7 +1985,7 @@
                 const val = latestWH[cat.id] || 0;
 
                 // กระจายยอด DUO SET ลงกลุ่มย่อย
-                if (group === 'DUO SET') {
+                if (group === 'ผสม(SO 1 ขวด+E1H 1 ขวด)') {
                     DUO_SPLIT.forEach(g => {
                         stockGroupTotals[g] = (stockGroupTotals[g] || 0) + val;
                     });
@@ -1996,7 +1996,7 @@
 
             // กรองกลุ่ม DUO SET ออกไม่ให้โชว์ในกราฟ และเรียงลำดับ
             const sortedStockGroups = Object.keys(PRODUCT_GROUPS)
-                .filter(g => g !== 'DUO SET') // ลบ DUO SET ออกจากการแสดงผล
+                .filter(g => g !== 'ผสม(SO 1 ขวด+E1H 1 ขวด)') // ลบ DUO SET ออกจากการแสดงผล
                 .map(g => ({
                     label: PRODUCT_GROUPS[g].label,
                     val: stockGroupTotals[g] || 0,
@@ -2206,30 +2206,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     layout: { padding: { right: 50 } },
-                    plugins: { 
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                afterLabel: function(context) {
-                                    const label = context.label;
-                                    const breakdown = context.chart.data.breakdownData;
-                                    if (breakdown && breakdown[label]) {
-                                        const items = breakdown[label];
-                                        const lines = ['','🔍 รายละเอียดในกลุ่มนี้:'];
-                                        // แสดง 10 อันดับแรกในกลุ่มนี้
-                                        items.slice(0, 10).forEach(i => {
-                                            lines.push(`- ${i.name}: ${i.total.toLocaleString()} กล่อง`);
-                                        });
-                                        if (items.length > 10) {
-                                            lines.push(`... และอื่นๆ อีก ${items.length - 10} รายการ`);
-                                        }
-                                        return lines;
-                                    }
-                                    return null;
-                                }
-                            }
-                        }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
                         x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9fa8da' } },
                         y: { grid: { display: false }, ticks: { autoSkip: false, color: '#9fa8da', font: { size: 12, family: 'Inter' } } }
@@ -2351,6 +2328,7 @@
                                     if (breakdown && breakdown[label]) {
                                         const items = breakdown[label];
                                         const lines = ['','🔍 รายละเอียดในกลุ่มนี้:'];
+                                        // แสดง 10 อันดับแรกในกลุ่มนี้
                                         items.slice(0, 10).forEach(i => {
                                             lines.push(`- ${i.name}: ${i.total.toLocaleString()} กล่อง`);
                                         });
@@ -2365,6 +2343,11 @@
                         }
                     },
                     scales: {
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9fa8da' } },
+                        y: { grid: { display: false }, ticks: { autoSkip: false, color: '#9fa8da', font: { size: 12, family: 'Inter' } } }
+                    }
+                }
+            });
 
             // 6. กราฟ Top 15 (อัปเกรด Tooltip)
             charts.topProductsSalesMonth = new Chart(document.getElementById('topProductsSalesChartMonth'), {
@@ -2407,7 +2390,7 @@
                                     let multiplier = 1;
                                     let unitName = 'ชิ้น';
                                     
-                                    if (itemName.includes('DUO SET')) {
+                                    if (itemName.includes('ผสม(SO 1 ขวด+E1H 1 ขวด)')) {
                                         multiplier = 2;
                                         unitName = 'ขวด';
                                     } else {
@@ -2435,8 +2418,7 @@
                                     const avgPerDay = (totalUnit / totalDays).toFixed(2);
 
                                     return [
-                                        `📦 แตกย่อย: ${to
-                                                     talUnit.toLocaleString()} ${unitName}`,
+                                        `📦 แตกย่อย: ${totalUnit.toLocaleString()} ${unitName}`,
                                         `📈 เฉลี่ย: ${avgPerDay} ${unitName}/วัน (จาก ${totalDays} วัน)`
                                     ];
                                 }
@@ -2625,6 +2607,7 @@
 
         // กฎการแยกส่วนประกอบ DUO SET
         const DUO_SPLIT = ['คิง 10,000 ppm.', 'King 13,500 ppm.'];
+        
         // ฟังก์ชันสำหรับแปลงชื่อสินค้าจากหลายแพลตฟอร์มให้เป็น "ชื่อมาตรฐาน" เดียวกัน
         function standardizeProductName(rawName) {
             const name = rawName.trim();
@@ -2666,6 +2649,7 @@
 
             return baseName;
         }
+
         // ฟังก์ชันสำหรับแปลงชื่อสินค้าจากหลายแพลตฟอร์มให้เป็น "ชื่อมาตรฐาน" เดียวกัน
         function detectProductGroup(itemName) {
             const name = itemName.trim();
@@ -2849,7 +2833,7 @@
                     pTotal += qty; grandTotal += qty;
 
                     // กระจายยอดกลุ่มสินค้า (De-bundling DUO SET)
-                    if (group === 'DUO SET') {
+                    if (group === 'ผสม(SO 1 ขวด+E1H 1 ขวด)') {
                         DUO_SPLIT.forEach(g => {
                             groupTotals[g] = (groupTotals[g] || 0) + qty;
                         });
@@ -3248,7 +3232,7 @@
             };
             const pendingDailyData = new Array(31).fill(0);
             const returnDailyData = new Array(31).fill(0);
-            const bounceDailyData = new Array(31).fill(0); // <-- เพิ่มบรรทัดนี้
+            const bounceDailyData = new Array(31).fill(0); 
 
             const allMonthItems = {};
             const monthGroupTotals = {};
@@ -3313,7 +3297,7 @@
                     
                     pendingDailyData[dayNum - 1] = dayPendingTotal;
                     returnDailyData[dayNum - 1] = dayReturnTotal;
-                    bounceDailyData[dayNum - 1] = dayBounceTotal; // <-- เพิ่มบรรทัดนี้
+                    bounceDailyData[dayNum - 1] = dayBounceTotal; 
                     hasAnyRow = true;
 
                     html += `<tr>
@@ -3337,7 +3321,7 @@
                 });
                 charts.monthlySales.data.pendingData = pendingDailyData;
                 charts.monthlySales.data.returnData = returnDailyData;
-                charts.monthlySales.data.bounceData = bounceDailyData; // <-- เพิ่มบรรทัดนี้
+                charts.monthlySales.data.bounceData = bounceDailyData; 
 
                 charts.monthlySales.update();
                 charts.monthlySales.resize();
