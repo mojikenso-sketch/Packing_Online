@@ -1995,7 +1995,7 @@
                 const val = latestWH[cat.id] || 0;
 
                 // กระจายยอด DUO SET ลงกลุ่มย่อย
-                if (group === 'ผสม(SO 1 ขวด+E1H 1 ขวด)') {
+                if (group === 'DUO SET(SO+E1H)') {
                     DUO_SPLIT.forEach(g => {
                         stockGroupTotals[g] = (stockGroupTotals[g] || 0) + val;
                     });
@@ -2006,7 +2006,7 @@
 
             // กรองกลุ่ม DUO SET ออกไม่ให้โชว์ในกราฟ และเรียงลำดับ
             const sortedStockGroups = Object.keys(PRODUCT_GROUPS)
-                .filter(g => g !== 'ผสม(SO 1 ขวด+E1H 1 ขวด)') // ลบ DUO SET ออกจากการแสดงผล
+                .filter(g => g !== 'DUO SET(SO+E1H)') // ลบ DUO SET ออกจากการแสดงผล
                 .map(g => ({
                     label: PRODUCT_GROUPS[g].label,
                     val: stockGroupTotals[g] || 0,
@@ -2332,19 +2332,59 @@
                         legend: { display: false },
                         tooltip: {
                             callbacks: {
+                                // เพิ่มคำว่า "กล่อง" ต่อท้ายเลขรวม
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw.toLocaleString()} กล่อง`;
+                                },
                                 afterLabel: function(context) {
                                     const label = context.label;
+                                    const boxQty = context.raw;
                                     const breakdown = context.chart.data.breakdownData;
+                                    
                                     if (breakdown && breakdown[label]) {
                                         const items = breakdown[label];
-                                        const lines = ['','🔍 รายละเอียดในกลุ่มนี้:'];
-                                        // แสดง 10 อันดับแรกในกลุ่มนี้
-                                        items.slice(0, 10).forEach(i => {
+                                        
+                                        // 1. คำนวณขวดย่อย/ชิ้นย่อย
+                                        let unitSums = {};
+                                        items.forEach(i => {
+                                            let multiplier = 1;
+                                            let uName = 'ชิ้น';
+                                            if (i.name.includes('ผสม(SO 1 ขวด+E1H 1 ขวด)')) {
+                                                multiplier = 2; uName = 'ขวด';
+                                            } else {
+                                                const match = i.name.match(/(\d+)\s*(ขวด|ซอง|กระป๋อง|ชิ้น|กล่อง|แผง|ชุด|หลอด|ก้อน)/);
+                                                if (match) {
+                                                    multiplier = parseInt(match[1]);
+                                                    uName = match[2];
+                                                }
+                                            }
+                                            unitSums[uName] = (unitSums[uName] || 0) + (i.total * multiplier);
+                                        });
+                                        const unitString = Object.entries(unitSums).map(([u, v]) => `${v.toLocaleString()} ${u}`).join(', ');
+
+                                        // 2. คำนวณวันเฉลี่ย
+                                        const selMonth = parseInt(document.getElementById('monthSelect').value);
+                                        const selYearCE = 2500 + parseInt(document.getElementById('yearInput').value) - 543;
+                                        const historyIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
+                                        const daysWithData = historyIndex.filter(dateKey => {
+                                            const parts = dateKey.split('-');
+                                            return parts.length === 3 && parseInt(parts[0]) === selYearCE && parseInt(parts[1]) - 1 === selMonth;
+                                        });
+                                        const totalDays = daysWithData.length > 0 ? daysWithData.length : 1;
+                                        const avgPerDayBox = (boxQty / totalDays).toFixed(2);
+
+                                        const lines = [
+                                            `📦 แตกย่อยรวม: ${unitString}`,
+                                            `📈 เฉลี่ยกลุ่มนี้: ${avgPerDayBox} กล่อง/วัน (จาก ${totalDays} วัน)`,
+                                            '',
+                                            '🔍 รายละเอียดในกลุ่มนี้:'
+                                        ];
+                                        
+                                        // 3. แสดงทุกรายการแบบไม่ต้องตัดคำ
+                                        items.forEach(i => {
                                             lines.push(`- ${i.name}: ${i.total.toLocaleString()} กล่อง`);
                                         });
-                                        if (items.length > 10) {
-                                            lines.push(`... และอื่นๆ อีก ${items.length - 10} รายการ`);
-                                        }
+                                        
                                         return lines;
                                     }
                                     return null;
@@ -2399,7 +2439,7 @@
                                     let multiplier = 1;
                                     let unitName = 'ชิ้น';
                                     
-                                    if (itemName.includes('ผสม(SO 1 ขวด+E1H 1 ขวด)')) {
+                                    if (itemName.includes('DUO SET(SO+E1H)')) {
                                         multiplier = 2;
                                         unitName = 'ขวด';
                                     } else {
@@ -2606,7 +2646,7 @@
             'ครีมเทียม 200ก.': { emoji: '🍦', color: 'rgba(233, 30, 99, 0.8)', label: 'ครีมเทียม 200ก.' },
             'ซีเรียลดริ๊งค์งาดำ': { emoji: '☕', color: 'rgba(76, 175, 80, 0.8)', label: 'ซีเรียลดริ๊งค์งาดำ' },
             'ซีเรียลดริ๊งค์ออริจินอล': { emoji: '🥣', color: 'rgba(255, 171, 64, 0.8)', label: 'ซีเรียลดริ๊งค์ออริจินอล' },
-            'ผสม(SO 1 ขวด+E1H 1 ขวด)': { emoji: '🎯', color: 'rgba(255, 82, 82, 0.8)', label: 'ผสม(SO 1 ขวด+E1H 1 ขวด)' },
+            'DUO SET(SO+E1H)': { emoji: '🎯', color: 'rgba(255, 82, 82, 0.8)', label: 'DUO SET(SO+E1H)' },
             'ผสม/อื่นๆ': { emoji: '🔀', color: 'rgba(158, 158, 158, 0.8)', label: 'ผสม/อื่นๆ' },
         };
 
@@ -2625,7 +2665,7 @@
             const hasSO1 = upper.includes('SO 1') || upper.includes('SO1') || upper.includes('SO 1ขวด');
             const hasE1H1 = upper.includes('E1H 1') || upper.includes('E1H1') || upper.includes('E1H 1ขวด');
             if ((hasSO1 && hasE1H1) || upper.includes('DUO')) {
-                return 'ผสม(SO 1 ขวด+E1H 1 ขวด)'; 
+                return 'DUO SET(SO+E1H)'; 
             }
 
             let baseName = name;
@@ -2665,7 +2705,7 @@
             const upper = itemName.toUpperCase();
             
             // เช็คตรงๆ จากชื่อที่โดน Standardize มาแล้ว
-            if (upper.includes('ผสม(SO 1 ขวด+E1H 1 ขวด)')) return 'ผสม(SO 1 ขวด+E1H 1 ขวด)';
+            if (upper.includes('DUO SET(SO+E1H)')) return 'DUO SET(SO+E1H)';
             if (upper.startsWith('SO')) return 'SO';
             if (upper.startsWith('E1H')) return 'E1H';
             if (upper.startsWith('RICELY')) return 'Ricely';
@@ -2676,7 +2716,7 @@
             if (upper.includes('ซีเรียลดริ๊งค์ออริจินอล')) return 'ซีเรียลดริ๊งค์ออริจินอล';
 
             // กฎดักเผื่อหลุด 
-            if (upper.includes('SO 1') && upper.includes('E1H 1')) return 'ผสม(SO 1 ขวด+E1H 1 ขวด)';
+            if (upper.includes('SO 1') && upper.includes('E1H 1')) return 'DUO SET(SO+E1H)';
             if (upper.includes('งาดำ') || upper.includes('BLACK SESAME') || (upper.includes('CRD') && upper.includes('งาดำ'))) return 'ซีเรียลดริ๊งค์งาดำ';
             if (upper.includes('ครีม') || upper.includes('NDC')) return 'ครีมเทียม 200ก.';
             if (upper.includes('ธัญญาหาร') || upper.includes('ออริจินอล') || upper.includes('ออริจินัล') || upper.includes('CEREAL') || upper.includes('CRD')) return 'ซีเรียลดริ๊งค์ออริจินอล';
@@ -2845,7 +2885,7 @@
                     pTotal += qty; grandTotal += qty;
 
                     // กระจายยอดกลุ่มสินค้า (De-bundling DUO SET)
-                    if (group === 'ผสม(SO 1 ขวด+E1H 1 ขวด)') {
+                    if (group === 'DUO SET(SO+E1H)') {
                         DUO_SPLIT.forEach(g => {
                             groupTotals[g] = (groupTotals[g] || 0) + qty;
                         });
