@@ -2206,7 +2206,30 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     layout: { padding: { right: 50 } },
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    const label = context.label;
+                                    const breakdown = context.chart.data.breakdownData;
+                                    if (breakdown && breakdown[label]) {
+                                        const items = breakdown[label];
+                                        const lines = ['','🔍 รายละเอียดในกลุ่มนี้:'];
+                                        // แสดง 10 อันดับแรกในกลุ่มนี้
+                                        items.slice(0, 10).forEach(i => {
+                                            lines.push(`- ${i.name}: ${i.total.toLocaleString()} กล่อง`);
+                                        });
+                                        if (items.length > 10) {
+                                            lines.push(`... และอื่นๆ อีก ${items.length - 10} รายการ`);
+                                        }
+                                        return lines;
+                                    }
+                                    return null;
+                                }
+                            }
+                        }
+                    },
                     scales: {
                         x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9fa8da' } },
                         y: { grid: { display: false }, ticks: { autoSkip: false, color: '#9fa8da', font: { size: 12, family: 'Inter' } } }
@@ -2395,7 +2418,8 @@
                                     const avgPerDay = (totalUnit / totalDays).toFixed(2);
 
                                     return [
-                                        `📦 แตกย่อย: ${totalUnit.toLocaleString()} ${unitName}`,
+                                        `📦 แตกย่อย: ${to
+                                                     talUnit.toLocaleString()} ${unitName}`,
                                         `📈 เฉลี่ย: ${avgPerDay} ${unitName}/วัน (จาก ${totalDays} วัน)`
                                     ];
                                 }
@@ -3327,9 +3351,25 @@
 
                 sortedGroups.sort((a, b) => b.val - a.val);
 
+                // --- โค้ดใหม่: เตรียมข้อมูลไส้ใน (Breakdown) ส่งให้ Tooltip ---
+                const breakdown = {};
+                Object.keys(PRODUCT_GROUPS).forEach(g => breakdown[PRODUCT_GROUPS[g].label] = []);
+                
+                Object.entries(allMonthItems).forEach(([itemName, info]) => {
+                    const gLabel = PRODUCT_GROUPS[info.group] ? PRODUCT_GROUPS[info.group].label : PRODUCT_GROUPS['ผสม/อื่นๆ'].label;
+                    if (!breakdown[gLabel]) breakdown[gLabel] = [];
+                    breakdown[gLabel].push({ name: itemName, total: info.total });
+                });
+                
+                // เรียงลำดับรายการใน Tooltip จากยอดขายมากไปน้อย
+                Object.keys(breakdown).forEach(gLabel => {
+                    breakdown[gLabel].sort((a, b) => b.total - a.total);
+                });
+
                 charts.categorySalesMonth.data.labels = sortedGroups.map(g => g.label);
                 charts.categorySalesMonth.data.datasets[0].data = sortedGroups.map(g => g.val);
                 charts.categorySalesMonth.data.datasets[0].backgroundColor = sortedGroups.map(g => g.color);
+                charts.categorySalesMonth.data.breakdownData = breakdown; // ส่งข้อมูลให้กราฟ
                 charts.categorySalesMonth.update('none');
             }
 
