@@ -62,7 +62,6 @@
             z-index: 0;
         }
 
-        /* ซ่อนเนื้อหาหลักจนกว่าจะ Login ผ่าน */
         .app-container {
             position: relative;
             z-index: 1;
@@ -72,7 +71,6 @@
             display: none;
         }
 
-        /* ================= LOGIN OVERLAY ================= */
         #loginOverlay {
             position: fixed;
             top: 0;
@@ -157,7 +155,6 @@
             font-weight: 500;
         }
 
-        /* Header */
         .header {
             background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
             border: 1px solid var(--glass-border);
@@ -260,7 +257,6 @@
             box-shadow: none !important;
         }
 
-        /* Summary Cards */
         .summary-cards {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -316,7 +312,6 @@
             line-height: 1.5;
         }
 
-        /* Dashboard Layout */
         .dashboard-layout {
             display: flex;
             gap: 24px;
@@ -340,7 +335,6 @@
             gap: 24px;
         }
 
-        /* Tabs */
         .tab-nav {
             display: flex;
             flex-direction: column;
@@ -413,7 +407,6 @@
             }
         }
 
-        /* Tables & Sections */
         .section {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
@@ -659,7 +652,6 @@
             color: rgba(255, 255, 255, 0.2)
         }
 
-        /* Category Modal */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -717,7 +709,6 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* Cloud Loading Spinner */
         .cloud-loader {
             width: 16px;
             height: 16px;
@@ -739,7 +730,6 @@
             }
         }
 
-        /* Order Section Styles */
         .upload-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -940,7 +930,6 @@
             padding: 0 16px 16px;
         }
 
-        /* Responsive */
         @media (max-width: 900px) {
             .dashboard-layout {
                 flex-direction: column;
@@ -1120,16 +1109,8 @@
                                     style="padding:6px 16px; border:none; border-radius:8px; background:transparent; color:var(--text-muted); font-weight:600; cursor:pointer; transition:all 0.3s;">ลัง</button>
                             </div>
                         </div>
-                        <style>
-                            .unit-toggle-btn.active {
-                                background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan)) !important;
-                                color: var(--bg-primary) !important;
-                                box-shadow: 0 4px 12px rgba(79, 195, 247, 0.2);
-                            }
-                        </style>
                         <div class="table-wrapper" id="warehouseTableWrapper"></div>
                     </div>
-
                 </div>
 
                 <div class="tab-panel" id="tab-daily">
@@ -1162,18 +1143,12 @@
                         </div>
                         <div class="table-wrapper" id="remarkTableWrapper"></div>
                     </div>
-
                 </div>
 
                 <div class="tab-panel" id="tab-order">
                     <div class="section animate-in">
                         <div class="section-header">
-                            <div class="section-title">
-                                <span>📊</span> สรุปยอดขายรายวัน (อัปโหลดและรวมยอด)
-                            </div>
-                            <div style="font-size:13px;color:var(--text-muted);">
-                                📂 อัปโหลดไฟล์ Excel ยอดขายจากแต่ละแพลตฟอร์ม แล้วกด "รวมยอด"
-                            </div>
+                            <div class="section-title"><span>📊</span> สรุปยอดขายรายวัน (อัปโหลดและรวมยอด)</div>
                         </div>
 
                         <div class="upload-grid">
@@ -1182,20 +1157,13 @@
                                 <input type="file" accept=".xlsx,.xls,.csv" id="file-shopee"
                                     onchange="handleFileUpload('shopee', this)" hidden multiple>
                                 <button class="btn btn-secondary"
-                                    onclick="document.getElementById('file-shopee').click()">📂 เลือกไฟล์
-                                    (เลือกได้หลายไฟล์)</button>
+                                    onclick="document.getElementById('file-shopee').click()">📂 เลือกไฟล์ (เลือกได้หลายไฟล์)</button>
                                 <div class="upload-status" id="status-shopee">ยังไม่ได้อัปโหลด</div>
                                 <div class="upload-file-list" id="filelist-shopee"></div>
                                 <div style="display:flex;width:100%;gap:6px;margin-top:auto;padding-top:10px;">
-                                    <input type="number" id="pending-shopee" class="cell-input"
-                                        style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
-                                        placeholder="ค้างส่ง">
-                                    <input type="number" id="return-shopee" class="cell-input"
-                                        style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
-                                        placeholder="ยกเลิก">
-                                    <input type="number" id="bounce-shopee" class="cell-input"
-                                        style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
-                                        placeholder="ตีกลับ">
+                                    <input type="number" id="pending-shopee" class="cell-input" style="flex:1" placeholder="ค้างส่ง">
+                                    <input type="number" id="return-shopee" class="cell-input" style="flex:1" placeholder="ยกเลิก">
+                                    <input type="number" id="bounce-shopee" class="cell-input" style="flex:1" placeholder="ตีกลับ">
                                 </div>
                             </div>
                             <div class="upload-card" id="upload-lazada">
@@ -1203,20 +1171,13 @@
                                 <input type="file" accept=".xlsx,.xls,.csv" id="file-lazada"
                                     onchange="handleFileUpload('lazada', this)" hidden multiple>
                                 <button class="btn btn-secondary"
-                                    onclick="document.getElementById('file-lazada').click()">📂 เลือกไฟล์
-                                    (เลือกได้หลายไฟล์)</button>
+                                    onclick="document.getElementById('file-lazada').click()">📂 เลือกไฟล์ (เลือกได้หลายไฟล์)</button>
                                 <div class="upload-status" id="status-lazada">ยังไม่ได้อัปโหลด</div>
                                 <div class="upload-file-list" id="filelist-lazada"></div>
                                 <div style="display:flex;width:100%;gap:6px;margin-top:auto;padding-top:10px;">
-                                    <input type="number" id="pending-lazada" class="cell-input"
-                                        style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
-                                        placeholder="ค้างส่ง">
-                                    <input type="number" id="return-lazada" class="cell-input"
-                                        style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
-                                        placeholder="ยกเลิก">
-                                    <input type="number" id="bounce-lazada" class="cell-input"
-                                        style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
-                                        placeholder="ตีกลับ">
+                                    <input type="number" id="pending-lazada" class="cell-input" style="flex:1" placeholder="ค้างส่ง">
+                                    <input type="number" id="return-lazada" class="cell-input" style="flex:1" placeholder="ยกเลิก">
+                                    <input type="number" id="bounce-lazada" class="cell-input" style="flex:1" placeholder="ตีกลับ">
                                 </div>
                             </div>
                             <div class="upload-card" id="upload-flash">
@@ -1224,20 +1185,13 @@
                                 <input type="file" accept=".xlsx,.xls,.csv" id="file-flash"
                                     onchange="handleFileUpload('flash', this)" hidden multiple>
                                 <button class="btn btn-secondary"
-                                    onclick="document.getElementById('file-flash').click()">📂 เลือกไฟล์
-                                    (เลือกได้หลายไฟล์)</button>
+                                    onclick="document.getElementById('file-flash').click()">📂 เลือกไฟล์ (เลือกได้หลายไฟล์)</button>
                                 <div class="upload-status" id="status-flash">ยังไม่ได้อัปโหลด</div>
                                 <div class="upload-file-list" id="filelist-flash"></div>
                                 <div style="display:flex;width:100%;gap:6px;margin-top:auto;padding-top:10px;">
-                                    <input type="number" id="pending-flash" class="cell-input"
-                                        style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
-                                        placeholder="ค้างส่ง">
-                                    <input type="number" id="return-flash" class="cell-input"
-                                        style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
-                                        placeholder="ยกเลิก">
-                                    <input type="number" id="bounce-flash" class="cell-input"
-                                        style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
-                                        placeholder="ตีกลับ">
+                                    <input type="number" id="pending-flash" class="cell-input" style="flex:1" placeholder="ค้างส่ง">
+                                    <input type="number" id="return-flash" class="cell-input" style="flex:1" placeholder="ยกเลิก">
+                                    <input type="number" id="bounce-flash" class="cell-input" style="flex:1" placeholder="ตีกลับ">
                                 </div>
                             </div>
                             <div class="upload-card" id="upload-best">
@@ -1245,48 +1199,32 @@
                                 <input type="file" accept=".xlsx,.xls,.csv" id="file-best"
                                     onchange="handleFileUpload('best', this)" hidden multiple>
                                 <button class="btn btn-secondary"
-                                    onclick="document.getElementById('file-best').click()">📂 เลือกไฟล์
-                                    (เลือกได้หลายไฟล์)</button>
+                                    onclick="document.getElementById('file-best').click()">📂 เลือกไฟล์ (เลือกได้หลายไฟล์)</button>
                                 <div class="upload-status" id="status-best">ยังไม่ได้อัปโหลด</div>
                                 <div class="upload-file-list" id="filelist-best"></div>
                                 <div style="display:flex;width:100%;gap:6px;margin-top:auto;padding-top:10px;">
-                                    <input type="number" id="pending-best" class="cell-input"
-                                        style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
-                                        placeholder="ค้างส่ง">
-                                    <input type="number" id="return-best" class="cell-input"
-                                        style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
-                                        placeholder="ยกเลิก">
-                                    <input type="number" id="bounce-best" class="cell-input"
-                                        style="flex:1;width:100%;font-size:12px;padding:6px;min-width:0"
-                                        placeholder="ตีกลับ">
+                                    <input type="number" id="pending-best" class="cell-input" style="flex:1" placeholder="ค้างส่ง">
+                                    <input type="number" id="return-best" class="cell-input" style="flex:1" placeholder="ยกเลิก">
+                                    <input type="number" id="bounce-best" class="cell-input" style="flex:1" placeholder="ตีกลับ">
                                 </div>
                             </div>
                         </div>
 
                         <div style="margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-                            <div class="month-selector">
-                                <label style="font-size:13px;color:var(--text-secondary)">📅 วันที่:</label>
-                                <input type="date" id="orderDateInput"
-                                    style="padding:8px 12px;background:rgba(79,195,247,0.1);border:1px solid var(--glass-border);border-radius:8px;color:var(--text-primary);font-family:inherit;font-size:14px;outline:none;">
-                            </div>
-                            <button class="btn btn-primary" onclick="consolidateOrders()">🔄 รวมยอด &
-                                สรุปภาพรวม</button>
-                            <button class="btn btn-secondary" onclick="exportOrderCSV()" id="btnExportOrder"
-                                style="display:none;">📥 Export ยอดขาย (CSV)</button>
-                            <button class="btn btn-primary" onclick="saveOrderHistory()"
-                                style="background:linear-gradient(135deg, var(--accent-green), #4caf50);">💾
-                                บันทึกประวัติ Order</button>
-                            <button class="btn btn-secondary" onclick="loadOrderHistory()">📂 โหลดประวัติ Order</button>
-                            <button class="btn btn-danger" onclick="clearOrders()">🗑️ ล้างข้อมูลออเดอร์</button>
+                            <input type="date" id="orderDateInput" style="padding:8px 12px;background:rgba(79,195,247,0.1);border:1px solid var(--glass-border);border-radius:8px;color:var(--text-primary);">
+                            <button class="btn btn-primary" onclick="consolidateOrders()">🔄 รวมยอด & สรุปภาพรวม</button>
+                            <button class="btn btn-secondary" onclick="exportOrderCSV()" id="btnExportOrder" style="display:none;">📥 Export (CSV)</button>
+                            <button class="btn btn-primary" onclick="saveOrderHistory()" style="background:linear-gradient(135deg, var(--accent-green), #4caf50);">💾 บันทึกประวัติ</button>
+                            <button class="btn btn-secondary" onclick="loadOrderHistory()">📂 โหลดประวัติ</button>
+                            <button class="btn btn-danger" onclick="clearOrders()">🗑️ ล้างข้อมูล</button>
                         </div>
 
                         <div id="orderHistorySection" style="margin-top:16px">
                             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
                                 <h4 style="color:var(--text-secondary);margin:0">📚 ประวัติยอดขายที่บันทึกแล้ว</h4>
-                                <button class="btn btn-secondary" onclick="toggleHistoryList()"
-                                    style="padding:4px 12px;font-size:12px" id="historyToggleBtn">▲ ซ่อน</button>
+                                <button class="btn btn-secondary" onclick="toggleHistoryList()" id="historyToggleBtn">▲ ซ่อน</button>
                             </div>
-                            <div id="orderHistoryList" style="display:block"></div>
+                            <div id="orderHistoryList"></div>
                         </div>
 
                         <div id="orderResults" style="margin-top:24px;display:none">
@@ -1296,58 +1234,37 @@
                                 <div class="order-summary-row" id="productGroupRow"></div>
                             </div>
                             <div style="margin-top:20px">
-                                <h3 style="color:var(--accent-cyan);margin-bottom:12px">📦 รายละเอียดสินค้ารวม
-                                    (ทุกแพลตฟอร์ม)</h3>
+                                <h3 style="color:var(--accent-cyan);margin-bottom:12px">📦 รายละเอียดสินค้ารวม (ทุกแพลตฟอร์ม)</h3>
                                 <div class="table-wrapper" id="orderTableWrapper"></div>
-                            </div>
-                            <div style="margin-top:20px">
-                                <h3 style="color:var(--accent-cyan);margin-bottom:12px">🏢 แยกตามแพลตฟอร์ม</h3>
-                                <div id="platformBreakdown"></div>
                             </div>
                             <div class="charts-grid" style="margin-top:20px">
                                 <div class="chart-card">
-                                    <div class="chart-title">📊 ยอดขายแยกตามสินค้า Top 15 (กล่อง)</div>
+                                    <div class="chart-title">📊 Top 15 (กล่อง)</div>
                                     <div class="chart-container"><canvas id="orderProductChart"></canvas></div>
                                 </div>
                                 <div class="chart-card">
-                                    <div class="chart-title">🥧 สัดส่วนยอดขายแต่ละแพลตฟอร์ม</div>
+                                    <div class="chart-title">🥧 สัดส่วนแพลตฟอร์ม</div>
                                     <div class="chart-container"><canvas id="orderPlatformChart"></canvas></div>
                                 </div>
                                 <div class="chart-card">
-                                    <div class="chart-title">🏷️ ยอดขายแยกตามกลุ่มสินค้า(กล่อง)</div>
+                                    <div class="chart-title">🏷️ ตามกลุ่มสินค้า</div>
                                     <div class="chart-container"><canvas id="orderGroupChart"></canvas></div>
-                                </div>
-                                <div class="chart-card">
-                                    <div class="chart-title">📈 ยอดขายแยกตามแพลตฟอร์ม (Stacked)</div>
-                                    <div class="chart-container"><canvas id="orderStackedChart"></canvas></div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
 
                 <div class="tab-panel" id="tab-monthly">
                     <div class="section animate-in">
-                        <div class="section-header" style="flex-wrap:wrap;gap:16px;">
+                        <div class="section-header">
                             <div class="section-title"><span>📆</span> สรุปยอดขายรายเดือน</div>
-                            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                                <span style="font-size:13px;color:var(--text-secondary)">📅 เดือน / ปี:</span>
-                                <select id="monthSelect4"
-                                    style="padding:8px 12px;background:rgba(79,195,247,0.1);border:1px solid var(--glass-border);border-radius:8px;color:var(--text-primary);font-family:inherit;font-size:14px;outline:none;"></select>
-                                <input type="number" id="yearInput4" min="60" max="99"
-                                    style="width:70px;padding:8px 12px;background:rgba(79,195,247,0.1);border:1px solid var(--glass-border);border-radius:8px;color:var(--text-primary);font-family:inherit;font-size:14px;outline:none;"
-                                    title="ปี พ.ศ. (2 หลัก)">
-                                <button class="btn btn-primary" onclick="renderMonthlyOrderSummary()"
-                                    style="padding:8px 16px;font-size:13px;">🔄 โหลดข้อมูล</button>
-                                <button class="btn btn-secondary" onclick="forceSaveMonthlyToCloud()"
-                                    style="padding:8px 16px;font-size:13px;background:linear-gradient(135deg, var(--accent-green), #4caf50);color:white;border:none;">💾
-                                    บันทึกขึ้น Cloud</button>
-                                <span style="font-size:12px;color:var(--text-muted);">🔗 ลิงก์กับเดือน/ปีด้านบน</span>
+                            <div style="display:flex;gap:10px;">
+                                <select id="monthSelect4" style="padding:8px;background:rgba(79,195,247,0.1);color:white;border-radius:8px;border:1px solid var(--glass-border);"></select>
+                                <input type="number" id="yearInput4" style="width:70px;padding:8px;background:rgba(79,195,247,0.1);color:white;border-radius:8px;border:1px solid var(--glass-border);">
+                                <button class="btn btn-primary" onclick="renderMonthlyOrderSummary()">🔄 โหลดข้อมูล</button>
+                                <button class="btn btn-secondary" onclick="forceSaveMonthlyToCloud()" style="background:var(--accent-green);color:white;">💾 บันทึก Cloud</button>
                             </div>
-                        </div>
-                        <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">
-                            *ข้อมูลตารางนี้จะดึงจาก "ประวัติที่บันทึกแล้ว" หากบันทึกเพิ่มเติม ตารางนี้จะอัปเดตทันที
                         </div>
                         <div id="monthlySummaryRow" class="order-summary-row" style="margin-bottom:24px;"></div>
                         <div class="table-wrapper" id="monthlyOrderTableWrapper"></div>
@@ -1359,17 +1276,12 @@
 
     <div class="modal-overlay" id="catModal">
         <div class="modal-content">
-            <h2 style="margin-bottom: 20px; color: var(--accent-cyan);">⚙️ จัดการประเภทสินค้าใน Stock</h2>
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
-                เพิ่ม ลบ หรือแก้ไขชื่อประเภทสินค้า ข้อมูลจะอัปเดตไปที่ตารางทั้งหมดทันที
-            </p>
+            <h2 style="margin-bottom: 20px; color: var(--accent-cyan);">⚙️ จัดการประเภทสินค้า</h2>
             <div id="catList"></div>
-            <button class="btn btn-secondary" onclick="addCategoryRow()"
-                style="margin-top: 10px; width: 100%; justify-content: center;">+ เพิ่มประเภทใหม่</button>
+            <button class="btn btn-secondary" onclick="addCategoryRow()" style="margin-top: 10px; width: 100%;">+ เพิ่มประเภทใหม่</button>
             <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 30px;">
-                <button class="btn btn-danger" onclick="closeCategoryModal()"
-                    style="background:transparent; border:none;">ยกเลิก</button>
-                <button class="btn btn-primary" onclick="saveCategories()">บันทึกการเปลี่ยนแปลง</button>
+                <button class="btn btn-danger" onclick="closeCategoryModal()">ยกเลิก</button>
+                <button class="btn btn-primary" onclick="saveCategories()">บันทึก</button>
             </div>
         </div>
     </div>
@@ -1377,34 +1289,24 @@
     <div class="toast" id="toast">✅ สำเร็จ!</div>
 
     <script>
-        // =========================================================================
-        // 🔴 🔴 🔴 ตั้งค่าบัญชีและรหัสผ่าน ตรงนี้ 🔴 🔴 🔴
         const VALID_USER = "admin";
         const VALID_PASS = "krgpackingonline";
-
-        // 🔴 🔴 🔴 CLOUD API URL 🔴 🔴 🔴
         const API_URL = "https://script.google.com/macros/s/AKfycbyqQy-5KC1XGL0dSumddKFCJLSptEzPmQ9Esc07UHvYa8flzA1K1QqkS3KzMVJ1Rg/exec";
-        // =========================================================================
 
-        // ================= LOGIN SYSTEM =================
         function checkLogin() {
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
-            const errorText = document.getElementById('loginError');
-
             if (user === VALID_USER && pass === VALID_PASS) {
                 sessionStorage.setItem('isLoggedIn', 'true');
-                const overlay = document.getElementById('loginOverlay');
-                overlay.style.opacity = '0';
+                document.getElementById('loginOverlay').style.opacity = '0';
                 setTimeout(() => {
-                    overlay.style.display = 'none';
+                    document.getElementById('loginOverlay').style.display = 'none';
                     document.getElementById('mainAppContent').style.display = 'block';
-                    // โหลดข้อมูลก็ต่อเมื่อ Login ผ่านแล้ว
                     initDashboard();
                 }, 500);
             } else {
-                errorText.style.display = 'block';
-                setTimeout(() => { errorText.style.display = 'none'; }, 3000);
+                document.getElementById('loginError').style.display = 'block';
+                setTimeout(() => { document.getElementById('loginError').style.display = 'none'; }, 3000);
             }
         }
 
@@ -1418,19 +1320,9 @@
 
         function logoutUser() {
             sessionStorage.removeItem('isLoggedIn');
-            location.reload(); // รีเฟรชหน้าเพื่อกลับไปหน้า Login
+            location.reload();
         }
 
-        // รองรับการกด Enter
-        document.getElementById('password').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') checkLogin();
-        });
-        document.getElementById('username').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') document.getElementById('password').focus();
-        });
-
-        // =========================================================================
-        // Plugin สำหรับวาดเส้นป้ายกำกับกราฟวงกลม
         Chart.register({
             id: 'pieLabelsLine',
             afterDraw(chart) {
@@ -1438,25 +1330,20 @@
                 const ctx = chart.ctx;
                 const dataset = chart.data.datasets[0];
                 const meta = chart.getDatasetMeta(0);
-
                 chart.data.labels.forEach((label, i) => {
                     const value = dataset.data[i];
                     if (value === 0) return;
-
                     const total = dataset.data.reduce((a, b) => a + b, 0);
                     const percent = ((value / total) * 100).toFixed(1) + '%';
-                    const text = `${label}: ${value} กล่อง (${percent})`;
-
+                    const text = `${label}: ${value} (${percent})`;
                     const arc = meta.data[i];
                     const angle = (arc.startAngle + arc.endAngle) / 2;
-
                     const radius = arc.outerRadius;
                     const startX = arc.x + Math.cos(angle) * radius;
                     const startY = arc.y + Math.sin(angle) * radius;
                     const endX = arc.x + Math.cos(angle) * (radius + 20);
                     const endY = arc.y + Math.sin(angle) * (radius + 20);
                     const lineX = endX + (Math.cos(angle) >= 0 ? 1 : -1) * 20;
-
                     ctx.beginPath();
                     ctx.moveTo(startX, startY);
                     ctx.lineTo(endX, endY);
@@ -1464,8 +1351,7 @@
                     ctx.strokeStyle = dataset.backgroundColor[i];
                     ctx.lineWidth = 2;
                     ctx.stroke();
-
-                    ctx.font = 'bold 12px "Inter", "Noto Sans Thai", sans-serif';
+                    ctx.font = 'bold 12px "Inter", "Noto Sans Thai"';
                     ctx.fillStyle = '#e8eaf6';
                     ctx.textAlign = Math.cos(angle) >= 0 ? 'left' : 'right';
                     ctx.textBaseline = 'middle';
@@ -1478,35 +1364,24 @@
         const STORAGE_PREFIX = 'ot_dashboard_';
         const CAT_KEY = 'ot_dashboard_categories';
 
-        const DEFAULT_CATEGORIES = [
-            { id: 'cat_so', name: 'SO' }, { id: 'cat_e', name: 'E' },
-            { id: 'cat_r', name: 'R' }, { id: 'cat_mix', name: 'ผสม' }
-        ];
+        const DEFAULT_CATEGORIES = [{ id: 'cat_so', name: 'SO' }, { id: 'cat_e', name: 'E' }, { id: 'cat_r', name: 'R' }, { id: 'cat_mix', name: 'ผสม' }];
 
         let stockCategories = DEFAULT_CATEGORIES;
         let data = {};
         let charts = {};
-        let currentStockViewUnit = 'ขวด'; // Global unit toggle for Stock ('ขวด' or 'ลัง')
+        let currentStockViewUnit = 'ขวด';
 
         function getConversionMultiplier(cat) {
             if (!cat) return 12;
             const name = (cat.name || '').toLowerCase();
-            // พิเศษ: ไขน้ำมันรำข้าว 5กก. -> 1 ลัง = 1 ลัง
             if (name.includes('5กก') || name.includes('5 กก')) return 1;
-            // ถ้าหน่วยที่ตั้งไว้เป็น "กล่อง" (กล่องเล็ก) -> 1 ลัง = 6 กล่อง
             if (cat.unit === 'กล่อง') return 6;
-            // อื่นๆ (ขวด, ซอง, กระป๋อง) -> 1 ลัง = 12 หน่วย
             return 12;
         }
 
         function setStockViewUnit(unit) {
             currentStockViewUnit = unit;
-            // อัปเดต UI ปุ่ม
-            document.querySelectorAll('.unit-toggle-btn').forEach(btn => {
-                if (btn.dataset.unit === unit) btn.classList.add('active');
-                else btn.classList.remove('active');
-            });
-            // Re-render ตารางที่เกี่ยวข้อง
+            document.querySelectorAll('.unit-toggle-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.unit === unit));
             renderDynamicTable('warehouseTableWrapper', 'warehouse');
             renderDynamicTable('stockTableWrapper', 'stock');
         }
@@ -1517,33 +1392,23 @@
 
         function getDefaultData() {
             const d = {};
-            for (let i = 1; i <= DAYS; i++) d[i] = { crates: '', crates_shortening: '', workers: '', otHours: '', stock: {}, warehouse: {} };
+            for (let i = 1; i <= DAYS; i++) d[i] = { crates: '', crates_shortening: '', workers: '', otHours: '', stock: {}, warehouse: {}, remark: '' };
             return d;
         }
 
-        // ================= CLOUD SYNC FUNCTIONS =================
         async function fetchFromCloud(key, forceNetwork = true) {
-            // Priority: Cloud (Network) -> Local Storage
             if (forceNetwork) {
                 try {
                     const res = await fetch(`${API_URL}?key=${key}`);
                     const result = await res.json();
                     if (result.status === 'success' && result.value) {
-                        const parsed = JSON.parse(result.value);
-                        localStorage.setItem(key, JSON.stringify(parsed)); // Update local cache
-                        return parsed;
+                        localStorage.setItem(key, result.value);
+                        return JSON.parse(result.value);
                     }
-                } catch (e) {
-                    console.log("Cloud Fetch Error, falling back to LocalStorage:", e);
-                }
+                } catch (e) { console.log("Cloud Fetch Error:", e); }
             }
-
-            // Fallback to local storage if network fails or if specified
             const localSaved = localStorage.getItem(key);
-            if (localSaved) {
-                try { return JSON.parse(localSaved); } catch (e) { }
-            }
-            return null;
+            return localSaved ? JSON.parse(localSaved) : null;
         }
 
         async function pushToCloud(key, valObj) {
@@ -1558,50 +1423,38 @@
                     localStorage.setItem(key, JSON.stringify(valObj));
                     return true;
                 }
-                return false;
-            } catch (e) {
-                localStorage.setItem(key, JSON.stringify(valObj));
-                return false;
-            }
+            } catch (e) { console.log("Cloud Push Error:", e); }
+            localStorage.setItem(key, JSON.stringify(valObj));
+            return false;
         }
 
         async function loadDataAndCategories() {
-            showToast('⏳ กำลังซิงค์ข้อมูลกับ Cloud...');
+            showToast('⏳ กำลังซิงค์ข้อมูล...');
             const { month, year } = getMonthYear();
             const dataKey = `${STORAGE_PREFIX}${month}_${year}`;
-
             const catSaved = await fetchFromCloud(CAT_KEY);
             if (catSaved) stockCategories = catSaved;
-
             const dataSaved = await fetchFromCloud(dataKey);
             if (dataSaved) {
                 data = dataSaved;
                 for (let i = 1; i <= DAYS; i++) {
-                    if (!data[i]) data[i] = { crates: '', crates_shortening: '', workers: '', otHours: '', stock: {}, warehouse: {} };
+                    if (!data[i]) data[i] = { crates: '', crates_shortening: '', workers: '', otHours: '', stock: {}, warehouse: {}, remark: '' };
                     if (!data[i].stock) data[i].stock = {};
                     if (!data[i].warehouse) data[i].warehouse = {};
                 }
-            } else {
-                data = getDefaultData();
-            }
-
+            } else { data = getDefaultData(); }
             refreshAllUI();
-            showToast('✅ ซิงค์ข้อมูลสำเร็จ!');
+            showToast('✅ ซิงค์สำเร็จ!');
         }
 
         async function saveDataToCloud() {
             const btn = document.getElementById('btnSaveCloud');
             const loader = document.getElementById('saveLoader');
             btn.disabled = true; loader.style.display = 'inline-block';
-
             const { month, year } = getMonthYear();
-            const dataKey = `${STORAGE_PREFIX}${month}_${year}`;
-
-            const success = await pushToCloud(dataKey, data);
-
+            const success = await pushToCloud(`${STORAGE_PREFIX}${month}_${year}`, data);
             btn.disabled = false; loader.style.display = 'none';
-            if (success) showToast('☁️ บันทึกขึ้น Cloud สำเร็จ!');
-            else showToast('❌ บันทึก Cloud ไม่สำเร็จ (บันทึกแค่ในเครื่อง)');
+            showToast(success ? '☁️ บันทึกสำเร็จ!' : '❌ บันทึกล้มเหลว');
         }
 
         function autoSaveLocal() {
@@ -1615,19 +1468,15 @@
             setTimeout(() => toast.classList.remove('show'), 2500);
         }
 
-        // ================= TABS & AUTO SCROLL =================
         function switchTab(tabId) {
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             document.getElementById('tabBtn-' + tabId).classList.add('active');
-
             setTimeout(() => {
-                for (let key in charts) { if (charts[key]) charts[key].resize(); }
-                for (let key in orderCharts) { if (orderCharts[key]) orderCharts[key].resize(); }
-                if (tabId === 'tab-orders') {
-                    syncHistoryIndex().then(() => renderHistoryList());
-                }
+                for (let k in charts) charts[k]?.resize();
+                for (let k in orderCharts) orderCharts[k]?.resize();
+                if (tabId === 'tab-order') syncHistoryIndex().then(() => renderHistoryList());
                 scrollToToday();
             }, 100);
         }
@@ -1635,1978 +1484,309 @@
         function scrollToToday() {
             const activePanel = document.querySelector('.tab-panel.active');
             if (!activePanel) return;
-            const wrappers = activePanel.querySelectorAll('.table-wrapper');
-
-            wrappers.forEach(wrapper => {
-                const targetTh = wrapper.querySelector('thead th.is-today');
-                if (targetTh && wrapper.clientWidth > 0) {
-                    const scrollPos = targetTh.offsetLeft - wrapper.clientWidth / 2 + targetTh.offsetWidth / 2;
-                    wrapper.scrollLeft = Math.max(0, scrollPos);
-                }
+            activePanel.querySelectorAll('.table-wrapper').forEach(wrapper => {
+                const today = wrapper.querySelector('thead th.is-today');
+                if (today) wrapper.scrollLeft = today.offsetLeft - wrapper.clientWidth / 2 + today.offsetWidth / 2;
             });
         }
 
-        function syncScroll() {
-            const wrappers = document.querySelectorAll('.table-wrapper');
-            let activeWrapper = null;
-
-            wrappers.forEach(wrapper => {
-                wrapper.addEventListener('mouseenter', () => { activeWrapper = wrapper; });
-                wrapper.addEventListener('mouseleave', () => { activeWrapper = null; });
-                wrapper.addEventListener('scroll', () => {
-                    if (activeWrapper !== wrapper) return;
-                    wrappers.forEach(target => {
-                        if (target !== wrapper) target.scrollLeft = wrapper.scrollLeft;
-                    });
-                });
-            });
-        }
-
-        // ================= CATEGORY MANAGER =================
-        let dragSrcCatEl = null;
-
-        function handleDragStartCat(e) {
-            dragSrcCatEl = this;
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', this.innerHTML); // Required for Firefox
-            this.classList.add('dragging');
-        }
-
-        function handleDragOverCat(e) {
-            if (e.preventDefault) { e.preventDefault(); }
-            e.dataTransfer.dropEffect = 'move';
-
-            const rect = this.getBoundingClientRect();
-            const relY = e.clientY - rect.top;
-            if (relY < rect.height / 2) {
-                this.classList.add('over-top');
-                this.classList.remove('over-bottom');
-            } else {
-                this.classList.add('over-bottom');
-                this.classList.remove('over-top');
+        function standardizeProductName(rawName) {
+            const name = rawName.trim();
+            const upper = name.toUpperCase();
+            const hasSO1 = upper.includes('SO 1') || upper.includes('SO1');
+            const hasE1H1 = upper.includes('E1H 1') || upper.includes('E1H1');
+            if ((hasSO1 && hasE1H1) || upper.includes('DUO')) return 'ผสม(SO 1 ขวด+E1H 1 ขวด)';
+            
+            let baseName = name;
+            if (upper.includes('งาดำ') || upper.includes('BLACK SESAME')) baseName = 'ซีเรียลดริ๊งค์งาดำ';
+            else if (upper.includes('ครีม') || upper.includes('NDC')) baseName = 'ครีมเทียม 200ก.';
+            else if (upper.includes('ธัญญาหาร') || upper.includes('ออริจินอล') || upper.includes('ออริจินัล') || upper.includes('CEREAL') || upper.includes('CRD')) baseName = 'ซีเรียลดริ๊งค์ออริจินอล';
+            else if (upper.includes('10000') || upper.includes('10,000')) baseName = 'คิง น้ำมันรำข้าว 10,000 ppm.';
+            else if (upper.includes('13500') || upper.includes('13,500')) baseName = 'King น้ำมันรำข้าว 13,500 ppm.';
+            else if (upper.includes('15000') || upper.includes('15,000') || upper.includes('RICELY') || name.includes('ไรซ์ลี่')) baseName = 'ไรซ์ลี่ 15,000 ppm.';
+            else if (upper.includes('SHORTENING') || upper.includes('ชอร์ตเทนนิ่ง') || upper.includes('STN') || name.includes('ไขน้ำมันรำข้าว')) {
+                baseName = (upper.includes('5 ') || upper.includes('5ก') || upper.includes('5 กก')) ? 'ไขน้ำมันรำข้าว 5กก.' : 'ไขน้ำมันรำข้าว 700ก.';
             }
-            return false;
+
+            const match = name.match(/(\d+)\s*(ขวด|ซอง|กระป๋อง|ชิ้น|กล่อง|แผง|ชุด|หลอด|ก้อน|ลัง)/);
+            if (match) baseName += ` (${match[1]} ${match[2]})`;
+            return baseName;
         }
 
-        function handleDragLeaveCat(e) {
-            this.classList.remove('over-top', 'over-bottom');
-        }
+        function detectProductGroup(itemName) {
+            const name = itemName.trim();
+            const upper = name.toUpperCase();
+            if (name.includes('ผสม(SO 1 ขวด+E1H 1 ขวด)')) return 'ผสม(SO 1 ขวด+E1H 1 ขวด)';
+            if (name.includes('คิง น้ำมันรำข้าว 10,000 ppm.')) return 'คิง 10,000 ppm.';
+            if (name.includes('King น้ำมันรำข้าว 13,500 ppm.')) return 'King 13,500 ppm.';
+            if (name.includes('ไรซ์ลี่ 15,000 ppm.')) return 'ไรซ์ลี่ 15,000 ppm.';
+            if (name.includes('ไขน้ำมันรำข้าว 5กก.')) return 'ไขน้ำมันรำข้าว 5กก.';
+            if (name.includes('ไขน้ำมันรำข้าว 700ก.')) return 'ไขน้ำมันรำข้าว 700ก.';
+            if (name.includes('ครีมเทียม 200ก.')) return 'ครีมเทียม 200ก.';
+            if (name.includes('ซีเรียลดริ๊งค์งาดำ')) return 'ซีเรียลดริ๊งค์งาดำ';
+            if (name.includes('ซีเรียลดริ๊งค์ออริจินอล')) return 'ซีเรียลดริ๊งค์ออริจินอล';
 
-        function handleDropCat(e) {
-            if (e.stopPropagation) { e.stopPropagation(); }
-            this.classList.remove('over-top', 'over-bottom');
-
-            if (dragSrcCatEl !== this) {
-                const list = this.parentNode;
-                const rect = this.getBoundingClientRect();
-                const relY = e.clientY - rect.top;
-
-                if (relY < rect.height / 2) {
-                    list.insertBefore(dragSrcCatEl, this);
-                } else {
-                    list.insertBefore(dragSrcCatEl, this.nextSibling);
-                }
-            }
-            return false;
-        }
-
-        function handleDragEndCat(e) {
-            this.classList.remove('dragging');
-            const items = document.querySelectorAll('#catList .cat-item');
-            items.forEach(item => item.classList.remove('over-top', 'over-bottom'));
+            if (upper.includes('งาดำ') || upper.includes('BLACK SESAME')) return 'ซีเรียลดริ๊งค์งาดำ';
+            if (upper.includes('ครีม') || upper.includes('NDC')) return 'ครีมเทียม 200ก.';
+            if (upper.includes('ธัญญาหาร') || upper.includes('ออริจินอล') || upper.includes('ออริจินัล') || upper.includes('CEREAL') || upper.includes('CRD')) return 'ซีเรียลดริ๊งค์ออริจินอล';
+            if (upper.includes('RICELY') || name.includes('ไรซ์ลี่') || upper.includes('15000')) return 'ไรซ์ลี่ 15,000 ppm.';
+            return 'ผสม/อื่นๆ';
         }
 
         function openCategoryModal() {
-            const list = document.getElementById('catList');
-            list.innerHTML = '';
+            const list = document.getElementById('catList'); list.innerHTML = '';
             stockCategories.forEach(cat => addCategoryRow(cat.id, cat.name, cat.group));
             document.getElementById('catModal').style.display = 'flex';
         }
         function closeCategoryModal() { document.getElementById('catModal').style.display = 'none'; }
-
         function addCategoryRow(id = 'cat_' + Date.now(), name = '', group = '') {
             const list = document.getElementById('catList');
-            const div = document.createElement('div');
-            div.className = 'cat-item';
-            div.style.display = 'flex';
-            div.style.alignItems = 'center';
-            div.style.gap = '10px';
-            div.style.marginBottom = '10px';
-            div.style.padding = '10px';
-            div.style.background = 'rgba(79,195,247,0.05)';
-            div.style.borderRadius = '10px';
-            div.style.border = '1px solid var(--glass-border)';
-            div.draggable = true;
-
-            div.addEventListener('dragstart', handleDragStartCat, false);
-            div.addEventListener('dragover', handleDragOverCat, false);
-            div.addEventListener('dragleave', handleDragLeaveCat, false);
-            div.addEventListener('drop', handleDropCat, false);
-            div.addEventListener('dragend', handleDragEndCat, false);
-
-            const groupOptions = Object.keys(PRODUCT_GROUPS).map(g => `<option value="${g}" ${group === g ? 'selected' : ''}>${g}</option>`).join('');
-
-            div.innerHTML = `
-                <span style="cursor:grab; font-size:24px; color:var(--text-muted); user-select:none; padding: 0 5px;">☰</span>
-                <input type="hidden" class="cat-id" value="${id}">
-                <input type="text" class="cat-name" value="${name}" placeholder="ชื่อประเภท (เช่น S12)" style="flex:1; padding:8px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(0,0,0,0.2); color:var(--text-primary);">
-                <select class="cat-group" style="width:120px; padding:8px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(0,0,0,0.2); color:var(--text-primary); font-size:13px;">
-                    <option value="">-- กลุ่ม --</option>
-                    ${groupOptions}
-                </select>
-                <button class="btn btn-danger" onclick="this.parentElement.remove()" style="padding:10px;">🗑️</button>
-            `;
+            const div = document.createElement('div'); div.className = 'cat-item';
+            div.innerHTML = `<input type="hidden" class="cat-id" value="${id}">
+                <input type="text" class="cat-name" value="${name}" placeholder="ชื่อ">
+                <select class="cat-group">${Object.keys(PRODUCT_GROUPS).map(g => `<option value="${g}" ${group === g ? 'selected' : ''}>${g}</option>`).join('')}</select>
+                <button onclick="this.parentElement.remove()">🗑️</button>`;
             list.appendChild(div);
         }
+
         async function saveCategories() {
             const items = document.querySelectorAll('#catList .cat-item');
-            const newCategories = [];
-            items.forEach(item => {
-                const id = item.querySelector('.cat-id').value;
-                const name = item.querySelector('.cat-name').value.trim();
-                const group = item.querySelector('.cat-group').value;
-                if (name) {
-                    const existingCat = stockCategories.find(c => c.id === id);
-                    const unit = existingCat && existingCat.unit ? existingCat.unit : 'ขวด';
-                    newCategories.push({ id, name, unit, group });
-                }
-            });
-            if (newCategories.length === 0) return alert('ต้องมีอย่างน้อย 1 ประเภทครับ');
-
-            stockCategories = newCategories;
-            closeCategoryModal();
-            showToast('⏳ กำลังอัปเดตประเภทสินค้าขึ้น Cloud...');
+            const newCats = Array.from(items).map(i => ({
+                id: i.querySelector('.cat-id').value,
+                name: i.querySelector('.cat-name').value.trim(),
+                group: i.querySelector('.cat-group').value
+            })).filter(c => c.name);
+            if (!newCats.length) return;
+            stockCategories = newCats;
             await pushToCloud(CAT_KEY, stockCategories);
-            refreshAllUI();
-            showToast('✅ อัปเดตประเภทสินค้าสำเร็จ!');
+            closeCategoryModal(); refreshAllUI();
         }
 
-        // ================= RENDERING =================
         function getMonthYear() { return { month: parseInt(document.getElementById('monthSelect').value), year: parseInt(document.getElementById('yearInput').value) }; }
         function formatDate(day) { const { month, year } = getMonthYear(); return `${day}/${month + 1}/${year}`; }
-        function getIsoDateStr(day, month, shortYear) {
-            const yyyy = (2500 + parseInt(shortYear)) - 543;
-            const mm = String(month + 1).padStart(2, '0');
-            const dd = String(day).padStart(2, '0');
-            return `${yyyy}-${mm}-${dd}`;
-        }
         function calcBottles(day) { return (parseFloat(data[day].crates) || 0) * 12; }
         function calcBoxes(day) { return (parseFloat(data[day].crates_shortening) || 0) * 12; }
         function calcRate(day) {
-            // นำยอดขวดบวกกับยอดกล่อง (shortening)
-            const totalItems = calcBottles(day) + calcBoxes(day);
+            const total = calcBottles(day) + calcBoxes(day);
             const w = parseFloat(data[day].workers) || 0;
             const h = parseFloat(data[day].otHours) || 0;
-
-            if (w > 0 && h > 0 && totalItems > 0) return (totalItems / w / h).toFixed(2);
-            return '-';
+            return (w > 0 && h > 0) ? (total / w / h).toFixed(2) : '-';
         }
-        function calcRatePerSec(day) { const r = calcRate(day); return (r === '-' || parseFloat(r) === 0) ? '-' : (3600 / parseFloat(r)).toFixed(2); }
+        function calcRatePerSec(day) { const r = calcRate(day); return (r !== '-') ? (3600 / r).toFixed(2) : '-'; }
 
         function renderProductionTable() {
             const wrapper = document.getElementById('tableWrapper');
-            let html = '<table><thead><tr><th>รายละเอียด</th><th>หน่วย</th>';
-            for (let i = 1; i <= DAYS; i++) html += `<th${i === _todayNum ? ' class="is-today"' : ''}>${formatDate(i)}</th>`;
-            html += '</tr></thead><tbody>';
-
-            html += '<tr class="row-header-group"><td colspan="2">ท่อกันกระแทก</td>'; for (let i = 1; i <= DAYS; i++) html += `<td${i === _todayNum ? ' class="is-today-col"' : ''}></td>`; html += '</tr>';
-            html += `<tr><td style="padding-left:24px">ลัง(น้ำมัน)</td><td class="cell-label">ลัง</td>`;
-            for (let i = 1; i <= DAYS; i++) html += `<td${i === _todayNum ? ' class="is-today-col"' : ''}><input class="cell-input" type="number" data-day="${i}" data-key="crates" value="${data[i].crates || ''}" placeholder="0" onchange="onProdChange(this)"></td>`;
-            html += '</tr>';
-
-            html += `<tr><td style="padding-left:24px">ขวด <small>(ลัง×12)</small></td><td class="cell-label">ขวด</td>`;
-            for (let i = 1; i <= DAYS; i++) html += `<td class="cell-calc${i === _todayNum ? ' is-today-col' : ''}" id="bottles-${i}">${calcBottles(i) || '-'}</td>`;
-            html += '</tr>';
-
-            html += `<tr><td style="padding-left:24px">ลัง(shortening)</td><td class="cell-label">ลัง</td>`;
-            for (let i = 1; i <= DAYS; i++) html += `<td${i === _todayNum ? ' class="is-today-col"' : ''}><input class="cell-input" type="number" data-day="${i}" data-key="crates_shortening" value="${data[i].crates_shortening || ''}" placeholder="0" onchange="onProdChange(this)"></td>`;
-            html += '</tr>';
-
-            html += `<tr><td style="padding-left:24px">กล่อง <small>(ลัง×12)</small></td><td class="cell-label">กล่อง</td>`;
-            for (let i = 1; i <= DAYS; i++) html += `<td class="cell-calc${i === _todayNum ? ' is-today-col' : ''}" id="boxes-${i}">${calcBoxes(i) || '-'}</td>`;
-            html += '</tr>';
-
-            html += `<tr><td>จำนวนคน</td><td class="cell-label">คน</td>`;
-            for (let i = 1; i <= DAYS; i++) html += `<td${i === _todayNum ? ' class="is-today-col"' : ''}><input class="cell-input" type="number" data-day="${i}" data-key="workers" value="${data[i].workers}" placeholder="0" onchange="onProdChange(this)"></td>`;
-            html += '</tr>';
-
-            html += `<tr><td>เวลา OT</td><td class="cell-label">ชม.</td>`;
-            for (let i = 1; i <= DAYS; i++) html += `<td${i === _todayNum ? ' class="is-today-col"' : ''}><input class="cell-input" type="number" step="0.5" data-day="${i}" data-key="otHours" value="${data[i].otHours}" placeholder="0" onchange="onProdChange(this)"></td>`;
-            html += '</tr>';
-
-            html += '<tr class="row-header-group"><td colspan="2">อัตราการผลิต<br><span style="font-size:10px;text-transform:none">(ค่ามาตรฐาน 45 ขวด/วิ/คน)</span></td>'; for (let i = 1; i <= DAYS; i++) html += `<td${i === _todayNum ? ' class="is-today-col"' : ''}></td>`; html += '</tr>';
-            html += `<tr><td style="padding-left:24px">ขวด/คน/ชม.</td><td class="cell-label">ขวด/คน/ชม.</td>`;
-            for (let i = 1; i <= DAYS; i++) html += `<td class="cell-calc${i === _todayNum ? ' is-today-col' : ''}" id="rate-${i}">${calcRate(i)}</td>`;
-            html += '</tr>';
-
-            html += `<tr><td style="padding-left:24px">ขวด/วิ/คน</td><td class="cell-label">ขวด/วิ/คน</td>`;
-            for (let i = 1; i <= DAYS; i++) html += `<td class="cell-calc${i === _todayNum ? ' is-today-col' : ''}" id="rateSec-${i}">${calcRatePerSec(i)}</td>`;
-            html += '</tr></tbody></table>';
-            wrapper.innerHTML = html;
+            let h = '<table><thead><tr><th>รายละเอียด</th><th>หน่วย</th>';
+            for (let i = 1; i <= DAYS; i++) h += `<th${i === _todayNum ? ' class="is-today"' : ''}>${formatDate(i)}</th>`;
+            h += '</tr></thead><tbody>';
+            const rows = [
+                { label: 'ลัง(น้ำมัน)', key: 'crates', unit: 'ลัง' },
+                { label: 'ขวด', calc: calcBottles, unit: 'ขวด' },
+                { label: 'ลัง(shortening)', key: 'crates_shortening', unit: 'ลัง' },
+                { label: 'กล่อง', calc: calcBoxes, unit: 'กล่อง' },
+                { label: 'จำนวนคน', key: 'workers', unit: 'คน' },
+                { label: 'เวลา OT', key: 'otHours', unit: 'ชม.' }
+            ];
+            rows.forEach(r => {
+                h += `<tr><td>${r.label}</td><td class="cell-label">${r.unit}</td>`;
+                for (let i = 1; i <= DAYS; i++) {
+                    const val = r.calc ? r.calc(i) : (data[i][r.key] || '');
+                    h += `<td${i === _todayNum ? ' class="is-today-col"' : ''}>${r.calc ? val : `<input class="cell-input" type="number" value="${val}" onchange="data[${i}].${r.key}=this.value;refreshAllUI();autoSaveLocal();">`}</td>`;
+                }
+                h += '</tr>';
+            });
+            h += '</tbody></table>'; wrapper.innerHTML = h;
         }
 
         function renderDynamicTable(wrapperId, type) {
             const wrapper = document.getElementById(wrapperId);
-            let html = '<table><thead><tr><th>ประเภทสินค้า</th><th>หน่วย</th>';
-            for (let i = 1; i <= DAYS; i++) html += `<th${i === _todayNum ? ' class="is-today"' : ''}>${formatDate(i)}</th>`;
-            html += '</tr></thead><tbody>';
-
+            let h = '<table><thead><tr><th>ประเภทสินค้า</th><th>หน่วย</th>';
+            for (let i = 1; i <= DAYS; i++) h += `<th${i === _todayNum ? ' class="is-today"' : ''}>${formatDate(i)}</th>`;
+            h += '</tr></thead><tbody>';
             stockCategories.forEach(cat => {
-                const multiplier = getConversionMultiplier(cat);
-                let unitHtml = '';
-                
-                if (currentStockViewUnit === 'ลัง') {
-                    // หากอยู่ในโหมด ลัง ให้แสดงข้อความสะท้อนโหมดนั้นออกมาเลย
-                    unitHtml = `<span style="font-size:12px; color:var(--accent-purple); font-weight:600;">ลัง</span>`;
-                } else {
-                    // โหมดขวด/ชิ้นปกติ ให้แสดง Dropdown เหมือนเดิม
-                    unitHtml = `
-                        <select class="unit-select" data-id="${cat.id}" onchange="changeCatUnit(this)" style="background:transparent;border:1px solid rgba(79,195,247,0.2);border-radius:4px;color:var(--text-muted);font-family:inherit;font-size:12px;outline:none;cursor:pointer;padding:2px 4px;">
-                            <option value="ขวด" ${(!cat.unit || cat.unit === 'ขวด') ? 'selected' : ''}>ขวด</option>
-                            <option value="ซอง" ${cat.unit === 'ซอง' ? 'selected' : ''}>ซอง</option>
-                            <option value="กระป๋อง" ${cat.unit === 'กระป๋อง' ? 'selected' : ''}>กระป๋อง</option>
-                            <option value="ลัง" ${cat.unit === 'ลัง' ? 'selected' : ''}>ลัง</option>
-                            <option value="กล่อง" ${cat.unit === 'กล่อง' ? 'selected' : ''}>กล่อง</option>
-                        </select>
-                    `;
-                }
-                
-                html += `<tr class="row-stock"><td><span style="font-weight:700">${cat.name}</span></td><td class="cell-label">${unitHtml}</td>`;
+                const mult = getConversionMultiplier(cat);
+                h += `<tr><td>${cat.name}</td><td class="cell-label">${currentStockViewUnit}</td>`;
                 for (let i = 1; i <= DAYS; i++) {
-                    const rawVal = parseFloat(data[i][type][cat.id]) || 0;
-                    let displayedVal = '';
-                    if (rawVal > 0) {
-                        if (currentStockViewUnit === 'ลัง') {
-                            const val = rawVal / multiplier;
-                            displayedVal = Number.isInteger(val) ? val : parseFloat(val.toFixed(2));
-                        } else {
-                            displayedVal = rawVal;
-                        }
-                    }
-                    html += `<td${i === _todayNum ? ' class="is-today-col"' : ''}><input class="cell-input" type="number" step="any" data-day="${i}" data-cat="${cat.id}" data-type="${type}" value="${displayedVal}" placeholder="0" onchange="onCatChange(this)"></td>`;
+                    const raw = parseFloat(data[i][type][cat.id]) || 0;
+                    const display = raw > 0 ? (currentStockViewUnit === 'ลัง' ? (raw / mult).toFixed(2) : raw) : '';
+                    h += `<td${i === _todayNum ? ' class="is-today-col"' : ''}><input class="cell-input" type="number" value="${display}" onchange="data[${i}].${type}['${cat.id}']=this.value * (currentStockViewUnit === 'ลัง' ? ${mult} : 1);refreshAllUI();autoSaveLocal();"></td>`;
                 }
-                html += '</tr>';
+                h += '</tr>';
             });
+            h += '</tbody></table>'; wrapper.innerHTML = h;
+        }
 
-            html += '<tr style="border-top: 2px solid var(--glass-border)"><td style="font-weight:700;color:var(--accent-cyan)">รวมทั้งหมด</td><td class="cell-label">-</td>';
+        function renderRemarkTable() {
+            const wrapper = document.getElementById('remarkTableWrapper');
+            let h = '<table><thead><tr><th>ความเห็น</th>';
+            for (let i = 1; i <= DAYS; i++) h += `<th${i === _todayNum ? ' class="is-today"' : ''}>${formatDate(i)}</th>`;
+            h += '</tr></thead><tbody><tr><td>หมายเหตุ</td>';
             for (let i = 1; i <= DAYS; i++) {
-                // คำนวณยอดรวมขวดก่อนเสมอ
-                const totalBottles = stockCategories.reduce((sum, c) => sum + (parseFloat(data[i][type][c.id]) || 0), 0);
-                let displayedTotal = '-';
-                if (totalBottles > 0) {
-                    if (currentStockViewUnit === 'ลัง') {
-                        // การแสดงยอดรวมเป็น "ลัง" อาจจะไม่เป๊ะหากแต่ละแถวตัวคูณไม่เท่ากัน 
-                        // แต่ในที่นี้เราจะใช้ค่าเฉลี่ยหรือยอดขวดรวมหาร 12 (ซึ่งเป็นลังมาตรฐาน) เพื่อความง่าย
-                        const val = totalBottles / 12;
-                        displayedTotal = Number.isInteger(val) ? val : parseFloat(val.toFixed(2));
-                    } else {
-                        displayedTotal = parseFloat(totalBottles.toFixed(2));
-                    }
-                }
-                html += `<td class="cell-calc${i === _todayNum ? ' is-today-col' : ''}" id="${type}-total-${i}">${displayedTotal}</td>`;
+                h += `<td${i === _todayNum ? ' class="is-today-col"' : ''}><input class="cell-input" type="text" value="${data[i].remark || ''}" style="width:120px" onchange="data[${i}].remark=this.value;autoSaveLocal();"></td>`;
             }
-            html += '</tr></tbody></table>';
-            wrapper.innerHTML = html;
-        }
-
-        function onProdChange(el) {
-            const day = el.dataset.day, key = el.dataset.key;
-            data[day][key] = el.value;
-            document.getElementById(`bottles-${day}`).textContent = calcBottles(day) || '-';
-            document.getElementById(`boxes-${day}`).textContent = calcBoxes(day) || '-';
-            document.getElementById(`rate-${day}`).textContent = calcRate(day);
-            document.getElementById(`rateSec-${day}`).textContent = calcRatePerSec(day);
-            updateSummaryAndCharts(); autoSaveLocal();
-        }
-
-        function onCatChange(el) {
-            const day = el.dataset.day, catId = el.dataset.cat, type = el.dataset.type;
-            const cat = stockCategories.find(c => c.id === catId);
-            const multiplier = getConversionMultiplier(cat);
-            const inputVal = parseFloat(el.value) || 0;
-
-            // แปลงค่ากลับเป็นหน่วยหลัก (ขวด) ก่อนบันทึก
-            let savedVal = inputVal;
-            if (currentStockViewUnit === 'ลัง') {
-                savedVal = inputVal * multiplier;
-            }
-
-            data[day][type][catId] = savedVal;
-            
-            // อัปเดตยอดรวมท้ายตาราง
-            const totalBottles = stockCategories.reduce((sum, c) => sum + (parseFloat(data[day][type][c.id]) || 0), 0);
-            let displayedTotal = '-';
-            if (totalBottles > 0) {
-                if (currentStockViewUnit === 'ลัง') {
-                    const val = totalBottles / 12;
-                    displayedTotal = Number.isInteger(val) ? val : parseFloat(val.toFixed(2));
-                } else {
-                    displayedTotal = parseFloat(totalBottles.toFixed(2));
-                }
-            }
-            document.getElementById(`${type}-total-${day}`).textContent = displayedTotal;
-            updateSummaryAndCharts(); autoSaveLocal();
-        }
-
-        async function changeCatUnit(el) {
-            const catId = el.dataset.id;
-            const newUnit = el.value;
-            const cat = stockCategories.find(c => c.id === catId);
-            if (cat) {
-                cat.unit = newUnit;
-                localStorage.setItem(CAT_KEY, JSON.stringify(stockCategories));
-                showToast('⏳ กำลังอัปเดตหน่วยขึ้น Cloud...');
-                await pushToCloud(CAT_KEY, stockCategories);
-                showToast('✅ บันทึกหน่วยสำเร็จ!');
-
-                // Re-render both tables to reflect unit selection dynamically
-                // (Using requestAnimationFrame to avoid blocking the initial select visual update)
-                requestAnimationFrame(() => {
-                    renderDynamicTable('warehouseTableWrapper', 'warehouse');
-                    renderDynamicTable('stockTableWrapper', 'stock');
-                });
-            }
+            h += '</tr></tbody></table>'; wrapper.innerHTML = h;
         }
 
         function updateSummaryAndCharts() {
-            let latestWH = {};
-            for (let i = DAYS; i >= 1; i--) {
-                const totalWH = stockCategories.reduce((sum, c) => sum + (parseFloat(data[i].warehouse[c.id]) || 0), 0);
-                if (totalWH > 0) {
-                    stockCategories.forEach(c => latestWH[c.id] = parseFloat(data[i].warehouse[c.id]) || 0);
-                    break;
-                }
-            }
-
-            // --- คำนวณยอดสต็อกแยกตามกลุ่มสินค้า (New!) ---
-            let stockGroupTotals = {};
-            stockCategories.forEach(cat => {
-                const group = cat.group || 'ผสม/อื่นๆ';
-                const val = latestWH[cat.id] || 0;
-
-                // กระจายยอด DUO SET ลงกลุ่มย่อย
-                if (group === 'ผสม(SO 1 ขวด+E1H 1 ขวด)') {
-                    DUO_SPLIT.forEach(g => {
-                        stockGroupTotals[g] = (stockGroupTotals[g] || 0) + val;
-                    });
-                } else {
-                    stockGroupTotals[group] = (stockGroupTotals[group] || 0) + val;
-                }
+            const labels = Array.from({ length: DAYS }, (_, i) => `${i + 1}`);
+            const rateData = labels.map((_, i) => {
+                const r = calcRatePerSec(i + 1);
+                return r === '-' ? 0 : parseFloat(r);
             });
-
-            // กรองกลุ่ม DUO SET ออกไม่ให้โชว์ในกราฟ และเรียงลำดับ
-            const sortedStockGroups = Object.keys(PRODUCT_GROUPS)
-                .filter(g => g !== 'ผสม(SO 1 ขวด+E1H 1 ขวด)') // ลบ DUO SET ออกจากการแสดงผล
-                .map(g => ({
-                    label: PRODUCT_GROUPS[g].label,
-                    val: stockGroupTotals[g] || 0,
-                    color: PRODUCT_GROUPS[g].color
-                }))
-                .filter(g => g.val > 0)
-                .sort((a, b) => b.val - a.val);
-
-            if (charts.stockGroup) {
-                charts.stockGroup.data.labels = sortedStockGroups.map(g => g.label);
-                charts.stockGroup.data.datasets[0].data = sortedStockGroups.map(g => g.val);
-                charts.stockGroup.data.datasets[0].backgroundColor = sortedStockGroups.map(g => g.color);
-                charts.stockGroup.update('none');
-            }
-
-            // Create array of objects for sorting (รายสินค้า)
-            let sortedStock = stockCategories.map((cat, index) => {
-                const groupInfo = PRODUCT_GROUPS[cat.group] || PRODUCT_GROUPS['ผสม/อื่นๆ'];
-                return {
-                    name: cat.name,
-                    val: latestWH[cat.id] || 0,
-                    color: groupInfo ? groupInfo.color : colors[index % colors.length]
-                };
-            });
-
-            // Sort descending (มากสุดอยู่บน)
-            sortedStock.sort((a, b) => b.val - a.val);
-
-            // Update horizontal bar chart (รายสินค้า)
-            if (charts.latestStock) {
-                charts.latestStock.data.labels = sortedStock.map(c => c.name);
-                charts.latestStock.data.datasets[0].data = sortedStock.map(c => c.val);
-                charts.latestStock.data.datasets[0].backgroundColor = sortedStock.map(c => c.color);
-                charts.latestStock.update('none');
-            }
-
-            let totalRateSum = 0, totalRateCount = 0;
-            let latestRate = 0; let latestRateDay = '-';
-            let bestRate = Infinity; let bestRateDay = '-';
-
-            for (let i = 1; i <= DAYS; i++) {
-                // รวมยอดขวดและยอดกล่องเข้าด้วยกันเพื่อนำไปคิดสถิติรวม
-                const b = calcBottles(i) + calcBoxes(i);
-                const w = parseFloat(data[i].workers) || 0;
-                const h = parseFloat(data[i].otHours) || 0;
-
-                if (w > 0 && h > 0 && b > 0) {
-                    const r = b / w / h;
-                    totalRateSum += r;
-                    totalRateCount++;
-
-                    const currentSecRate = 3600 / r;
-                    latestRate = currentSecRate;
-                    latestRateDay = formatDate(i);
-
-                    if (currentSecRate < bestRate) {
-                        bestRate = currentSecRate;
-                        bestRateDay = formatDate(i);
-                    }
-                }
-            }
-
-            const avgRatePerHour = totalRateCount > 0 ? (totalRateSum / totalRateCount) : 0;
-            const avgSecPerBottle = avgRatePerHour > 0 ? (3600 / avgRatePerHour) : 0;
-
             if (charts.rate) {
-                let exceedCount = 0;
-                const pointColors = [];
-                const pointRadii = [];
-
-                const dataArr = Array.from({ length: DAYS }, (_, i) => {
-                    const r = calcRatePerSec(i + 1);
-                    const val = r === '-' ? 0 : parseFloat(r);
-                    if (val > 45) {
-                        exceedCount++;
-                        pointColors.push('#00e5ff');
-                        pointRadii.push(5);
-                    } else {
-                        pointColors.push('#ffd740');
-                        pointRadii.push(3);
-                    }
-                    return val;
-                });
-
-                charts.rate.data.datasets[0].data = dataArr;
-                charts.rate.data.datasets[0].pointBackgroundColor = pointColors;
-                charts.rate.data.datasets[0].pointBorderColor = pointColors;
-                charts.rate.data.datasets[0].pointRadius = pointRadii;
-
-                // ยืนยันค่ามาตรฐาน 45 ทุกครั้งที่อัปเดต เพื่อป้องกันปัญหาเส้นหายหรือขยับ
-                charts.rate.data.datasets[1].data = new Array(DAYS).fill(45);
-
-                charts.rate.update('none');
-
-                const titleElem = document.getElementById('rateChartTitleTop');
-                if (titleElem) {
-                    if (exceedCount > 0) {
-                        titleElem.innerHTML = `⏱️ ขวด/วินาที/คน (<span style="color:var(--accent-red)">เกินค่ามาตรฐาน ${exceedCount} วัน</span>)`;
-                    } else {
-                        titleElem.innerHTML = `⏱️ ขวด/วินาที/คน (ยิ่งน้อยยิ่งเร็ว)`;
-                    }
-                }
+                charts.rate.data.datasets[0].data = rateData;
+                charts.rate.update();
             }
         }
 
         function initCharts() {
-            const labels = Array.from({ length: DAYS }, (_, i) => `${i + 1}`);
-
-            // 1. กราฟสต็อกแยกตามกลุ่ม
-            charts.stockGroup = new Chart(document.getElementById('stockGroupChart'), {
-                type: 'bar',
-                data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderRadius: 4 }] },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { ticks: { color: '#5c6bc0' }, grid: { color: 'rgba(79,195,247,0.06)' } },
-                        y: { ticks: { color: '#e8eaf6', font: { size: 12, weight: '600' } }, grid: { display: false } }
-                    }
-                },
-                plugins: [{
-                    id: 'barValuePluginGroup',
-                    afterDatasetsDraw(chart) {
-                        const { ctx, data } = chart;
-                        ctx.save();
-                        chart.getDatasetMeta(0).data.forEach((datapoint, index) => {
-                            const value = data.datasets[0].data[index];
-                            if (value > 0) {
-                                ctx.font = '600 12px Inter, sans-serif';
-                                ctx.fillStyle = '#e8eaf6';
-                                ctx.textAlign = 'left';
-                                ctx.textBaseline = 'middle';
-                                // บังคับลงพิกเซลเต็มด้วย Math.round
-                                ctx.fillText(value.toLocaleString(), Math.round(datapoint.x + 6), Math.round(datapoint.y));
-                            }
-                        });
-                        ctx.restore();
-                    }
-                }]
-            });
-
-            // 2. กราฟ Rate (พร้อม Tooltip จำนวนคน, OT และ หมายเหตุ)
+            const commonOptions = { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' } }, y: { grid: { display: false } } } };
             charts.rate = new Chart(document.getElementById('rateChart'), {
                 type: 'line',
-                data: {
-                    labels, datasets: [
-                        { label: 'วินาที/ขวด/คน', data: [], borderColor: '#ffd740', borderWidth: 2, tension: 0.4 },
-                        { label: 'ค่ามาตรฐาน 45', data: new Array(DAYS).fill(45), borderColor: '#ff5252', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, fill: false }
-                    ]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: { 
-                        legend: { labels: { color: '#9fa8da', font: { family: 'Inter', size: 12 } } },
-                        tooltip: {
-                            callbacks: {
-                                afterLabel: function(context) {
-                                    if (context.datasetIndex === 1) return null; 
-                                    const day = context.dataIndex + 1; 
-                                    const workers = data[day] && data[day].workers ? data[day].workers : '-';
-                                    const ot = data[day] && data[day].otHours ? data[day].otHours : '-';
-                                    const remark = data[day] && data[day].remark ? data[day].remark : '-'; // ดึงหมายเหตุมาแสดง
-                                    return [
-                                        `👥 จำนวนคน: ${workers} คน`,
-                                        `⏳ เวลา OT: ${ot} ชม.`,
-                                        `📝 หมายเหตุ: ${remark}`
-                                    ];
-                                }
-                            }
-                        }
-                    }, 
-                    scales: { 
-                        x: { ticks: { color: '#5c6bc0', font: { size: 10 } }, grid: { color: 'rgba(79,195,247,0.06)' } }, 
-                        y: { min: 0, suggestedMax: 50, ticks: { color: '#5c6bc0', font: { size: 11 } }, grid: { color: 'rgba(79,195,247,0.06)' } } 
-                    } 
-                }
+                data: { labels: Array.from({ length: 31 }, (_, i) => i + 1), datasets: [{ label: 'วิ/ขวด/คน', data: [], borderColor: '#ffd740', tension: 0.4 }, { label: 'มาตรฐาน 45', data: Array(31).fill(45), borderColor: '#ff5252', borderDash: [5, 5], pointRadius: 0 }] },
+                options: { ...commonOptions, plugins: { tooltip: { callbacks: { afterLabel: (c) => [`คน: ${data[c.dataIndex + 1].workers}`, `OT: ${data[c.dataIndex + 1].otHours}`, `หมายเหตุ: ${data[c.dataIndex + 1].remark}`] } } } }
             });
 
-            // 3. กราฟ Latest Stock
-            charts.latestStock = new Chart(document.getElementById('latestStockChart'), {
-                type: 'bar',
-                data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderRadius: 4 }] },
-                plugins: [{
-                    id: 'barValuePlugin',
-                    afterDatasetsDraw(chart) {
-                        const { ctx, data } = chart;
-                        ctx.save();
-                        chart.getDatasetMeta(0).data.forEach((datapoint, index) => {
-                            const value = data.datasets[0].data[index];
-                            if (value > 0) {
-                                ctx.font = '600 12px Inter, sans-serif';
-                                ctx.fillStyle = '#e8eaf6';
-                                ctx.textAlign = 'left';
-                                ctx.textBaseline = 'middle';
-                                // บังคับลงพิกเซลเต็มด้วย Math.round
-                                ctx.fillText(value.toLocaleString(), Math.round(datapoint.x + 6), Math.round(datapoint.y));
-                            }
-                        });
-                        ctx.restore();
-                    }
-                }],
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    layout: { padding: { right: 50 } },
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9fa8da' } },
-                        y: { grid: { display: false }, ticks: { autoSkip: false, color: '#9fa8da', font: { size: 12, family: 'Inter' } } }
-                    }
-                }
-            });
-
-            // 4. กราฟ Monthly Sales 
-            const pKeys = ['shopee', 'lazada', 'flash', 'best'];
-            const pNames = { shopee: 'Shopee', lazada: 'Lazada', flash: 'Flash', best: 'Best' };
-            const pColors = { shopee: 'rgba(255, 87, 34, 0.8)', lazada: 'rgba(123, 127, 246, 0.8)', flash: 'rgba(255, 193, 7, 0.8)', best: 'rgba(233, 30, 99, 0.8)' };
-
-            charts.monthlySales = new Chart(document.getElementById('monthlySalesChart'), {
-                type: 'bar',
-                data: {
-                    labels: Array.from({ length: 31 }, (_, i) => String(i + 1)),
-                    datasets: pKeys.map(p => ({
-                        label: pNames[p],
-                        data: new Array(31).fill(0),
-                        backgroundColor: pColors[p]
-                    })),
-                    pendingData: new Array(31).fill(0),
-                    returnData: new Array(31).fill(0),
-                    bounceData: new Array(31).fill(0)
-                },
-                plugins: [{
-                    id: 'barValuePluginSales',
-                    afterDatasetsDraw(chart) {
-                        const { ctx, data } = chart;
-                        ctx.save();
-                        for (let index = 0; index < 31; index++) {
-                            let totalValue = 0;
-                            let maxX = 0;
-                            let y = 0;
-                            data.datasets.forEach((dataset, dsIndex) => {
-                                const val = dataset.data[index] || 0;
-                                totalValue += val;
-                                const meta = chart.getDatasetMeta(dsIndex).data[index];
-                                if (meta && val > 0) {
-                                    if (meta.x > maxX) maxX = meta.x;
-                                    y = meta.y;
-                                }
-                            });
-
-                            if (totalValue > 0 && maxX > 0) {
-                                const pend = data.pendingData && data.pendingData[index] ? data.pendingData[index] : 0;
-                                const ret = data.returnData && data.returnData[index] ? data.returnData[index] : 0;
-                                const bnc = data.bounceData && data.bounceData[index] ? data.bounceData[index] : 0; 
-
-                                let text = totalValue.toLocaleString();
-                                if (pend > 0 || ret > 0 || bnc > 0) { 
-                                    text += ` (`;
-                                    const parts = [];
-                                    if (ret > 0) parts.push(`ยกเลิก=${ret.toLocaleString()}`);
-                                    if (pend > 0) parts.push(`ค้าง=${pend.toLocaleString()}`);
-                                    if (bnc > 0) parts.push(`ตีกลับ=${bnc.toLocaleString()}`); 
-                                    text += parts.join(', ') + `)`;
-                                }
-
-                                ctx.font = '600 12px Inter, sans-serif';
-                                ctx.fillStyle = '#e8eaf6';
-                                ctx.textAlign = 'left';
-                                ctx.textBaseline = 'middle';
-                                // บังคับลงพิกเซลเต็มด้วย Math.round
-                                ctx.fillText(text, Math.round(maxX + 6), Math.round(y));
-                            }
-                        }
-                        ctx.restore();
-                    }
-                }],
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    layout: { padding: { right: 120 }, paddingBottom: 10 },
-                    plugins: { legend: { display: true, position: 'bottom', labels: { color: '#9fa8da', font: { size: 10, family: 'Inter' }, padding: 10, boxWidth: 12 } } },
-                    scales: {
-                        x: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9fa8da' } },
-                        y: { stacked: true, grid: { display: false }, ticks: { autoSkip: false, color: '#9fa8da', font: { size: 12, family: 'Inter' } } }
-                    }
-                }
-            });
-
-            // 5. กราฟหมวดหมู่
             charts.categorySalesMonth = new Chart(document.getElementById('categorySalesChartMonth'), {
                 type: 'bar',
-                data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderRadius: 4 }] },
-                plugins: [{
-                    id: 'barValuePluginSalesCat',
-                    afterDatasetsDraw(chart) {
-                        const { ctx, data } = chart;
-                        ctx.save();
-                        chart.getDatasetMeta(0).data.forEach((datapoint, index) => {
-                            const value = data.datasets[0].data[index];
-                            if (value > 0) {
-                                ctx.font = '600 12px Inter, sans-serif';
-                                ctx.fillStyle = '#e8eaf6';
-                                ctx.textAlign = 'left';
-                                ctx.textBaseline = 'middle';
-                                // บังคับลงพิกเซลเต็มด้วย Math.round
-                                ctx.fillText(value.toLocaleString(), Math.round(Math.max(datapoint.x + 6, 0)), Math.round(datapoint.y));
-                            }
-                        });
-                        ctx.restore();
-                    }
-                }],
+                data: { labels: [], datasets: [{ data: [], backgroundColor: colors }] },
                 options: {
                     indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    layout: { padding: { right: 50 } },
-                    plugins: { 
+                    ...commonOptions,
+                    plugins: {
                         legend: { display: false },
                         tooltip: {
                             callbacks: {
-                                afterLabel: function(context) {
-                                    const label = context.label;
+                                afterLabel: function (context) {
                                     const breakdown = context.chart.data.breakdownData;
-                                    if (breakdown && breakdown[label]) {
-                                        const items = breakdown[label];
-                                        const lines = ['','🔍 รายละเอียดในกลุ่มนี้:'];
-                                        // แสดง 10 อันดับแรกในกลุ่มนี้
-                                        items.slice(0, 10).forEach(i => {
-                                            lines.push(`- ${i.name}: ${i.total.toLocaleString()} กล่อง`);
-                                        });
-                                        if (items.length > 10) {
-                                            lines.push(`... และอื่นๆ อีก ${items.length - 10} รายการ`);
-                                        }
-                                        return lines;
-                                    }
-                                    return null;
+                                    const items = breakdown?.[context.label];
+                                    if (!items) return null;
+                                    const lines = ['', '🔍 รายละเอียดในกลุ่มนี้:'];
+                                    items.slice(0, 10).forEach(i => lines.push(`- ${i.name}: ${i.total}`));
+                                    if (items.length > 10) lines.push(`...และอื่นๆ อีก ${items.length - 10} รายการ`);
+                                    return lines;
                                 }
                             }
                         }
-                    },
-                    scales: {
-                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9fa8da' } },
-                        y: { grid: { display: false }, ticks: { autoSkip: false, color: '#9fa8da', font: { size: 12, family: 'Inter' } } }
                     }
                 }
             });
-
-            // 6. กราฟ Top 15 (อัปเกรด Tooltip)
+            
             charts.topProductsSalesMonth = new Chart(document.getElementById('topProductsSalesChartMonth'), {
                 type: 'bar',
-                data: { labels: [], datasets: [{ data: [], backgroundColor: 'rgba(79, 195, 247, 0.8)', borderRadius: 4 }] },
-                plugins: [{
-                    id: 'barValuePluginSalesTop',
-                    afterDatasetsDraw(chart) {
-                        const { ctx, data } = chart;
-                        ctx.save();
-                        chart.getDatasetMeta(0).data.forEach((datapoint, index) => {
-                            const value = data.datasets[0].data[index];
-                            if (value > 0) {
-                                ctx.font = '600 12px Inter, sans-serif';
-                                ctx.fillStyle = '#e8eaf6';
-                                ctx.textAlign = 'left';
-                                ctx.textBaseline = 'middle';
-                                ctx.fillText(value.toLocaleString(), Math.round(Math.max(datapoint.x + 6, 0)), Math.round(datapoint.y));
-                            }
-                        });
-                        ctx.restore();
-                    }
-                }],
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    layout: { padding: { right: 50 } },
-                    plugins: { 
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                afterLabel: function(context) {
-                                    // 1. ดึงชื่อสินค้า และจำนวนกล่อง
-                                    const itemName = context.label;
-                                    const boxQty = context.raw;
-                                    
-                                    // 2. คำนวณตัวคูณเพื่อแตกเป็นหน่วยย่อย (ขวด/ซอง)
-                                    // ปกติ DUO SET จะหมายถึง 2 ขวดเสมอ (SO 1 + E1H 1)
-                                    let multiplier = 1;
-                                    let unitName = 'ชิ้น';
-                                    
-                                    if (itemName.includes('ผสม(SO 1 ขวด+E1H 1 ขวด)')) {
-                                        multiplier = 2;
-                                        unitName = 'ขวด';
-                                    } else {
-                                        const match = itemName.match(/(\d+)\s*(ขวด|ซอง|กระป๋อง|ชิ้น|กล่อง|แผง|ชุด|หลอด|ก้อน)/);
-                                        if (match) {
-                                            multiplier = parseInt(match[1]);
-                                            unitName = match[2];
-                                        }
-                                    }
-                                    
-                                    const totalUnit = boxQty * multiplier;
-
-                                    // 3. หาจำนวนวันล่าสุดที่มีการบันทึกในเดือนนี้
-                                    // ดึงจาก Select Month/Year เพื่อหาว่ากำลังดูเดือนไหนอยู่
-                                    const selMonth = parseInt(document.getElementById('monthSelect').value);
-                                    const selYearCE = 2500 + parseInt(document.getElementById('yearInput').value) - 543;
-                                    
-                                    const historyIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
-                                    const daysWithData = historyIndex.filter(dateKey => {
-                                        const parts = dateKey.split('-');
-                                        return parts.length === 3 && parseInt(parts[0]) === selYearCE && parseInt(parts[1]) - 1 === selMonth;
-                                    });
-                                    
-                                    const totalDays = daysWithData.length > 0 ? daysWithData.length : 1; // ป้องกันหาร 0
-                                    const avgPerDay = (totalUnit / totalDays).toFixed(2);
-
-                                    return [
-                                        `📦 แตกย่อย: ${totalUnit.toLocaleString()} ${unitName}`,
-                                        `📈 เฉลี่ย: ${avgPerDay} ${unitName}/วัน (จาก ${totalDays} วัน)`
-                                    ];
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9fa8da' } },
-                        y: { grid: { display: false }, ticks: { autoSkip: false, color: '#9fa8da', font: { size: 12, family: 'Inter' } } }
-                    }
-                }
+                data: { labels: [], datasets: [{ data: [], backgroundColor: colors }] },
+                options: { indexAxis: 'y', ...commonOptions, plugins: { tooltip: { callbacks: { afterLabel: (c) => {
+                    const match = c.label.match(/\d+/);
+                    const mult = c.label.includes('ผสม') ? 2 : (match ? parseInt(match[0]) : 1);
+                    return [`📦 แตกย่อย: ${c.raw * mult}`];
+                } } } } }
             });
         }
 
-        function exportCSV() {
-            const { month, year } = getMonthYear();
-            const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
-            let csv = '\uFEFFรายละเอียด,หน่วย';
-            for (let i = 1; i <= DAYS; i++) csv += `,${i}/${month + 1}/${year}`;
-            csv += '\n';
-
-            const rows = [
-                { label: 'ลัง(น้ำมัน)', unit: 'ลัง', key: 'crates' },
-                { label: 'ขวด (ลัง×12)', unit: 'ขวด', key: 'bottles', calc: true },
-                { label: 'ลัง(shortening)', unit: 'ลัง', key: 'crates_shortening' },
-                { label: 'กล่อง (ลัง×12)', unit: 'กล่อง', key: 'boxes', calc: true },
-                { label: 'จำนวนคน', unit: 'คน', key: 'workers' },
-                { label: 'เวลา OT', unit: 'ชม.', key: 'otHours' },
-            ];
-
-            rows.forEach(r => {
-                csv += `${r.label},${r.unit}`;
-                for (let i = 1; i <= DAYS; i++) {
-                    if (r.key === 'bottles') csv += `,${calcBottles(i) || ''}`;
-                    else if (r.key === 'boxes') csv += `,${calcBoxes(i) || ''}`;
-                    else csv += `,${data[i][r.key] || ''}`;
-                }
-                csv += '\n';
-            });
-
-            csv += 'อัตรา ขวด/คน/ชม.,ขวด/คน/ชม.';
-            for (let i = 1; i <= DAYS; i++) csv += `,${calcRate(i)}`;
-            csv += '\n';
-
-            csv += 'ขวด/วินาที/คน,ขวด/วิ./คน';
-            for (let i = 1; i <= DAYS; i++) csv += `,${calcRatePerSec(i)}`;
-            csv += '\n';
-
-            stockCategories.forEach(c => {
-                csv += `สร้าง Stock ${c.name},กล่อง`;
-                for (let i = 1; i <= DAYS; i++) csv += `,${data[i].stock[c.id] || ''}`;
-                csv += '\n';
-            });
-
-            stockCategories.forEach(c => {
-                csv += `คลัง ${c.name},กล่อง`;
-                for (let i = 1; i <= DAYS; i++) csv += `,${data[i].warehouse[c.id] || ''}`;
-                csv += '\n';
-            });
-
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `OT_Production_${months[month]}_${year}.csv`;
-            link.click();
-            showToast('📥 Export CSV เรียบร้อย!');
-        }
-        function renderRemarkTable() {
-            const wrapper = document.getElementById('remarkTableWrapper');
-            let html = '<table><thead><tr><th>รายละเอียด</th><th>หน่วย</th>';
-            for (let i = 1; i <= DAYS; i++) html += `<th${i === _todayNum ? ' class="is-today"' : ''}>${formatDate(i)}</th>`;
-            html += '</tr></thead><tbody>';
-
-
-            // แถว: ความเห็น
-            html += `<tr><td style="font-weight:700; color:var(--accent-yellow);">ความเห็น</td><td class="cell-label">ข้อความ</td>`;
-            for (let i = 1; i <= DAYS; i++) html += `<td${i === _todayNum ? ' class="is-today-col"' : ''}><input class="cell-input" type="text" data-day="${i}" data-key="remark" value="${data[i].remark || ''}" placeholder="..." style="width: 150px; height: 45px; text-align: left; padding: 10px 12px;" onchange="onProdChange(this)"></td>`;html += '</tr>';
-            html += '</tbody></table>';
-            wrapper.innerHTML = html;
-        }
-        function refreshAllUI() {
-            renderProductionTable();
-            renderDynamicTable('stockTableWrapper', 'stock');
-            renderRemarkTable(); 
-            renderDynamicTable('warehouseTableWrapper', 'warehouse');
-            updateSummaryAndCharts();
-            renderMonthlyOrderSummary();
-
-            setTimeout(scrollToToday, 200);
-        }
-
-        // โหลดข้อมูลก็ต่อเมื่อ Login ผ่านแล้ว
-        function initDashboard() {
-            const now = new Date();
-            const monthNames = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
-            const monthOptionsHTML = monthNames.map((m, i) => `<option value="${i}" ${i === now.getMonth() ? 'selected' : ''}>${m}</option>`).join('');
-            const currentYear2 = (now.getFullYear() + 543) % 100;
-
-            // Init selector หัวข้อ (header) และ Tab 4 ให้ตรงกัน
-            document.getElementById('monthSelect').innerHTML = monthOptionsHTML;
-            document.getElementById('yearInput').value = currentYear2;
-            document.getElementById('monthSelect4').innerHTML = monthOptionsHTML;
-            document.getElementById('yearInput4').value = currentYear2;
-
-            initCharts();
-            loadDataAndCategories();
-            syncScroll();
-
-            document.getElementById('orderDateInput').value = getTodayString();
-
-            // Sync history index จาก Cloud ก่อน แล้วค่อย render (async)
-            syncHistoryIndex().then(async () => {
-                await renderHistoryList();
-                await renderMonthlyOrderSummary();
-            });
-
-            // ======== SYNC ทิศทาง: Header → Tab 4 ========
-            document.getElementById('monthSelect').addEventListener('change', () => {
-                document.getElementById('monthSelect4').value = document.getElementById('monthSelect').value;
-                loadDataAndCategories();
-                renderMonthlyOrderSummary();
-            });
-            document.getElementById('yearInput').addEventListener('change', () => {
-                document.getElementById('yearInput4').value = document.getElementById('yearInput').value;
-                loadDataAndCategories();
-                renderMonthlyOrderSummary();
-            });
-
-            // ======== SYNC ทิศทาง: Tab 4 → Header ========
-            document.getElementById('monthSelect4').addEventListener('change', () => {
-                document.getElementById('monthSelect').value = document.getElementById('monthSelect4').value;
-                loadDataAndCategories();
-                renderMonthlyOrderSummary();
-            });
-            document.getElementById('yearInput4').addEventListener('change', () => {
-                document.getElementById('yearInput').value = document.getElementById('yearInput4').value;
-                loadDataAndCategories();
-                renderMonthlyOrderSummary();
-            });
-
-            // เมื่อเปลี่ยนวันที่ -> โหลดประวัติอัตโนมัติ
-            document.getElementById('orderDateInput').addEventListener('change', () => { loadOrderHistory(); });
-        }
-
-        // ดึง history index จาก Cloud และ merge กับ localStorage
-        async function syncHistoryIndex() {
-            try {
-                const cloudIndex = await fetchFromCloud('ot_order_history_index', true);
-                if (cloudIndex && Array.isArray(cloudIndex)) {
-                    const localIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
-                    // Merge: รวมทั้งสองแล้ว deduplicate และ sort
-                    const merged = [...new Set([...localIndex, ...cloudIndex])].sort().reverse();
-                    localStorage.setItem('ot_order_history_index', JSON.stringify(merged));
-                }
-            } catch (e) {
-                console.log('syncHistoryIndex error:', e);
-            }
-        }
-
-        // ตอนเปิดหน้าเว็บ ให้เช็ค Session ก่อน ถ้าไม่มีจะยังไม่โหลดข้อมูล
-        document.addEventListener('DOMContentLoaded', verifySession);
-
-        // =========================================================================================
-        // ================= ORDER IMPORT TAB =======================================
-        // =========================================================================================
-        const PLATFORMS = ['shopee', 'lazada', 'flash', 'best'];
-        const PLATFORM_NAMES = { shopee: 'Shopee', lazada: 'Lazada', flash: 'Flash', best: 'Best' };
-        const PLATFORM_COLORS = { shopee: 'rgba(255, 87, 34, 0.8)', lazada: 'rgba(123, 127, 246, 0.8)', flash: 'rgba(255, 193, 7, 0.8)', best: 'rgba(233, 30, 99, 0.8)' };
-
-        const PRODUCT_GROUPS = {
-            'คิง 10,000 ppm.': { emoji: '🌿', color: 'rgba(79, 195, 247, 0.8)', label: 'คิง น้ำมันรำข้าว 10,000 ppm.' },
-            'King 13,500 ppm.': { emoji: '🫧', color: 'rgba(105, 240, 174, 0.8)', label: 'King น้ำมันรำข้าว 13,500 ppm.' },
-            'ไรซ์ลี่ 15,000 ppm.': { emoji: '🌾', color: 'rgba(255, 215, 64, 0.8)', label: 'ไรซ์ลี่ 15,000 ppm.' },
-            'ไขน้ำมันรำข้าว 700ก.': { emoji: '🧈', color: 'rgba(179, 136, 255, 0.8)', label: 'ไขน้ำมันรำข้าว 700ก.' },
-            'ไขน้ำมันรำข้าว 5กก.': { emoji: '📦', color: 'rgba(0, 229, 255, 0.8)', label: 'ไขน้ำมันรำข้าว 5กก.' },
-            'ครีมเทียม 200ก.': { emoji: '🍦', color: 'rgba(233, 30, 99, 0.8)', label: 'ครีมเทียม 200ก.' },
-            'ซีเรียลดริ๊งค์งาดำ': { emoji: '☕', color: 'rgba(76, 175, 80, 0.8)', label: 'ซีเรียลดริ๊งค์งาดำ' },
-            'ซีเรียลดริ๊งค์ออริจินอล': { emoji: '🥣', color: 'rgba(255, 171, 64, 0.8)', label: 'ซีเรียลดริ๊งค์ออริจินอล' },
-            'ผสม(SO 1 ขวด+E1H 1 ขวด)': { emoji: '🎯', color: 'rgba(255, 82, 82, 0.8)', label: 'ผสม(SO 1 ขวด+E1H 1 ขวด)' },
-            'ผสม/อื่นๆ': { emoji: '🔀', color: 'rgba(158, 158, 158, 0.8)', label: 'ผสม/อื่นๆ' },
-        };
-
-        let platformData = {};
-        let platformFiles = {};
+        let platformData = { shopee: [], lazada: [], flash: [], best: [] };
+        let platformFiles = { shopee: [], lazada: [], flash: [], best: [] };
         let orderCharts = {};
 
-        // กฎการแยกส่วนประกอบ DUO SET
-        const DUO_SPLIT = ['คิง 10,000 ppm.', 'King 13,500 ppm.'];
-        
-        // ฟังก์ชันสำหรับแปลงชื่อสินค้าจากหลายแพลตฟอร์มให้เป็น "ชื่อมาตรฐาน" เดียวกัน
-        function standardizeProductName(rawName) {
-            const name = rawName.trim();
-            const upper = name.toUpperCase();
-            
-            // 1. ดักจับ DUO SET
-            const hasSO1 = upper.includes('SO 1') || upper.includes('SO1');
-            const hasE1H1 = upper.includes('E1H 1') || upper.includes('E1H1');
-            if ((hasSO1 && hasE1H1) || upper.includes('DUO')) {
-                return 'ผสม(SO 1 ขวด+E1H 1 ขวด)'; 
-            }
-
-            // 2. จัดกลุ่มและแก้ชื่อตาม Keyword
-            let baseName = name;
-            if (upper.includes('10000') || upper.includes('10,000')) {
-                baseName = 'คิง น้ำมันรำข้าว 10,000 ppm.';
-            } else if (upper.includes('13500') || upper.includes('13,500')) {
-                baseName = 'King น้ำมันรำข้าว 13,500 ppm.';
-            } else if (upper.includes('15000') || upper.includes('15,000')) {
-                baseName = 'ไรซ์ลี่ 15,000 ppm.';
-            } else if (upper.includes('SHORTENING') || upper.includes('ชอร์ตเทนนิ่ง') || upper.includes('STN') || name.includes('ไขน้ำมันรำข้าว')) {
-                if (upper.includes('5 ') || upper.includes('5ก') || upper.includes('5 กก')) baseName = 'ไขน้ำมันรำข้าว 5กก.';
-                else baseName = 'ไขน้ำมันรำข้าว 700ก.';
-            } else if (upper.includes('ครีม') || upper.includes('NDC')) {
-                baseName = 'ครีมเทียม 200ก.';
-            } else if (upper.includes('งาดำ') || upper.includes('BLACK SESAME')) {
-                baseName = 'ซีเรียลดริ๊งค์งาดำ';
-            } else if (upper.includes('ธัญญาหาร') || upper.includes('ออริจินอล') || upper.includes('CEREAL')) {
-                baseName = 'ซีเรียลดริ๊งค์ออริจินอล';
-            }
-
-            // 3. ดึงจำนวนแพ็คเกจมาต่อท้าย 
-            const match = name.match(/(\d+)\s*(ขวด|ซอง|กระป๋อง|ชิ้น|กล่อง|แผง|ชุด|หลอด|ก้อน|ลัง)/);
-            if (match) {
-                baseName += ` (${match[1]} ${match[2]})`;
-            } else if (upper.includes('ยกลัง') || name.includes('ลัง')) {
-                baseName += ' (ยกลัง)';
-            }
-
-            return baseName;
-        }
-
-        // ฟังก์ชันสำหรับแปลงชื่อสินค้าจากหลายแพลตฟอร์มให้เป็น "ชื่อมาตรฐาน" เดียวกัน
-        function detectProductGroup(itemName) {
-            const name = itemName.trim();
-            const upper = name.toUpperCase();
-
-            const hasSO1 = upper.includes('SO 1') || upper.includes('SO1');
-            const hasE1H1 = upper.includes('E1H 1') || upper.includes('E1H1');
-            const hasPlus = name.includes('+');
-            const isDuoWord = upper.includes('DUO');
-
-            if ((hasSO1 && hasE1H1 && (hasPlus || isDuoWord)) || name.includes('ผสม(SO 1 ขวด+E1H 1 ขวด)')) return 'ผสม(SO 1 ขวด+E1H 1 ขวด)';
-
-            if (name.includes('10,000') || name.includes('10000') || upper.startsWith('SO ')) return 'คิง 10,000 ppm.';
-            if (name.includes('13,500') || name.includes('13500') || upper.startsWith('E1H ')) return 'King 13,500 ppm.';
-            if (upper.includes('RICELY') && (name.includes('15,000') || name.includes('15000'))) return 'ไรซ์ลี่ 15,000 ppm.';
-
-            if (upper.includes('SHORTENING') || name.includes('ชอร์ตเทนนิ่ง') || upper.includes('STN') || name.includes('ไขน้ำมันรำข้าว')) {
-                if (name.includes('5 ') || name.includes('5ก') || name.includes('5 กก')) return 'ไขน้ำมันรำข้าว 5กก.';
-                return 'ไขน้ำมันรำข้าว 700ก.';
-            }
-
-            if (name.includes('ครีม') || upper.includes('NDC')) return 'ครีมเทียม 200ก.';
-            if (name.includes('งาดำ') || upper.includes('BLACK SESAME')) return 'ซีเรียลดริ๊งค์งาดำ';
-            if (name.includes('ธัญญาหาร') || name.includes('ออริจินอล') || upper.includes('CEREAL')) return 'ซีเรียลดริ๊งค์ออริจินอล';
-
-            return 'ผสม/อื่นๆ';
-        }
-
-        function normalizeItemName(name) { return name.trim().replace(/\s+/g, ' '); }
-
         function handleFileUpload(platform, input) {
-            const files = input.files;
-            if (!files || files.length === 0) return;
-            if (!platformData[platform]) platformData[platform] = [];
-            if (!platformFiles[platform]) platformFiles[platform] = [];
-            let filesProcessed = 0; const totalFiles = files.length;
-            Array.from(files).forEach(file => {
+            Array.from(input.files).forEach(file => {
                 const reader = new FileReader();
-                reader.onload = function (e) {
-                    try {
-                        const workbook = XLSX.read(e.target.result, { type: 'array' });
-                        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-                        const parsed = parseOrderData(jsonData);
-                        const fileEntry = { name: file.name, items: parsed, totalQty: parsed.reduce((s, r) => s + r.qty, 0) };
-                        platformFiles[platform].push(fileEntry);
-                        parsed.forEach(p => { platformData[platform].push({ ...p, fileName: file.name }); });
-                        filesProcessed++; updatePlatformUI(platform);
-                        if (filesProcessed === totalFiles) showToast(`📂 โหลด ${totalFiles} ไฟล์ ${PLATFORM_NAMES[platform]} สำเร็จ!`);
-                    } catch (err) {
-                        filesProcessed++;
-                        document.getElementById(`status-${platform}`).innerHTML = `<span style="color:var(--accent-red)">❌ อ่านไฟล์ ${file.name} ไม่ได้</span>`;
-                    }
+                reader.onload = (e) => {
+                    const workbook = XLSX.read(e.target.result, { type: 'array' });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                    const parsed = parseOrderData(json);
+                    platformFiles[platform].push({ name: file.name, qty: parsed.reduce((s, r) => s + r.qty, 0) });
+                    parsed.forEach(p => platformData[platform].push(p));
+                    updatePlatformUI(platform);
                 };
                 reader.readAsArrayBuffer(file);
             });
         }
 
         function updatePlatformUI(platform) {
-            const files = platformFiles[platform] || [];
-            const allItems = platformData[platform] || [];
-            const totalQty = allItems.reduce((s, r) => s + r.qty, 0);
-            const card = document.getElementById(`upload-${platform}`);
-            card.classList.add('has-file');
-            document.getElementById(`status-${platform}`).innerHTML = `<span style="color:var(--accent-green)">✅ ${files.length} ไฟล์ | ${allItems.length} รายการ | ${totalQty.toLocaleString()} กล่อง</span>`;
-            let listHTML = '';
-            files.forEach((f, idx) => {
-                listHTML += `<div class="upload-file-item">
-                    <div class="file-info"><div class="file-name">📄 ${f.name}</div><div class="file-meta">${f.items.length} รายการ, ${f.totalQty.toLocaleString()} กล่อง</div></div>
-                    <span class="file-remove" onclick="removeFile('${platform}', ${idx})" title="ลบไฟล์นี้">✕</span></div>`;
-            });
-            document.getElementById(`filelist-${platform}`).innerHTML = listHTML;
-        }
-
-        function removeFile(platform, fileIndex) {
-            const files = platformFiles[platform] || [];
-            if (fileIndex < 0 || fileIndex >= files.length) return;
-            const removedFile = files[fileIndex];
-            platformFiles[platform].splice(fileIndex, 1);
-            platformData[platform] = (platformData[platform] || []).filter(item => item.fileName !== removedFile.name);
-            if (platformFiles[platform].length === 0) {
-                document.getElementById(`upload-${platform}`).classList.remove('has-file');
-                document.getElementById(`status-${platform}`).textContent = 'ยังไม่ได้อัปโหลด';
-                document.getElementById(`filelist-${platform}`).innerHTML = '';
-            } else updatePlatformUI(platform);
+            const list = document.getElementById(`filelist-${platform}`);
+            const total = platformData[platform].reduce((s, r) => s + r.qty, 0);
+            document.getElementById(`status-${platform}`).innerHTML = `✅ ${platformFiles[platform].length} ไฟล์ | ${total} กล่อง`;
+            list.innerHTML = platformFiles[platform].map((f, i) => `<div class="upload-file-item">📄 ${f.name} (${f.qty}) <span onclick="removeFile('${platform}',${i})">✕</span></div>`).join('');
         }
 
         function parseOrderData(rows) {
-            let nameCol = -1, qtyCol = -1, headerRow = 0;
-            for (let r = 0; r < Math.min(rows.length, 10); r++) {
-                const row = rows[r]; if (!row) continue;
-                for (let c = 0; c < row.length; c++) {
-                    const cell = String(row[c] || '').toLowerCase().trim();
-                    if (cell.includes('รายการ') || cell.includes('ออเดอร์') || cell.includes('สินค้า') || cell.includes('order') || cell.includes('item') || cell.includes('product') || cell.includes('sku')) nameCol = c;
-                    if (cell.includes('จำนวน') || cell.includes('กล่อง') || cell.includes('qty') || cell.includes('quantity') || cell.includes('amount')) qtyCol = c;
-                }
-                if (nameCol >= 0 && qtyCol >= 0) { headerRow = r + 1; break; }
-            }
-            if (nameCol < 0) nameCol = 0;
-            if (qtyCol < 0) qtyCol = rows[0] ? rows[0].length - 1 : 1;
-            if (headerRow === 0) {
-                const firstVal = rows[0] && rows[0][qtyCol];
-                if (typeof firstVal === 'string' && isNaN(parseFloat(firstVal))) headerRow = 1;
-            }
-            const parsed = [];
-            for (let r = headerRow; r < rows.length; r++) {
-                const row = rows[r]; if (!row || !row[nameCol]) continue;
-                const item = normalizeItemName(String(row[nameCol]));
-                const qty = parseFloat(row[qtyCol]) || 0;
-                if (item && qty > 0) parsed.push({ item, qty });
-            }
-            return parsed;
-        }
-
-        // ======== MODE TOGGLE: วันนี้ / ทั้งเดือน ========
-        let _consolidateMode = 'day';
-
-        function setConsolidateMode(mode) {
-            _consolidateMode = mode;
-            const dayBtn = document.getElementById('modeBtn-day');
-            const monthBtn = document.getElementById('modeBtn-month');
-            if (mode === 'day') {
-                dayBtn.style.background = 'var(--accent-cyan)'; dayBtn.style.color = '#0d1b2a';
-                monthBtn.style.background = 'transparent'; monthBtn.style.color = '#var(--text-muted)';
-            } else {
-                monthBtn.style.background = 'var(--accent-purple)'; monthBtn.style.color = '#fff';
-                dayBtn.style.background = 'transparent'; dayBtn.style.color = '#var(--text-muted)';
-            }
-        }
-
-        async function runConsolidate() {
-            if (_consolidateMode === 'month') { await consolidateMonthly(); }
-            else { consolidateOrders(); }
-        }
-
-        async function consolidateMonthly() {
-            const selMonth = parseInt(document.getElementById('monthSelect').value);
-            const selYear2 = parseInt(document.getElementById('yearInput').value);
-            const selYearBE = 2500 + selYear2;
-            const selYearCE = selYearBE - 543;
-            const monthNames = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
-            const historyIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
-            const daysWithData = historyIndex.filter(dateKey => {
-                const parts = dateKey.split('-');
-                if (parts.length !== 3) return false;
-                return parseInt(parts[0]) === selYearCE && parseInt(parts[1]) - 1 === selMonth;
-            }).sort();
-            if (daysWithData.length === 0) return showToast(`⚠️ ไม่มีประวัติในเดือน ${monthNames[selMonth]} ${selYearBE}`);
-            showToast(`⏳ กำลังรวมยอดทั้งเดือน ${monthNames[selMonth]} ${selYearBE}...`);
-            const mergedData = {};
-            PLATFORMS.forEach(p => mergedData[p] = []);
-            let loadedDays = 0;
-            for (const dateKey of daysWithData) {
-                let entry = null;
-                const localSaved = localStorage.getItem('ot_order_history_' + dateKey);
-                if (localSaved) { try { entry = JSON.parse(localSaved); } catch (e) { } }
-                if (!entry) { entry = await fetchFromCloud('ot_order_history_' + dateKey); }
-                if (!entry) continue;
-                loadedDays++;
-                PLATFORMS.forEach(p => { (entry.platformData[p] || []).forEach(({ item, qty }) => { mergedData[p].push({ item, qty }); }); });
-            }
-            if (loadedDays === 0) return showToast('⚠️ ไม่สามารถโหลดข้อมูลได้');
-            const origData = platformData;
-            platformData = mergedData;
-            consolidateOrders(`📆 สรุปทั้งเดือน ${monthNames[selMonth]} ${selYearBE} (${loadedDays} วัน)`);
-            platformData = origData;
-        }
-
-        function consolidateOrders(modeLabel) {
-            const allItems = {}; let grandTotal = 0; const platformTotals = {}; const groupTotals = {};
-            PLATFORMS.forEach(p => {
-                const items = platformData[p] || []; let pTotal = 0;
-                items.forEach(({ item, qty }) => {
-                    const stdItem = standardizeProductName(item); 
-                    const group = detectProductGroup(stdItem);
-                    // ใช้ชื่อมาตรฐานที่จัดระเบียบแล้วเป็น Key หลักในการนับยอด
-                    const itemKey = stdItem;
-                    
-                    if (!allItems[itemKey]) allItems[itemKey] = { total: 0, platforms: {}, group };
-                    allItems[itemKey].total += qty; allItems[itemKey].platforms[p] = (allItems[itemKey].platforms[p] || 0) + qty;
-                    pTotal += qty; grandTotal += qty;
-
-                    // กระจายยอดกลุ่มสินค้า (De-bundling DUO SET)
-                    if (group === 'ผสม(SO 1 ขวด+E1H 1 ขวด)') {
-                        DUO_SPLIT.forEach(g => {
-                            groupTotals[g] = (groupTotals[g] || 0) + qty;
-                        });
-                    } else {
-                        groupTotals[group] = (groupTotals[group] || 0) + qty;
-                    }
-                });
-                platformTotals[p] = pTotal;
+            let nameCol = 0, qtyCol = 1, startRow = 1;
+            rows[0].forEach((c, i) => {
+                const s = String(c).toLowerCase();
+                if (s.includes('รายการ') || s.includes('sku')) nameCol = i;
+                if (s.includes('จำนวน') || s.includes('กล่อง')) qtyCol = i;
             });
+            return rows.slice(startRow).map(r => ({ item: String(r[nameCol] || ''), qty: parseFloat(r[qtyCol]) || 0 })).filter(r => r.qty > 0);
+        }
 
-            if (grandTotal === 0) return showToast('⚠️ ยังไม่มีข้อมูล กรุณาอัปโหลดไฟล์ก่อน');
+        function consolidateOrders() {
+            const allItems = {}; const groupTotals = {};
+            const platforms = ['shopee', 'lazada', 'flash', 'best'];
+            platforms.forEach(p => {
+                platformData[p].forEach(r => {
+                    const std = standardizeProductName(r.item);
+                    const grp = detectProductGroup(std);
+                    if (!allItems[std]) allItems[std] = { total: 0, group: grp };
+                    allItems[std].total += r.qty;
+                    groupTotals[grp] = (groupTotals[grp] || 0) + r.qty;
+                });
+            });
             document.getElementById('orderResults').style.display = 'block';
-
-            // แสดง mode label
-            const labelEl = document.getElementById('consolidateModeLabel');
-            if (labelEl) {
-                if (modeLabel) {
-                    labelEl.style.display = 'block';
-                    labelEl.innerHTML = `<span style="color:var(--accent-purple);font-weight:700">${modeLabel}</span>`;
-                } else {
-                    const dateVal = document.getElementById('orderDateInput').value || getTodayString();
-                    const [yr, mo, day] = dateVal.split('-');
-                    labelEl.style.display = 'block';
-                    labelEl.innerHTML = `<span style="color:var(--accent-cyan);font-weight:700">📅 สรุปยอดวันที่ ${day}/${mo}/${parseInt(yr) + 543}</span>`;
-                }
-            }
-
-            const activePlatforms = PLATFORMS.filter(p => (platformData[p] || []).length > 0);
-
-            let summaryHTML = `<div class="order-stat-card"><div class="stat-label">รวมทั้งหมด</div><div class="stat-value" style="color:var(--accent-cyan)">${grandTotal.toLocaleString()}</div><div style="font-size:12px;color:var(--text-muted)">กล่อง</div></div>
-                               <div class="order-stat-card"><div class="stat-label">จำนวนรายการ (SKU)</div><div class="stat-value" style="color:var(--accent-purple)">${Object.keys(allItems).length}</div><div style="font-size:12px;color:var(--text-muted)">รายการ</div></div>
-                               <div class="order-stat-card"><div class="stat-label">แพลตฟอร์ม</div><div class="stat-value" style="color:var(--accent-green)">${activePlatforms.length}</div><div style="font-size:12px;color:var(--text-muted)">ช่องทาง</div></div>`;
-            activePlatforms.forEach(p => { summaryHTML += `<div class="order-stat-card"><div class="stat-label">${PLATFORM_NAMES[p]}</div><div class="stat-value" style="color:${PLATFORM_COLORS[p]}">${platformTotals[p].toLocaleString()}</div><div style="font-size:12px;color:var(--text-muted)">กล่อง (${(platformTotals[p] / grandTotal * 100).toFixed(1)}%)</div></div>`; });
-            document.getElementById('orderSummaryRow').innerHTML = summaryHTML;
-
-            const groupOrder = Object.keys(PRODUCT_GROUPS); let groupHTML = '';
-            groupOrder.forEach(g => {
-                const val = groupTotals[g] || 0; if (val <= 0) return;
-                const info = PRODUCT_GROUPS[g]; const pct = (val / grandTotal * 100).toFixed(1);
-                groupHTML += `<div class="product-group-card"><div class="group-emoji">${info.emoji}</div><div class="group-name" style="color:${info.color}">${info.label}</div><div class="group-value" style="color:${info.color}">${val.toLocaleString()}</div><div class="group-sub">${pct}% ของยอดรวม</div></div>`;
-            });
-            document.getElementById('productGroupRow').innerHTML = groupHTML;
-
-            const sorted = Object.entries(allItems).sort((a, b) => {
-                const gA = groupOrder.indexOf(a[1].group), gB = groupOrder.indexOf(b[1].group);
-                if (gA !== gB) return gA - gB; return b[1].total - a[1].total;
-            });
-
-            // --- โค้ดใหม่: เตรียมคำนวณแยกหน่วย ---
-            let unitTotalsByGroup = {};
-            let unitGrandTotal = {};
-
-            // ฟังก์ชันช่วยจัดรูปแบบตัวเลข (เช่น { 'ขวด': 24, 'ซอง': 2 } -> "24 ขวด, 2 ซอง")
-            function formatUnitObj(obj) {
-                if (Object.keys(obj).length === 0) return '-';
-                return Object.entries(obj).map(([u, v]) => `${v.toLocaleString()} ${u}`).join(', ');
-            }
-
-            sorted.forEach(([item, info]) => {
-                // ตัวคูณเฉพาะหน่วยย่อย (ขวด,ซอง,...) ไม่เอา กล่อง/ลัง เพราะเป็นหน่วยหลักอยู่แล้ว
-                const regex = /[(（]?\s*(\d+)\s*(ขวด|ซอง|กระป๋อง|ชิ้น|แผง|ชุด|หลอด|ก้อน)\s*[)）]?/g;
-                let match;
-                let itemUnitMap = {};
-                let hasMatch = false;
-
-                while ((match = regex.exec(item)) !== null) {
-                    hasMatch = true;
-                    const qty = parseInt(match[1]);
-                    const unit = match[2];
-                    if (!itemUnitMap[unit]) itemUnitMap[unit] = 0;
-                    itemUnitMap[unit] += qty;
-                }
-                // ถ้าไม่พบหน่วยย่อย ให้ถือว่า 1 ชิ้นต่อ 1 กล่อง
-                if (!hasMatch) itemUnitMap['ชิ้น'] = 1;
-
-                if (!unitTotalsByGroup[info.group]) unitTotalsByGroup[info.group] = {};
-                let rowUnitMap = {};
-
-                for (let unit in itemUnitMap) {
-                    const totalForUnit = itemUnitMap[unit] * info.total;
-                    rowUnitMap[unit] = totalForUnit;
-                    if (!unitTotalsByGroup[info.group][unit]) unitTotalsByGroup[info.group][unit] = 0;
-                    unitTotalsByGroup[info.group][unit] += totalForUnit;
-                    if (!unitGrandTotal[unit]) unitGrandTotal[unit] = 0;
-                    unitGrandTotal[unit] += totalForUnit;
-                }
-                // สรุปตัวคูณออกมาโชว์ (ถ้ามีการคูณ)
-                const multipliers = Object.entries(itemUnitMap).map(([u, m]) => m > 1 ? `x${m} ${u}` : '').filter(v => v).join(', ');
-                info.multiplierTag = multipliers ? `<div style="font-size:10px;color:var(--text-muted)">(${multipliers})</div>` : '';
-                info.unitString = formatUnitObj(rowUnitMap);
-            });
-
-            // --- โค้ดใหม่: สร้างตารางและเพิ่มคอลัมน์ ---
-            let tableHTML = '<table><thead><tr><th>#</th><th style="text-align:left">กลุ่ม</th><th style="text-align:left">รายการสินค้า</th><th>รวม (กล่อง)</th><th style="color:var(--accent-green);">รวมแยกชิ้น (ขวด,ซอง,ฯลฯ)</th>';
-            activePlatforms.forEach(p => tableHTML += `<th>${PLATFORM_NAMES[p]}</th>`); tableHTML += '</tr></thead><tbody>';
-            let currentGroup = ''; let idx = 0;
-
-            sorted.forEach(([item, info]) => {
-                if (info.group !== currentGroup) {
-                    currentGroup = info.group;
-                    const gi = PRODUCT_GROUPS[currentGroup] || PRODUCT_GROUPS['ผสม/อื่นๆ'];
-                    const gTotal = groupTotals[currentGroup] || 0;
-                    const gUnitStr = formatUnitObj(unitTotalsByGroup[currentGroup] || {});
-
-                    tableHTML += `<tr class="group-header-row"><td></td><td colspan="2">${gi.emoji} ${gi.label} — ${gTotal.toLocaleString()} กล่อง</td><td class="cell-calc">${gTotal.toLocaleString()}</td><td class="cell-calc" style="color:var(--accent-green); font-size:13px;">${gUnitStr}</td>`;
-                    activePlatforms.forEach(() => tableHTML += '<td></td>'); tableHTML += '</tr>';
-                }
-                idx++;
-
-                tableHTML += `<tr><td>${idx}</td><td><span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(79,195,247,0.1);color:var(--text-secondary)">${info.group}</span></td><td style="text-align:left;font-weight:600">${item} ${info.multiplierTag || ''}</td><td class="cell-calc">${info.total.toLocaleString()}</td><td class="cell-calc" style="color:var(--accent-green); font-size:13px;">${info.unitString}</td>`;
-                activePlatforms.forEach(p => { const val = info.platforms[p] || 0; tableHTML += `<td>${val ? val.toLocaleString() : '-'}</td>`; });
-                tableHTML += '</tr>';
-            });
-
-            const grandTotalStr = formatUnitObj(unitGrandTotal);
-            tableHTML += `<tr style="border-top:2px solid var(--glass-border);"><td></td><td></td><td style="text-align:left;font-weight:700;color:var(--accent-cyan)">รวมทั้งหมด</td><td class="cell-calc" style="font-size:16px">${grandTotal.toLocaleString()}</td><td class="cell-calc" style="font-size:14px;color:var(--accent-green);">${grandTotalStr}</td>`;
-            activePlatforms.forEach(p => tableHTML += `<td class="cell-calc">${platformTotals[p].toLocaleString()}</td>`);
-            tableHTML += '</tr></tbody></table>'; document.getElementById('orderTableWrapper').innerHTML = tableHTML;
-
-            let breakdownHTML = '';
-            activePlatforms.forEach(p => {
-                const items = platformData[p] || []; const pItems = {};
-                items.forEach(({ item, qty }) => { const n = normalizeItemName(item); pItems[n] = (pItems[n] || 0) + qty; });
-                const pSorted = Object.entries(pItems).sort((a, b) => b[1] - a[1]);
-                breakdownHTML += `<div class="platform-section"><div class="platform-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'"><span><span class="upload-platform-badge ${p}-badge">${PLATFORM_NAMES[p]}</span> — ${platformTotals[p].toLocaleString()} กล่อง (${pSorted.length} รายการ)</span><span style="color:var(--text-muted)">▼</span></div><div class="platform-content"><table><thead><tr><th>#</th><th style="text-align:left">รายการ</th><th>จำนวน (กล่อง)</th></tr></thead><tbody>`;
-                pSorted.forEach(([item, qty], i) => { breakdownHTML += `<tr><td>${i + 1}</td><td style="text-align:left">${item}</td><td>${qty.toLocaleString()}</td></tr>`; });
-                breakdownHTML += '</tbody></table></div></div>';
-            });
-            document.getElementById('platformBreakdown').innerHTML = breakdownHTML;
-
-            setTimeout(() => {
-                const pColors = ['rgba(79,195,247,0.7)', 'rgba(105,240,174,0.7)', 'rgba(255,215,64,0.7)', 'rgba(179,136,255,0.7)', 'rgba(255,171,64,0.7)', 'rgba(255,82,82,0.7)', 'rgba(0,229,255,0.7)', 'rgba(233,30,99,0.5)', 'rgba(76,175,80,0.7)', 'rgba(255,152,0,0.7)', 'rgba(63,81,181,0.7)', 'rgba(244,67,54,0.7)', 'rgba(0,188,212,0.7)', 'rgba(156,39,176,0.7)', 'rgba(121,85,72,0.7)'];
-                const top15 = sorted.slice(0, 15);
-                const commonChartOpts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#9fa8da', font: { family: 'Inter', size: 12 } } } }, scales: { x: { ticks: { color: '#5c6bc0', font: { size: 10 } }, grid: { color: 'rgba(79,195,247,0.06)' } }, y: { ticks: { color: '#5c6bc0', font: { size: 11 } }, grid: { color: 'rgba(79,195,247,0.06)' } } } };
-
-                if (orderCharts.product) orderCharts.product.destroy();
-                orderCharts.product = new Chart(document.getElementById('orderProductChart'), { 
-                    type: 'bar', 
-                    data: { 
-                        labels: top15.map(([item]) => item.length > 25 ? item.substring(0, 25) + '...' : item), 
-                        datasets: [{ 
-                            label: 'กล่อง', 
-                            data: top15.map(([, info]) => info.total), 
-                            backgroundColor: top15.map(([, info]) => PRODUCT_GROUPS[info.group] ? PRODUCT_GROUPS[info.group].color : 'rgba(79, 195, 247, 0.8)'),
-                            borderRadius: 6 
-                        }] 
-                    }, 
-                    options: { ...commonChartOpts, indexAxis: 'y', plugins: { legend: { display: false } } } 
-                });
-
-                if (orderCharts.platform) orderCharts.platform.destroy();
-                orderCharts.platform = new Chart(document.getElementById('orderPlatformChart'), { type: 'doughnut', data: { labels: activePlatforms.map(p => PLATFORM_NAMES[p]), datasets: [{ data: activePlatforms.map(p => platformTotals[p]), backgroundColor: activePlatforms.map(p => PLATFORM_COLORS[p]), borderColor: '#16213e', borderWidth: 2, hoverOffset: 10 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#9fa8da', font: { family: 'Inter', size: 13 }, padding: 20 } } } } });
-
-                const activeGroups = groupOrder.filter(g => (groupTotals[g] || 0) > 0);
-                if (orderCharts.group) orderCharts.group.destroy();
-                orderCharts.group = new Chart(document.getElementById('orderGroupChart'), { type: 'bar', data: { labels: activeGroups.map(g => PRODUCT_GROUPS[g].label), datasets: [{ label: 'กล่อง', data: activeGroups.map(g => groupTotals[g]), backgroundColor: activeGroups.map(g => PRODUCT_GROUPS[g].color), borderRadius: 8 }] }, options: { ...commonChartOpts, plugins: { legend: { display: false } } } });
-
-                if (orderCharts.stacked) orderCharts.stacked.destroy();
-                const groupPlatformData = {}; activeGroups.forEach(g => { groupPlatformData[g] = {}; activePlatforms.forEach(p => { groupPlatformData[g][p] = 0; }); });
-                sorted.forEach(([, info]) => { activePlatforms.forEach(p => { if (info.platforms[p]) groupPlatformData[info.group][p] = (groupPlatformData[info.group][p] || 0) + info.platforms[p]; }); });
-                orderCharts.stacked = new Chart(document.getElementById('orderStackedChart'), { type: 'bar', data: { labels: activeGroups.map(g => PRODUCT_GROUPS[g].label), datasets: activePlatforms.map(p => ({ label: PLATFORM_NAMES[p], data: activeGroups.map(g => groupPlatformData[g][p] || 0), backgroundColor: PLATFORM_COLORS[p], borderRadius: 4 })) }, options: { ...commonChartOpts, scales: { x: { stacked: true, ticks: { color: '#5c6bc0', font: { size: 11 } }, grid: { color: 'rgba(79,195,247,0.06)' } }, y: { stacked: true, ticks: { color: '#5c6bc0', font: { size: 11 } }, grid: { color: 'rgba(79,195,247,0.06)' } } } } });
-
-            }, 100);
-
-            // บันทึกข้อมูลเสริมสำหรับตอน Export CSV ด้วย
-            window.lastConsolidated = { allItems, grandTotal, platformTotals, groupTotals, activePlatforms, sorted, unitGrandTotal };
-            document.getElementById('btnExportOrder').style.display = 'inline-flex';
-            showToast('✅ รวมยอดสำเร็จ!');
+            renderOrderTable(allItems);
+            updateOrderCharts(allItems, groupTotals);
         }
 
-        function clearOrders() {
-            if (!confirm('⚠️ ล้างข้อมูลออเดอร์ทั้งหมด?')) return;
-            platformData = {}; platformFiles = {}; window.lastConsolidated = null;
-            PLATFORMS.forEach(p => { 
-                document.getElementById(`upload-${p}`).classList.remove('has-file'); 
-                document.getElementById(`status-${p}`).textContent = 'ยังไม่ได้อัปโหลด'; 
-                document.getElementById(`file-${p}`).value = ''; 
-                document.getElementById(`filelist-${p}`).innerHTML = ''; 
-                document.getElementById(`pending-${p}`).value = ''; 
-                document.getElementById(`return-${p}`).value = ''; 
-                document.getElementById(`bounce-${p}`).value = ''; 
+        function renderOrderTable(items) {
+            const sorted = Object.entries(items).sort((a, b) => b[1].total - a[1].total);
+            let h = '<table><thead><tr><th>กลุ่ม</th><th>รายการ</th><th>จำนวน (กล่อง)</th></tr></thead><tbody>';
+            sorted.forEach(([name, info]) => {
+                h += `<tr><td>${info.group}</td><td style="text-align:left">${name}</td><td>${info.total}</td></tr>`;
             });
-            document.getElementById('orderResults').style.display = 'none'; document.getElementById('btnExportOrder').style.display = 'none';
-            if (orderCharts.product) orderCharts.product.destroy(); if (orderCharts.platform) orderCharts.platform.destroy(); if (orderCharts.group) orderCharts.group.destroy(); if (orderCharts.stacked) orderCharts.stacked.destroy();
-            showToast('🗑️ ล้างข้อมูลออเดอร์แล้ว');
+            h += '</tbody></table>'; document.getElementById('orderTableWrapper').innerHTML = h;
         }
 
-        function getOrderDateKey() { return document.getElementById('orderDateInput').value || getTodayString(); }
-        function getTodayString() { return new Date().toISOString().split('T')[0]; }
-
-        async function saveOrderHistory() {
-            const dateKey = getOrderDateKey();
-            if (!dateKey) return showToast('⚠️ กรุณาเลือกวันที่ก่อนบันทึก');
-            const hasData = PLATFORMS.some(p => (platformData[p] || []).length > 0);
-            if (!hasData) return showToast('⚠️ ยังไม่มีข้อมูลออเดอร์');
-
-            const historyEntry = { date: dateKey, savedAt: new Date().toISOString(), platformData: {}, pending: {}, returned: {}, bounced: {} };
-            PLATFORMS.forEach(p => {
-                if (platformData[p] && platformData[p].length > 0) historyEntry.platformData[p] = platformData[p].map(({ item, qty }) => ({ item, qty }));
-                const pendingVal = parseInt(document.getElementById(`pending-${p}`).value);
-                if (!isNaN(pendingVal)) historyEntry.pending[p] = pendingVal;
-                const returnVal = parseInt(document.getElementById(`return-${p}`).value);
-                if (!isNaN(returnVal)) historyEntry.returned[p] = returnVal;
-                const bounceVal = parseInt(document.getElementById(`bounce-${p}`).value);
-                if (!isNaN(bounceVal)) historyEntry.bounced[p] = bounceVal;
+        function updateOrderCharts(items, groupTotals) {
+            const sorted = Object.entries(items).sort((a, b) => b[1].total - a[1].total).slice(0, 15);
+            if (orderCharts.product) orderCharts.product.destroy();
+            orderCharts.product = new Chart(document.getElementById('orderProductChart'), {
+                type: 'bar',
+                data: { labels: sorted.map(i => i[0].substring(0, 20)), datasets: [{ data: sorted.map(i => i[1].total), backgroundColor: colors }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
             });
-
-            showToast('⏳ กำลังบันทึกประวัติขึ้น Cloud...');
-            const cloudKey = 'ot_order_history_' + dateKey;
-            await pushToCloud(cloudKey, historyEntry);
-
-            // อัปเดต Index แบบ Fetch-Merge-Push (ป้องกันการบันทึกทับจนข้อมูลคนอื่นหาย)
-            let cloudIndex = await fetchFromCloud('ot_order_history_index', true) || [];
-            let localIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
-
-            // รวมทั้ง Cloud, Local และตัวใหม่เข้าด้วยกัน
-            let newIndex = [...new Set([...cloudIndex, ...localIndex, dateKey])].sort().reverse();
-
-            localStorage.setItem('ot_order_history_index', JSON.stringify(newIndex));
-            await pushToCloud('ot_order_history_index', newIndex);
-
-            showToast(`✅ บันทึกประวัติยอดขาย ${dateKey} สำเร็จ!`);
-            renderHistoryList();
-            renderMonthlyOrderSummary();
         }
 
-        async function loadOrderHistory(dateOverride) {
-            const dateKey = dateOverride || getOrderDateKey();
-            const cloudKey = 'ot_order_history_' + dateKey;
-            showToast('⏳ กำลังโหลดประวัติ...');
-            const saved = await fetchFromCloud(cloudKey, true); // Force network read
-            if (!saved) {
-                // ❌ ไม่พบข้อมูล → เคลียร์ UI ทั้งหมดให้เป็น default ว่างเปล่า
-                platformData = {}; platformFiles = {};
-                PLATFORMS.forEach(p => {
-                    document.getElementById(`upload-${p}`).classList.remove('has-file');
-                    document.getElementById(`status-${p}`).textContent = 'ยังไม่ได้อัปโหลด';
-                    document.getElementById(`file-${p}`).value = '';
-                    document.getElementById(`filelist-${p}`).innerHTML = '';
-                    document.getElementById(`pending-${p}`).value = '';
-                    document.getElementById(`return-${p}`).value = '';
-                    document.getElementById(`bounce-${p}`).value = '';
-                });
-                document.getElementById('orderResults').style.display = 'none';
-                document.getElementById('btnExportOrder').style.display = 'none';
-                if (orderCharts.product) { orderCharts.product.destroy(); orderCharts.product = null; }
-                if (orderCharts.platform) { orderCharts.platform.destroy(); orderCharts.platform = null; }
-                if (orderCharts.group) { orderCharts.group.destroy(); orderCharts.group = null; }
-                if (orderCharts.stacked) { orderCharts.stacked.destroy(); orderCharts.stacked = null; }
-                return showToast('⚠️ ไม่พบประวัติของวันที่ ' + dateKey);
-            }
-
-            // ตรวจสอบว่าวันที่นี้อยู่ใน Index หรือไม่ (ถ้าไม่มี ให้ซ่อมแซมแอบเติมเข้าไปอัตโนมัติ)
-            let localIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
-            if (!localIndex.includes(dateKey)) {
-                console.log(`Auto-Repair: Adding ${dateKey} back to history index...`);
-                repairHistoryIndex(dateKey);
-            }
-
-            try {
-                platformData = {}; platformFiles = {};
-                PLATFORMS.forEach(p => {
-                    document.getElementById(`pending-${p}`).value = (saved.pending && saved.pending[p] !== undefined) ? saved.pending[p] : '';
-                    document.getElementById(`return-${p}`).value = (saved.returned && saved.returned[p] !== undefined) ? saved.returned[p] : '';
-                    document.getElementById(`bounce-${p}`).value = (saved.bounced && saved.bounced[p] !== undefined) ? saved.bounced[p] : '';
-
-                    if (saved.platformData[p]) {
-                        platformData[p] = saved.platformData[p].map(item => ({ ...item, fileName: `ประวัติ ${dateKey}` }));
-                        platformFiles[p] = [{ name: `ประวัติ ${dateKey}`, items: saved.platformData[p], totalQty: saved.platformData[p].reduce((s, r) => s + r.qty, 0) }];
-                        updatePlatformUI(p);
-                    } else {
-                        document.getElementById(`upload-${p}`).classList.remove('has-file');
-                        document.getElementById(`status-${p}`).textContent = 'ยังไม่ได้อัปโหลด';
-                        document.getElementById(`filelist-${p}`).innerHTML = '';
-                    }
-                });
-                document.getElementById('orderDateInput').value = dateKey;
-                consolidateOrders();
-                renderHistoryList(); // อัปเดตรายการด้านล่าง
-                showToast(`📂 โหลดประวัติ ${dateKey} สำเร็จ!`);
-            } catch (e) { showToast('❌ โหลดประวัติไม่สำเร็จ'); }
+        async function syncHistoryIndex() {
+            const idx = await fetchFromCloud('ot_order_history_index');
+            if (idx) localStorage.setItem('ot_order_history_index', JSON.stringify(idx));
         }
 
-        async function repairHistoryIndex(dateKey) {
-            try {
-                let cloudIndex = await fetchFromCloud('ot_order_history_index', true) || [];
-                if (!cloudIndex.includes(dateKey)) {
-                    cloudIndex.push(dateKey);
-                    cloudIndex.sort().reverse();
-                    await pushToCloud('ot_order_history_index', cloudIndex);
-                    const localIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
-                    const merged = [...new Set([...localIndex, ...cloudIndex])].sort().reverse();
-                    localStorage.setItem('ot_order_history_index', JSON.stringify(merged));
-                    renderHistoryList();
-                }
-            } catch (e) { console.log('Repair logic skipped (network issue):', e); }
-        }
-
-        // ================= SUMMARY MONTHLY ORDER =================
-        async function renderMonthlyOrderSummary(forceCloudSync = true) {
-            const wrapper = document.getElementById('monthlyOrderTableWrapper');
-            if (!wrapper) return;
-
-            const selMonth = parseInt(document.getElementById('monthSelect').value); 
-            const selYear2 = parseInt(document.getElementById('yearInput').value);   
-            const selYearBE = 2500 + selYear2;
-            const selYearCE = selYearBE - 543;
-            const monthNames = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
-
-            if (forceCloudSync && !wrapper.innerHTML.includes('table')) {
-                wrapper.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:16px;text-align:center">⏳ กำลังโหลดข้อมูล...</div>`;
-            }
-
-            let historyIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
-            if (forceCloudSync) {
-                const cloudIndex = await fetchFromCloud('ot_order_history_index', true) || [];
-                historyIndex = [...new Set([...cloudIndex, ...historyIndex])].sort().reverse();
-                localStorage.setItem('ot_order_history_index', JSON.stringify(historyIndex));
-            }
-            const localIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
-            historyIndex = [...new Set([...historyIndex, ...localIndex])].sort().reverse();
-            localStorage.setItem('ot_order_history_index', JSON.stringify(historyIndex));
-
-            const daysWithData = historyIndex.filter(dateKey => {
-                const parts = dateKey.split('-');
-                if (parts.length !== 3) return false;
-                return parseInt(parts[0]) === selYearCE && parseInt(parts[1]) - 1 === selMonth;
-            }).sort();
-
-            if (daysWithData.length === 0) {
-                if (charts.monthlySales) {
-                    charts.monthlySales.data.labels = Array.from({ length: 31 }, (_, i) => String(i + 1));
-                    PLATFORMS.forEach((p, idx) => {
-                        if (charts.monthlySales.data.datasets[idx]) {
-                            charts.monthlySales.data.datasets[idx].data = new Array(31).fill(0);
-                        }
-                    });
-                    charts.monthlySales.data.pendingData = new Array(31).fill(0);
-                    charts.monthlySales.data.returnData = new Array(31).fill(0);
-                    charts.monthlySales.update('none');
-                }
-                if (charts.categorySalesMonth) {
-                    charts.categorySalesMonth.data.labels = [];
-                    charts.categorySalesMonth.data.datasets[0].data = [];
-                    charts.categorySalesMonth.update('none');
-                }
-                if (charts.topProductsSalesMonth) {
-                    charts.topProductsSalesMonth.data.labels = [];
-                    charts.topProductsSalesMonth.data.datasets[0].data = [];
-                    charts.topProductsSalesMonth.update('none');
-                }
-                wrapper.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:16px;text-align:center">ไม่มีข้อมูลยอดขายที่บันทึกใน ${monthNames[selMonth]} ${selYearBE}</div>`;
-                return;
-            }
-
-            let html = `<table><thead>
-                <tr>
-                    <th rowspan="2">วันที่</th>
-                    <th rowspan="2">ยอดรวมขาย</th>
-                    <th rowspan="2" style="color:var(--accent-orange)">ค้างส่งรวม</th>
-                    <th rowspan="2" style="color:var(--accent-red)">ยกเลิกรวม</th>
-                    <th rowspan="2" style="color:var(--accent-purple)">ตีกลับรวม</th>`;
-            PLATFORMS.forEach(p => html += `<th colspan="4" style="border-bottom:1px solid rgba(255,255,255,0.1);">${PLATFORM_NAMES[p]}</th>`);
-            html += `<th rowspan="2">จัดการ</th></tr><tr>`;
-            PLATFORMS.forEach(p => {
-                html += `<th style="font-size:11px;font-weight:normal;padding:6px">ยอดขาย</th>`;
-                html += `<th style="font-size:11px;font-weight:normal;color:var(--accent-orange);padding:6px">ค้างส่ง</th>`;
-                html += `<th style="font-size:11px;font-weight:normal;color:var(--accent-red);padding:6px">ยกเลิก</th>`;
-                html += `<th style="font-size:11px;font-weight:normal;color:var(--accent-purple);padding:6px">ตีกลับ</th>`;
-            });
-            html += `</tr></thead><tbody>`;
-
-            let monthGrandTotal = 0;
-            let monthGrandPendingTotal = 0;
-            let monthGrandReturnTotal = 0;
-            let monthGrandBounceTotal = 0;
-
-            const monthPlatformTotals = {};
-            const monthPlatformPendingTotals = {};
-            const monthPlatformReturnTotals = {};
-            const monthPlatformBounceTotals = {};
-            
-            PLATFORMS.forEach(p => {
-                monthPlatformTotals[p] = 0;
-                monthPlatformPendingTotals[p] = 0;
-                monthPlatformReturnTotals[p] = 0;
-                monthPlatformBounceTotals[p] = 0;
-            });
-            let hasAnyRow = false;
-
-            const platformDailyData = {
-                shopee: new Array(31).fill(0),
-                lazada: new Array(31).fill(0),
-                flash: new Array(31).fill(0),
-                best: new Array(31).fill(0)
-            };
-            const pendingDailyData = new Array(31).fill(0);
-            const returnDailyData = new Array(31).fill(0);
-            const bounceDailyData = new Array(31).fill(0); 
-
-            const allMonthItems = {};
-            const monthGroupTotals = {};
-
-            for (const dateKey of daysWithData) {
-                const parts = dateKey.split('-');
-                const dayNum = parseInt(parts[2]);
-                const displayDate = `${dayNum}/${(selMonth + 1).toString().padStart(2, '0')}/${selYear2}`;
-
-                let entry = await fetchFromCloud('ot_order_history_' + dateKey, forceCloudSync);
-                if (!entry) continue;
-
-                try {
-                    let dayTotal = 0;
-                    let dayPendingTotal = 0;
-                    let dayReturnTotal = 0;
-                    let dayBounceTotal = 0;
-                    let pCols = '';
-                    
-                    PLATFORMS.forEach(p => {
-                        const items = entry.platformData[p] || [];
-                        items.forEach(({ item, qty }) => {
-                            const stdItem = standardizeProductName(item);
-                            const group = detectProductGroup(stdItem);
-                            // ใช้ชื่อมาตรฐานที่จัดระเบียบแล้วเป็น Key หลักในการนับยอด
-                            const itemKey = stdItem; 
-
-                            if (!allMonthItems[itemKey]) allMonthItems[itemKey] = { total: 0, group: group };
-                            allMonthItems[itemKey].total += qty;
-                            monthGroupTotals[group] = (monthGroupTotals[group] || 0) + qty;
-                        });
-
-                        const pQty = items.reduce((s, r) => s + r.qty, 0);
-                        const pPending = (entry.pending && entry.pending[p]) ? entry.pending[p] : 0;
-                        const pReturn = (entry.returned && entry.returned[p]) ? entry.returned[p] : 0;
-                        const pBounce = (entry.bounced && entry.bounced[p]) ? entry.bounced[p] : 0;
-
-                        dayTotal += pQty;
-                        dayPendingTotal += pPending;
-                        dayReturnTotal += pReturn;
-                        dayBounceTotal += pBounce;
-
-                        monthPlatformTotals[p] += pQty;
-                        monthPlatformPendingTotals[p] += pPending;
-                        monthPlatformReturnTotals[p] += pReturn;
-                        monthPlatformBounceTotals[p] += pBounce;
-
-                        platformDailyData[p][dayNum - 1] = pQty;
-
-                        pCols += `
-                            <td style="font-weight:600">${pQty > 0 ? pQty.toLocaleString() : '-'}</td>
-                            <td style="padding:4px"><input type="number" class="quick-input" value="${pPending || ''}" onchange="updatePendingReturn('${dateKey}', '${p}', 'pending', this.value)" placeholder="-"></td>
-                            <td style="padding:4px"><input type="number" class="quick-input" value="${pReturn || ''}" onchange="updatePendingReturn('${dateKey}', '${p}', 'returned', this.value)" placeholder="-"></td>
-                            <td style="padding:4px"><input type="number" class="quick-input" value="${pBounce || ''}" onchange="updatePendingReturn('${dateKey}', '${p}', 'bounced', this.value)" placeholder="-"></td>
-                        `;
-                    });
-
-                    monthGrandTotal += dayTotal;
-                    monthGrandPendingTotal += dayPendingTotal;
-                    monthGrandReturnTotal += dayReturnTotal;
-                    monthGrandBounceTotal += dayBounceTotal;
-                    
-                    pendingDailyData[dayNum - 1] = dayPendingTotal;
-                    returnDailyData[dayNum - 1] = dayReturnTotal;
-                    bounceDailyData[dayNum - 1] = dayBounceTotal; 
-                    hasAnyRow = true;
-
-                    html += `<tr>
-                        <td style="text-align:left;font-weight:600;color:var(--accent-blue);white-space:nowrap">${displayDate}</td>
-                        <td class="cell-calc" style="font-weight:bold">${dayTotal.toLocaleString()}</td>
-                        <td class="cell-calc" style="color:var(--accent-orange)">${dayPendingTotal > 0 ? dayPendingTotal.toLocaleString() : '-'}</td>
-                        <td class="cell-calc" style="color:var(--accent-red)">${dayReturnTotal > 0 ? dayReturnTotal.toLocaleString() : '-'}</td>
-                        <td class="cell-calc" style="color:var(--accent-purple)">${dayBounceTotal > 0 ? dayBounceTotal.toLocaleString() : '-'}</td>
-                        ${pCols}
-                        <td><button class="btn btn-danger" style="padding:4px 8px;font-size:12px;" onclick="deleteOrderHistory('${dateKey}')">🗑️ ลบ</button></td>
-                    </tr>`;
-                } catch (e) { }
-            }
-
-            if (charts.monthlySales) {
-                charts.monthlySales.data.labels = Array.from({ length: 31 }, (_, i) => String(i + 1));
-                PLATFORMS.forEach((p, idx) => {
-                    if (charts.monthlySales.data.datasets[idx]) {
-                        charts.monthlySales.data.datasets[idx].data = platformDailyData[p];
-                    }
-                });
-                charts.monthlySales.data.pendingData = pendingDailyData;
-                charts.monthlySales.data.returnData = returnDailyData;
-                charts.monthlySales.data.bounceData = bounceDailyData; 
-
-                charts.monthlySales.update();
-                charts.monthlySales.resize();
-            }
-
-            if (charts.categorySalesMonth) {
-                const groupOrder = Object.keys(PRODUCT_GROUPS);
-                let sortedGroups = groupOrder.map(g => {
-                    return {
-                        label: PRODUCT_GROUPS[g].label,
-                        val: monthGroupTotals[g] || 0,
-                        color: PRODUCT_GROUPS[g].color
-                    };
-                }).filter(g => g.val > 0);
-
-                sortedGroups.sort((a, b) => b.val - a.val);
-
-                // --- โค้ดใหม่: เตรียมข้อมูลไส้ใน (Breakdown) ส่งให้ Tooltip ---
-                const breakdown = {};
-                Object.keys(PRODUCT_GROUPS).forEach(g => breakdown[PRODUCT_GROUPS[g].label] = []);
-                
-                Object.entries(allMonthItems).forEach(([itemName, info]) => {
-                    const gLabel = PRODUCT_GROUPS[info.group] ? PRODUCT_GROUPS[info.group].label : PRODUCT_GROUPS['ผสม/อื่นๆ'].label;
-                    if (!breakdown[gLabel]) breakdown[gLabel] = [];
-                    breakdown[gLabel].push({ name: itemName, total: info.total });
-                });
-                
-                // เรียงลำดับรายการใน Tooltip จากยอดขายมากไปน้อย
-                Object.keys(breakdown).forEach(gLabel => {
-                    breakdown[gLabel].sort((a, b) => b.total - a.total);
-                });
-
-                charts.categorySalesMonth.data.labels = sortedGroups.map(g => g.label);
-                charts.categorySalesMonth.data.datasets[0].data = sortedGroups.map(g => g.val);
-                charts.categorySalesMonth.data.datasets[0].backgroundColor = sortedGroups.map(g => g.color);
-                charts.categorySalesMonth.data.breakdownData = breakdown; // ส่งข้อมูลให้กราฟ
-                charts.categorySalesMonth.update('none');
-            }
-
-            if (charts.topProductsSalesMonth) {
-                const overallSorted = Object.entries(allMonthItems).sort((a, b) => b[1].total - a[1].total).slice(0, 15);
-                charts.topProductsSalesMonth.data.labels = overallSorted.map(i => i[0].length > 20 ? i[0].substring(0, 20) + '...' : i[0]);
-                charts.topProductsSalesMonth.data.datasets[0].data = overallSorted.map(i => i[1].total);
-                charts.topProductsSalesMonth.data.datasets[0].backgroundColor = overallSorted.map(i => PRODUCT_GROUPS[i[1].group] ? PRODUCT_GROUPS[i[1].group].color : 'rgba(79, 195, 247, 0.8)');
-                charts.topProductsSalesMonth.update('none');
-            }
-
-            if (!hasAnyRow) {
-                wrapper.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:16px;text-align:center">ไม่พบข้อมูลใน Cloud สำหรับ ${monthNames[selMonth]} ${selYearBE}</div>`;
-                return;
-            }
-
-            let summaryHTML = `
-                <div class="order-stat-card"><div class="stat-label">ยอดขายรวมทั้งเดือน</div><div class="stat-value" style="color:var(--accent-cyan)">${monthGrandTotal.toLocaleString()}</div><div style="font-size:12px;color:var(--text-muted)">กล่อง (จากประวัติ ${daysWithData.length} วัน)</div></div>
-                <div class="order-stat-card"><div class="stat-label">ค้างส่งรวมทั้งเดือน</div><div class="stat-value" style="color:var(--accent-orange)">${monthGrandPendingTotal.toLocaleString()}</div><div style="font-size:12px;color:var(--text-muted)">กล่อง</div></div>
-                <div class="order-stat-card"><div class="stat-label">ยกเลิกรวมทั้งเดือน</div><div class="stat-value" style="color:var(--accent-red)">${monthGrandReturnTotal.toLocaleString()}</div><div style="font-size:12px;color:var(--text-muted)">กล่อง</div></div>
-                <div class="order-stat-card"><div class="stat-label">ตีกลับรวมทั้งเดือน</div><div class="stat-value" style="color:var(--accent-purple)">${monthGrandBounceTotal.toLocaleString()}</div><div style="font-size:12px;color:var(--text-muted)">กล่อง</div></div>
-            `;
-            document.getElementById('monthlySummaryRow').innerHTML = summaryHTML;
-
-            html += `<tr style="border-top:2px solid var(--accent-cyan); background:rgba(0,0,0,0.2);">
-                     <td style="text-align:left;font-weight:800;color:var(--accent-cyan)">รวมทั้งเดือน</td>
-                     <td class="cell-calc" style="font-size:16px;font-weight:bold">${monthGrandTotal.toLocaleString()}</td>
-                     <td class="cell-calc" style="color:var(--accent-orange);font-weight:bold;">${monthGrandPendingTotal > 0 ? monthGrandPendingTotal.toLocaleString() : '-'}</td>
-                     <td class="cell-calc" style="color:var(--accent-red);font-weight:bold;">${monthGrandReturnTotal > 0 ? monthGrandReturnTotal.toLocaleString() : '-'}</td>
-                     <td class="cell-calc" style="color:var(--accent-purple);font-weight:bold;">${monthGrandBounceTotal > 0 ? monthGrandBounceTotal.toLocaleString() : '-'}</td>`;
-            PLATFORMS.forEach(p => {
-                html += `<td class="cell-calc" style="font-weight:600">${monthPlatformTotals[p] > 0 ? monthPlatformTotals[p].toLocaleString() : '-'}</td>`;
-                html += `<td class="cell-calc" style="color:var(--accent-orange);font-weight:600">${monthPlatformPendingTotals[p] > 0 ? monthPlatformPendingTotals[p].toLocaleString() : '-'}</td>`;
-                html += `<td class="cell-calc" style="color:var(--accent-red);font-weight:600">${monthPlatformReturnTotals[p] > 0 ? monthPlatformReturnTotals[p].toLocaleString() : '-'}</td>`;
-                html += `<td class="cell-calc" style="color:var(--accent-purple);font-weight:600">${monthPlatformBounceTotals[p] > 0 ? monthPlatformBounceTotals[p].toLocaleString() : '-'}</td>`;
-            });
-            html += '<td></td></tr></tbody></table>';
-            wrapper.innerHTML = html;
-        }
-
-        // 1. ฟังก์ชันตอนพิมพ์ช่องตัวเลข (เซฟแค่ในเครื่อง & เปลี่ยนสีปุ่มเตือน)
-        async function updatePendingReturn(dateKey, p, type, val) {
-            const num = parseInt(val) || 0;
-            
-            // อ่านจากในเครื่องเท่านั้น (ไม่ดึง Cloud ทำให้ไวมาก)
-            let entry = JSON.parse(localStorage.getItem('ot_order_history_' + dateKey));
-            if (!entry) return;
-
-            if (!entry[type]) entry[type] = {};
-            entry[type][p] = num;
-            
-            // เซฟลงเครื่องพักไว้ก่อน (Draft)
-            localStorage.setItem('ot_order_history_' + dateKey, JSON.stringify(entry));
-
-            // อัปเดตตารางและกราฟทันที (false = ไม่อ่าน Cloud ซ้ำ)
-            renderMonthlyOrderSummary(false);
-
-            // หาปุ่ม "บันทึกขึ้น Cloud" ตัวเดิมที่มีอยู่ แล้วเปลี่ยนเป็นสีแดงเตือน
-            const btn = document.querySelector('button[onclick="forceSaveMonthlyToCloud()"]');
-            if (btn) {
-                btn.style.background = 'linear-gradient(135deg, #ff5252, #d32f2f)';
-                btn.innerHTML = '⚠️ กดเพื่อบันทึกขึ้น Cloud';
-            }
-        }
-
-        // 2. ฟังก์ชันของปุ่มเซฟ (โยนขึ้น Cloud ทีเดียว & เปลี่ยนปุ่มกลับเป็นสีเขียว)
-        async function forceSaveMonthlyToCloud() {
-            const btn = document.querySelector('button[onclick="forceSaveMonthlyToCloud()"]');
-            if (btn) {
-                btn.innerHTML = '⏳ กำลังบันทึก...';
-                btn.style.pointerEvents = 'none'; // ล็อกปุ่มกันกดเบิ้ล
-            }
-
-            showToast('⏳ กำลังบันทึกข้อมูลเดือนนี้ขึ้น Cloud ทั้งหมด...');
-
-            const selMonth = parseInt(document.getElementById('monthSelect').value);
-            const selYear2 = parseInt(document.getElementById('yearInput').value);
-            const selYearCE = 2500 + selYear2 - 543;
-
-            let historyIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
-            const daysWithData = historyIndex.filter(dateKey => {
-                const parts = dateKey.split('-');
-                return parts.length === 3 && parseInt(parts[0]) === selYearCE && parseInt(parts[1]) - 1 === selMonth;
-            });
-
-            let successCount = 0;
-            // อัปเดต Index สารบบเผื่อไว้ก่อน
-            await pushToCloud('ot_order_history_index', historyIndex);
-
-            // ลูปเอาข้อมูลที่ Draft ไว้ในเครื่อง ยิงขึ้น Cloud ให้หมด
-            for (const dateKey of daysWithData) {
-                const entry = JSON.parse(localStorage.getItem('ot_order_history_' + dateKey));
-                if (entry) {
-                    await pushToCloud('ot_order_history_' + dateKey, entry);
-                    successCount++;
-                }
-            }
-            
-            // คืนค่าปุ่มกลับเป็นสีเขียวปกติ
-            if (btn) {
-                btn.style.background = 'linear-gradient(135deg, var(--accent-green), #4caf50)';
-                btn.innerHTML = '💾 บันทึกขึ้น Cloud';
-                btn.style.pointerEvents = 'auto'; // ปลดล็อกปุ่ม
-            }
-
-            showToast(`✅ บันทึกยอดค้าง ยกเลิก ตีกลับ ${successCount} วัน ขึ้น Cloud สำเร็จ!`);
-            
-            // อัปเดตหน้าตารางอีกครั้งเพื่อให้ชัวร์ว่าข้อมูลนิ่ง (โดยไม่ดึงจาก Cloud ซ้ำ)
-            renderMonthlyOrderSummary(false);
-        }
-
-        async function deleteOrderHistory(dateKey) {
-            if (!confirm(`⚠️ แน่ใจหรือไม่ว่าต้องการลบประวัติของวันที่ ${dateKey} ?\n\nข้อมูลจะถูกลบทิ้งจากทั้งในเครื่องและบน Cloud (ทุกคนจะเห็นว่าถูกลบแล้ว)`)) return;
-            
-            showToast('⏳ กำลังลบประวัติออกจาก Cloud...');
-
-            // 1. นำออกจาก LocalStorage (ลบในเครื่องเรา)
-            localStorage.removeItem('ot_order_history_' + dateKey);
-
-            // 2. เคลียร์ข้อมูลทิ้งจาก Cloud (ส่งค่า null ไปทับเพื่อให้ข้อมูลบน Cloud หายไป)
-            await pushToCloud('ot_order_history_' + dateKey, null); 
-
-            // 3. นำวันที่นี้ออกจากสารบบ Index
-            let historyIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
-            historyIndex = historyIndex.filter(k => k !== dateKey);
-            localStorage.setItem('ot_order_history_index', JSON.stringify(historyIndex));
-
-            // 4. อัปเดตสารบบ Index ไปยัง Cloud
-            await pushToCloud('ot_order_history_index', historyIndex);
-
-            showToast(`🗑️ ลบประวัติวันที่ ${dateKey} สำเร็จ`);
-
-            // โหลดหน้าจอใหม่ให้เป็นปัจจุบัน
-            renderHistoryList();
-            renderMonthlyOrderSummary();
-
-            // ถ้าหน้าจอกำลังแสดงผลข้อมูลของวันที่เพิ่งโดนลบไป ให้รีเซ็ตหน้าจอเป็นค่าว่าง
-            if (document.getElementById('orderDateInput').value === dateKey) {
-                platformData = {}; platformFiles = {};
-                PLATFORMS.forEach(p => {
-                    document.getElementById(`upload-${p}`).classList.remove('has-file');
-                    document.getElementById(`status-${p}`).textContent = 'ยังไม่ได้อัปโหลด';
-                    document.getElementById(`file-${p}`).value = '';
-                    document.getElementById(`filelist-${p}`).innerHTML = '';
-                    document.getElementById(`pending-${p}`).value = '';
-                    document.getElementById(`return-${p}`).value = '';
-                    document.getElementById(`bounce-${p}`).value = '';
-                });
-                document.getElementById('orderResults').style.display = 'none';
-                document.getElementById('btnExportOrder').style.display = 'none';
-                if (orderCharts.product) orderCharts.product.destroy();
-                if (orderCharts.platform) orderCharts.platform.destroy();
-                if (orderCharts.group) orderCharts.group.destroy();
-                if (orderCharts.stacked) orderCharts.stacked.destroy();
-            }
-        }
-
-        // ======== RENDER HISTORY LIST ========
         async function renderHistoryList() {
-            const container = document.getElementById('orderHistoryList');
-            if (!container) return;
-
-            // ดึง index จาก Cloud เสมอ เพื่อให้เห็นข้อมูลของทุกคน
-            let historyIndex = await fetchFromCloud('ot_order_history_index', true) || [];
-            const localIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
-            historyIndex = [...new Set([...historyIndex, ...localIndex])].sort().reverse();
-            localStorage.setItem('ot_order_history_index', JSON.stringify(historyIndex));
-
-            if (historyIndex.length === 0) {
-                container.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:8px">ยังไม่มีประวัติที่บันทึก</div>';
-                return;
-            }
-
-            let html = '';
-            for (const dateKey of historyIndex) {
-                // บังคับอ่านจาก Cloud เสมอเพื่อให้เห็นข้อมูลล่าสุดของทุกคน
-                let entry = await fetchFromCloud('ot_order_history_' + dateKey, true);
-                if (!entry) continue;
-
-                try {
-                    const totalQty = PLATFORMS.reduce((sum, p) => sum + (entry.platformData[p] || []).reduce((s, r) => s + r.qty, 0), 0);
-                    const platformCount = PLATFORMS.filter(p => (entry.platformData[p] || []).length > 0).length;
-                    const savedDate = new Date(entry.savedAt);
-                    const savedStr = savedDate.toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' });
-
-                    html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(79,195,247,0.05);border:1px solid var(--glass-border);border-radius:10px;margin-bottom:8px;">
-                        <div>
-                            <div style="font-weight:700;color:var(--text-primary);font-size:14px">📅 ${dateKey}</div>
-                            <div style="font-size:12px;color:var(--text-muted)">${totalQty.toLocaleString()} กล่อง | ${platformCount} แพลตฟอร์ม | บันทึก: ${savedStr}</div>
-                        </div>
-                        <div style="display:flex;gap:6px">
-                            <button class="btn btn-secondary" onclick="loadOrderHistory('${dateKey}')" style="padding:6px 12px;font-size:12px">📂 โหลด</button>
-                            <button class="btn btn-danger" onclick="deleteOrderHistory('${dateKey}')" style="padding:6px 12px;font-size:12px">🗑️ ลบ</button>
-                        </div>
-                    </div>`;
-                } catch (e) { }
-            }
-            container.innerHTML = html || '<div style="color:var(--text-muted);font-size:13px;padding:8px">ยังไม่มีประวัติที่บันทึก</div>';
+            const idx = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
+            document.getElementById('orderHistoryList').innerHTML = idx.map(d => `<div class="upload-file-item">📅 ${d} <button onclick="loadOrderHistory('${d}')">📂 โหลด</button></div>`).join('');
         }
 
-        function toggleHistoryList() {
-            const list = document.getElementById('orderHistoryList');
-            const btn = document.getElementById('historyToggleBtn');
-            if (list.style.display === 'none') {
-                list.style.display = 'block';
-                btn.textContent = '▲ ซ่อน';
-                renderHistoryList();
-            } else {
-                list.style.display = 'none';
-                btn.textContent = '▼ แสดง';
-            }
+        function refreshAllUI() {
+            renderProductionTable();
+            renderDynamicTable('warehouseTableWrapper', 'warehouse');
+            renderDynamicTable('stockTableWrapper', 'stock');
+            renderRemarkTable();
+            updateSummaryAndCharts();
         }
-        // --- เพิ่มการแก้ไขที่ส่วน Export CSV ด้วย ---
-        function exportOrderCSV() {
-            if (!window.lastConsolidated || window.lastConsolidated.grandTotal === 0) return showToast('⚠️ ไม่มีข้อมูลให้ Export');
-            const { grandTotal, platformTotals, groupTotals, activePlatforms, sorted, unitGrandTotal } = window.lastConsolidated;
-            const dateInput = document.getElementById('orderDateInput').value || getTodayString();
-            const [year, month, day] = dateInput.split('-');
 
-            let csv = '\uFEFF';
-            csv += `สรุปยอดขายรวม วันที่ ${day}/${month}/${year}\n\nแพลตฟอร์ม,จำนวน (กล่อง)\n`;
-            activePlatforms.forEach(p => csv += `${PLATFORM_NAMES[p]},${platformTotals[p]}\n`);
-            csv += `รวมทั้งหมด,${grandTotal}\n\nกลุ่มสินค้า,จำนวน (กล่อง)\n`;
-            Object.keys(groupTotals).forEach(g => csv += `${g},${groupTotals[g]}\n`);
-
-            csv += '\nรายละเอียดสินค้ารวม\nลำดับ,กลุ่มสินค้า,รายการสินค้า,รวม (กล่อง),รวม (ขวด/ซอง/กระป๋อง),';
-            activePlatforms.forEach(p => csv += `${PLATFORM_NAMES[p]},`); csv += '\n';
-
-            sorted.forEach(([item, info], index) => {
-                const match = item.match(/(\d+)\s*(ขวด|ซอง|กระป๋อง|ชิ้น|กล่อง|แผง|ชุด|หลอด|ก้อน|ลัง)/);
-                const multiplier = match ? parseInt(match[1]) : 1;
-                const unitTotal = info.total * multiplier;
-
-                let row = [index + 1, info.group, `"${item.replace(/"/g, '""')}"`, info.total, unitTotal];
-                activePlatforms.forEach(p => row.push(info.platforms[p] || 0));
-                csv += row.join(',') + '\n';
-            });
-
-            let totalRow = ['', '', 'รวมทั้งหมด', grandTotal, unitGrandTotal];
-            activePlatforms.forEach(p => totalRow.push(platformTotals[p]));
-            csv += totalRow.join(',') + '\n';
-
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `Order_Summary_${year}${month}${day}.csv`;
-            link.click();
-            showToast('📥 Export ออเดอร์เรียบร้อย!');
+        function initDashboard() {
+            const now = new Date();
+            const months = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+            const opts = months.map((m, i) => `<option value="${i}" ${i === now.getMonth() ? 'selected' : ''}>${m}</option>`).join('');
+            document.getElementById('monthSelect').innerHTML = opts;
+            document.getElementById('monthSelect4').innerHTML = opts;
+            document.getElementById('yearInput').value = (now.getFullYear() + 543) % 100;
+            document.getElementById('yearInput4').value = (now.getFullYear() + 543) % 100;
+            initCharts();
+            loadDataAndCategories();
         }
+
+        document.addEventListener('DOMContentLoaded', verifySession);
     </script>
 </body>
 
