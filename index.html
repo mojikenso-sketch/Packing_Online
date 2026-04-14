@@ -2620,6 +2620,7 @@
 
             let baseName = name;
             
+            // ดัก "งาดำ" ก่อน "ออริจินอล/CRD" เสมอ ป้องกันการทับซ้อน
             if (upper.includes('งาดำ') || upper.includes('BLACK SESAME')) {
                 baseName = 'ซีเรียลดริ๊งค์งาดำ';
             } else if (upper.includes('ครีม') || upper.includes('NDC')) {
@@ -2975,7 +2976,7 @@
                 orderCharts.product = new Chart(document.getElementById('orderProductChart'), { 
                     type: 'bar', 
                     data: { 
-                        labels: top15.map(([item]) => item.length > 25 ? item.substring(0, 25) + '...' : item), 
+                        labels: top15.map(([item]) => item),
                         datasets: [{ 
                             label: 'กล่อง', 
                             data: top15.map(([, info]) => info.total), 
@@ -3365,7 +3366,7 @@
 
             if (charts.topProductsSalesMonth) {
                 const overallSorted = Object.entries(allMonthItems).sort((a, b) => b[1].total - a[1].total).slice(0, 15);
-                charts.topProductsSalesMonth.data.labels = overallSorted.map(i => i[0].length > 20 ? i[0].substring(0, 20) + '...' : i[0]);
+                charts.topProductsSalesMonth.data.labels = overallSorted.map(i => i[0]);
                 charts.topProductsSalesMonth.data.datasets[0].data = overallSorted.map(i => i[1].total);
                 charts.topProductsSalesMonth.data.datasets[0].backgroundColor = overallSorted.map(i => PRODUCT_GROUPS[i[1].group] ? PRODUCT_GROUPS[i[1].group].color : 'rgba(79, 195, 247, 0.8)');
                 charts.topProductsSalesMonth.update('none');
