@@ -62,7 +62,6 @@
             z-index: 0;
         }
 
-        /* ซ่อนเนื้อหาหลักจนกว่าจะ Login ผ่าน */
         .app-container {
             position: relative;
             z-index: 1;
@@ -260,7 +259,6 @@
             box-shadow: none !important;
         }
 
-        /* Summary Cards */
         .summary-cards {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -316,7 +314,6 @@
             line-height: 1.5;
         }
 
-        /* Dashboard Layout */
         .dashboard-layout {
             display: flex;
             gap: 24px;
@@ -340,7 +337,6 @@
             gap: 24px;
         }
 
-        /* Tabs */
         .tab-nav {
             display: flex;
             flex-direction: column;
@@ -413,7 +409,6 @@
             }
         }
 
-        /* Tables & Sections */
         .section {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
@@ -1090,7 +1085,8 @@
             </div>
         </div>
 
-        <div class="charts-grid animate-in" id="monthlyThirdRowCharts" style="grid-template-columns: 1fr; margin-bottom: 24px;">
+        <div class="charts-grid animate-in" id="monthlyThirdRowCharts"
+            style="grid-template-columns: 1fr; margin-bottom: 24px;">
             <div class="chart-card" style="border-color: var(--glass-border); padding: 20px; max-width: 700px; margin: 0 auto; width: 100%;">
                 <div class="chart-title"
                     style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px; margin-bottom: 16px;">
@@ -1386,6 +1382,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal-overlay" id="workloadModal">
         <div class="modal-content" style="width: 600px; max-height: 85vh; display: flex; flex-direction: column;">
             <h2 style="margin-bottom: 10px; color: var(--accent-cyan);">✏️ ปรับปรุงกลุ่ม: ภาระงานคลังสินค้า</h2>
@@ -1396,7 +1393,7 @@
             <input type="text" id="workloadSearch" placeholder="🔍 ค้นหาสินค้า..." style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); color: white;" onkeyup="filterWorkloadItems()">
 
             <div id="workloadItemList" style="flex: 1; overflow-y: auto; padding-right: 10px; border: 1px solid var(--glass-border); border-radius: 8px; background: rgba(79, 195, 247, 0.02);">
-            </div>
+                </div>
             
             <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
                 <button class="btn btn-secondary" onclick="resetWorkloadOverrides()" style="margin-right: auto; color: var(--accent-yellow); border-color: var(--accent-yellow);">🔄 รีเซ็ตเป็นอัตโนมัติทั้งหมด</button>
@@ -1462,9 +1459,6 @@
         });
 
         // =========================================================================
-        // Plugin สำหรับวาดเส้นป้ายกำกับกราฟวงกลม
-        // =========================================================================
-        // Plugin สำหรับวาดป้ายกำกับกราฟวงกลม (ชื่ออยู่ข้างใน, ตัวเลขอยู่ข้างนอก)
         // Plugin สำหรับวาดป้ายกำกับกราฟวงกลม (ชื่ออยู่ข้างใน, ตัวเลขอยู่ข้างนอก)
         Chart.register({
             id: 'pieLabelsLine',
@@ -1650,6 +1644,10 @@
             } else {
                 data = getDefaultData();
             }
+
+            // โหลดค่า Overrides จาก Cloud เพื่อใช้ในกราฟ Workload
+            const savedOverrides = await fetchFromCloud('ot_workload_overrides', false);
+            if (savedOverrides) workloadOverrides = savedOverrides;
 
             refreshAllUI();
             showToast('✅ ซิงค์ข้อมูลสำเร็จ!');
@@ -1922,10 +1920,8 @@
                 let unitHtml = '';
                 
                 if (currentStockViewUnit === 'ลัง') {
-                    // หากอยู่ในโหมด ลัง ให้แสดงข้อความสะท้อนโหมดนั้นออกมาเลย
                     unitHtml = `<span style="font-size:12px; color:var(--accent-purple); font-weight:600;">ลัง</span>`;
                 } else {
-                    // โหมดขวด/ชิ้นปกติ ให้แสดง Dropdown เหมือนเดิม
                     unitHtml = `
                         <select class="unit-select" data-id="${cat.id}" onchange="changeCatUnit(this)" style="background:transparent;border:1px solid rgba(79,195,247,0.2);border-radius:4px;color:var(--text-muted);font-family:inherit;font-size:12px;outline:none;cursor:pointer;padding:2px 4px;">
                             <option value="ขวด" ${(!cat.unit || cat.unit === 'ขวด') ? 'selected' : ''}>ขวด</option>
@@ -1956,13 +1952,10 @@
 
             html += '<tr style="border-top: 2px solid var(--glass-border)"><td style="font-weight:700;color:var(--accent-cyan)">รวมทั้งหมด</td><td class="cell-label">-</td>';
             for (let i = 1; i <= DAYS; i++) {
-                // คำนวณยอดรวมขวดก่อนเสมอ
                 const totalBottles = stockCategories.reduce((sum, c) => sum + (parseFloat(data[i][type][c.id]) || 0), 0);
                 let displayedTotal = '-';
                 if (totalBottles > 0) {
                     if (currentStockViewUnit === 'ลัง') {
-                        // การแสดงยอดรวมเป็น "ลัง" อาจจะไม่เป๊ะหากแต่ละแถวตัวคูณไม่เท่ากัน 
-                        // แต่ในที่นี้เราจะใช้ค่าเฉลี่ยหรือยอดขวดรวมหาร 12 (ซึ่งเป็นลังมาตรฐาน) เพื่อความง่าย
                         const val = totalBottles / 12;
                         displayedTotal = Number.isInteger(val) ? val : parseFloat(val.toFixed(2));
                     } else {
@@ -1991,7 +1984,6 @@
             const multiplier = getConversionMultiplier(cat);
             const inputVal = parseFloat(el.value) || 0;
 
-            // แปลงค่ากลับเป็นหน่วยหลัก (ขวด) ก่อนบันทึก
             let savedVal = inputVal;
             if (currentStockViewUnit === 'ลัง') {
                 savedVal = inputVal * multiplier;
@@ -1999,7 +1991,6 @@
 
             data[day][type][catId] = savedVal;
             
-            // อัปเดตยอดรวมท้ายตาราง
             const totalBottles = stockCategories.reduce((sum, c) => sum + (parseFloat(data[day][type][c.id]) || 0), 0);
             let displayedTotal = '-';
             if (totalBottles > 0) {
@@ -2025,8 +2016,6 @@
                 await pushToCloud(CAT_KEY, stockCategories);
                 showToast('✅ บันทึกหน่วยสำเร็จ!');
 
-                // Re-render both tables to reflect unit selection dynamically
-                // (Using requestAnimationFrame to avoid blocking the initial select visual update)
                 requestAnimationFrame(() => {
                     renderDynamicTable('warehouseTableWrapper', 'warehouse');
                     renderDynamicTable('stockTableWrapper', 'stock');
@@ -2044,13 +2033,11 @@
                 }
             }
 
-            // --- คำนวณยอดสต็อกแยกตามกลุ่มสินค้า (New!) ---
             let stockGroupTotals = {};
             stockCategories.forEach(cat => {
                 const group = cat.group || 'ผสม/อื่นๆ';
                 const val = latestWH[cat.id] || 0;
 
-                // กระจายยอด DUO SET ลงกลุ่มย่อย
                 if (group === 'DUO SET(SO+E1H)') {
                     DUO_SPLIT.forEach(g => {
                         stockGroupTotals[g] = (stockGroupTotals[g] || 0) + val;
@@ -2060,9 +2047,8 @@
                 }
             });
 
-            // กรองกลุ่ม DUO SET ออกไม่ให้โชว์ในกราฟ และเรียงลำดับ
             const sortedStockGroups = Object.keys(PRODUCT_GROUPS)
-                .filter(g => g !== 'DUO SET(SO+E1H)') // ลบ DUO SET ออกจากการแสดงผล
+                .filter(g => g !== 'DUO SET(SO+E1H)') 
                 .map(g => ({
                     label: PRODUCT_GROUPS[g].label,
                     val: stockGroupTotals[g] || 0,
@@ -2078,7 +2064,6 @@
                 charts.stockGroup.update('none');
             }
 
-            // Create array of objects for sorting (รายสินค้า)
             let sortedStock = stockCategories.map((cat, index) => {
                 const groupInfo = PRODUCT_GROUPS[cat.group] || PRODUCT_GROUPS['ผสม/อื่นๆ'];
                 return {
@@ -2088,10 +2073,8 @@
                 };
             });
 
-            // Sort descending (มากสุดอยู่บน)
             sortedStock.sort((a, b) => b.val - a.val);
 
-            // Update horizontal bar chart (รายสินค้า)
             if (charts.latestStock) {
                 charts.latestStock.data.labels = sortedStock.map(c => c.name);
                 charts.latestStock.data.datasets[0].data = sortedStock.map(c => c.val);
@@ -2104,7 +2087,6 @@
             let bestRate = Infinity; let bestRateDay = '-';
 
             for (let i = 1; i <= DAYS; i++) {
-                // รวมยอดขวดและยอดกล่องเข้าด้วยกันเพื่อนำไปคิดสถิติรวม
                 const b = calcBottles(i) + calcBoxes(i);
                 const w = parseFloat(data[i].workers) || 0;
                 const h = parseFloat(data[i].otHours) || 0;
@@ -2152,9 +2134,7 @@
                 charts.rate.data.datasets[0].pointBorderColor = pointColors;
                 charts.rate.data.datasets[0].pointRadius = pointRadii;
 
-                // ยืนยันค่ามาตรฐาน 45 ทุกครั้งที่อัปเดต เพื่อป้องกันปัญหาเส้นหายหรือขยับ
                 charts.rate.data.datasets[1].data = new Array(DAYS).fill(45);
-
                 charts.rate.update('none');
 
                 const titleElem = document.getElementById('rateChartTitleTop');
@@ -2197,7 +2177,6 @@
                                 ctx.fillStyle = '#e8eaf6';
                                 ctx.textAlign = 'left';
                                 ctx.textBaseline = 'middle';
-                                // บังคับลงพิกเซลเต็มด้วย Math.round
                                 ctx.fillText(value.toLocaleString(), Math.round(datapoint.x + 6), Math.round(datapoint.y));
                             }
                         });
@@ -2206,7 +2185,7 @@
                 }]
             });
 
-            // 2. กราฟ Rate (พร้อม Tooltip จำนวนคน, OT และ หมายเหตุ)
+            // 2. กราฟ Rate
             charts.rate = new Chart(document.getElementById('rateChart'), {
                 type: 'line',
                 data: {
@@ -2227,7 +2206,7 @@
                                     const day = context.dataIndex + 1; 
                                     const workers = data[day] && data[day].workers ? data[day].workers : '-';
                                     const ot = data[day] && data[day].otHours ? data[day].otHours : '-';
-                                    const remark = data[day] && data[day].remark ? data[day].remark : '-'; // ดึงหมายเหตุมาแสดง
+                                    const remark = data[day] && data[day].remark ? data[day].remark : '-'; 
                                     return [
                                         `👥 จำนวนคน: ${workers} คน`,
                                         `⏳ เวลา OT: ${ot} ชม.`,
@@ -2260,7 +2239,6 @@
                                 ctx.fillStyle = '#e8eaf6';
                                 ctx.textAlign = 'left';
                                 ctx.textBaseline = 'middle';
-                                // บังคับลงพิกเซลเต็มด้วย Math.round
                                 ctx.fillText(value.toLocaleString(), Math.round(datapoint.x + 6), Math.round(datapoint.y));
                             }
                         });
@@ -2336,7 +2314,6 @@
                                 ctx.fillStyle = '#e8eaf6';
                                 ctx.textAlign = 'left';
                                 ctx.textBaseline = 'middle';
-                                // บังคับลงพิกเซลเต็มด้วย Math.round
                                 ctx.fillText(text, Math.round(maxX + 6), Math.round(y));
                             }
                         }
@@ -2372,7 +2349,6 @@
                                 ctx.fillStyle = '#e8eaf6';
                                 ctx.textAlign = 'left';
                                 ctx.textBaseline = 'middle';
-                                // บังคับลงพิกเซลเต็มด้วย Math.round
                                 ctx.fillText(value.toLocaleString(), Math.round(Math.max(datapoint.x + 6, 0)), Math.round(datapoint.y));
                             }
                         });
@@ -2392,21 +2368,18 @@
                         legend: { display: false },
                         tooltip: {
                             callbacks: {
-                                // เพิ่มคำว่า "กล่อง" ต่อท้ายเลขรวม
                                 label: function(context) {
                                     return `${context.label}: ${context.raw.toLocaleString()} กล่อง`;
                                 },
                                 afterLabel: function(context) {
                                     const label = context.label;
-                                    const boxQty = context.raw;
                                     const breakdown = context.chart.data.breakdownData;
                                     
                                     if (breakdown && breakdown[label]) {
                                         const items = breakdown[label];
                                         
-                                        // 1. คำนวณขวดย่อย/ชิ้นย่อย
                                         let unitSums = {};
-                                        let totalSubUnits = 0; // ตัวแปรเก็บยอดแตกรวม
+                                        let totalSubUnits = 0; 
                                         items.forEach(i => {
                                             let multiplier = 1;
                                             let uName = 'ชิ้น';
@@ -2425,7 +2398,6 @@
                                         });
                                         const unitString = Object.entries(unitSums).map(([u, v]) => `${v.toLocaleString()} ${u}`).join(', ');
 
-                                        // 2. คำนวณวันเฉลี่ย
                                         const selMonth = parseInt(document.getElementById('monthSelect').value);
                                         const selYearCE = 2500 + parseInt(document.getElementById('yearInput').value) - 543;
                                         const historyIndex = JSON.parse(localStorage.getItem('ot_order_history_index') || '[]');
@@ -2435,7 +2407,6 @@
                                         });
                                         const totalDays = daysWithData.length > 0 ? daysWithData.length : 1;
                                         
-                                        // คำนวณเฉลี่ยแบบใหม่: (ยอดแตกรวม / 12) / จำนวนวัน
                                         const avgPerDayBox = ((totalSubUnits / 12) / totalDays).toFixed(2);
 
                                         const lines = [
@@ -2445,7 +2416,6 @@
                                             '🔍 รายละเอียดในกลุ่มนี้:'
                                         ];
                                         
-                                        // 3. แสดงทุกรายการแบบไม่ต้องตัดคำ
                                         items.forEach(i => {
                                             lines.push(`- ${i.name}: ${i.total.toLocaleString()} กล่อง`);
                                         });
@@ -2464,7 +2434,7 @@
                 }
             });
 
-            // 6. กราฟ Top 15 (อัปเกรด Tooltip)
+            // 6. กราฟ Top 15 
             charts.topProductsSalesMonth = new Chart(document.getElementById('topProductsSalesChartMonth'), {
                 type: 'bar',
                 data: { labels: [], datasets: [{ data: [], backgroundColor: 'rgba(79, 195, 247, 0.8)', borderRadius: 4 }] },
@@ -2496,11 +2466,9 @@
                         tooltip: {
                             callbacks: {
                                 afterLabel: function(context) {
-                                    // 1. ดึงชื่อสินค้า และจำนวนกล่อง
                                     const itemName = context.label;
                                     const boxQty = context.raw;
                                     
-                                    // 2. คำนวณตัวคูณเพื่อแตกเป็นหน่วยย่อย (ขวด/ซอง)
                                     let multiplier = 1;
                                     let unitName = 'ชิ้น';
                                     
@@ -2517,8 +2485,6 @@
                                     
                                     const totalUnit = boxQty * multiplier;
 
-                                    // 3. หาจำนวนวันล่าสุดที่มีการบันทึกในเดือนนี้
-                                    // ดึงจาก Select Month/Year เพื่อหาว่ากำลังดูเดือนไหนอยู่
                                     const selMonth = parseInt(document.getElementById('monthSelect').value);
                                     const selYearCE = 2500 + parseInt(document.getElementById('yearInput').value) - 543;
                                     
@@ -2528,9 +2494,8 @@
                                         return parts.length === 3 && parseInt(parts[0]) === selYearCE && parseInt(parts[1]) - 1 === selMonth;
                                     });
                                     
-                                    const totalDays = daysWithData.length > 0 ? daysWithData.length : 1; // ป้องกันหาร 0
+                                    const totalDays = daysWithData.length > 0 ? daysWithData.length : 1; 
                                     
-                                    // คำนวณเฉลี่ยแบบใหม่: (ยอดแตกรวม / 12) / จำนวนวัน
                                     const avgPerDayBox = ((totalUnit / 12) / totalDays).toFixed(2);
 
                                     return [
@@ -2549,7 +2514,6 @@
             });
 
             // 7. กราฟวงกลม ภาระงาน (Workload)
-            // 7. กราฟวงกลม ภาระงาน (Workload)
             charts.workloadMonth = new Chart(document.getElementById('workloadMonthChart'), {
                 type: 'pie',
                 data: {
@@ -2565,17 +2529,16 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    // 📌 เพิ่ม Padding เพื่อบีบวงกลมให้เล็กลง มีที่ว่างให้ตัวเลข และดันกราฟขึ้นให้ห่างจาก Legend
                     layout: {
                         padding: { top: 40, bottom: 50, left: 100, right: 100 }
                     },
                     plugins: {
                         legend: { 
                             position: 'bottom', 
+                            align: 'center',
                             labels: { color: '#e8eaf6', font: { family: 'Inter', size: 13 }, padding: 10 } 
                         },
                         tooltip: {
-                            // 📌 ปรับพื้นหลังกล่องให้เป็นสีดำทึบ 100%
                             backgroundColor: 'rgba(15, 15, 26, 1)', 
                             titleColor: '#ffffff',
                             bodyColor: '#e8eaf6',
@@ -2607,7 +2570,7 @@
                     }
                 }
             });
-        } // 🟢 เพิ่มปีกกาปิด } ตรงนี้ครับ 🟢
+        } 
 
         function exportCSV() {
             const { month, year } = getMonthYear();
@@ -2662,12 +2625,12 @@
             link.click();
             showToast('📥 Export CSV เรียบร้อย!');
         }
+        
         function renderRemarkTable() {
             const wrapper = document.getElementById('remarkTableWrapper');
             let html = '<table><thead><tr><th>รายละเอียด</th><th>หน่วย</th>';
             for (let i = 1; i <= DAYS; i++) html += `<th${i === _todayNum ? ' class="is-today"' : ''}>${formatDate(i)}</th>`;
             html += '</tr></thead><tbody>';
-
 
             // แถว: ความเห็น
             html += `<tr><td style="font-weight:700; color:var(--accent-yellow);">ความเห็น</td><td class="cell-label">ข้อความ</td>`;
@@ -3443,7 +3406,6 @@
                         items.forEach(({ item, qty }) => {
                             const stdItem = standardizeProductName(item);
                             const group = detectProductGroup(stdItem);
-                            // ใช้ชื่อมาตรฐานที่จัดระเบียบแล้วเป็น Key หลักในการนับยอด
                             const itemKey = stdItem; 
 
                             if (!allMonthItems[itemKey]) allMonthItems[itemKey] = { total: 0, group: group };
@@ -3567,29 +3529,23 @@
                 };
 
                 Object.entries(allMonthItems).forEach(([itemName, info]) => {
-                    let name = itemName.toUpperCase();
                     let qty = info.total;
+                    let targetGroup = -1;
 
-                    // เงื่อนไขที่ 1: ยกลัง (12 ขวด)
-                    if (name.includes('12 ขวด') || name.includes('12ขวด') || name.includes('ยกลัง')) {
-                        workloadData[0] += qty;
-                        workloadBreakdown['ยกลัง (12 ขวด)'].push({ name: itemName, total: qty });
+                    // 📌 1. เช็คว่ามีการตั้งค่าปรับปรุงกลุ่มไว้ไหม
+                    if (workloadOverrides[itemName] !== undefined) {
+                        targetGroup = parseInt(workloadOverrides[itemName]);
                     } 
-                    // เงื่อนไขที่ 2: Stock (2, 4, 6 ขวด, DUO)
-                    else if (
-                        name.includes('2 ขวด') || name.includes('2ขวด') || 
-                        name.includes('4 ขวด') || name.includes('4ขวด') || 
-                        name.includes('6 ขวด') || name.includes('6ขวด') || 
-                        name.includes('DUO')
-                    ) {
-                        workloadData[1] += qty;
-                        workloadBreakdown['Stock (2, 4, 6 ขวด, DUO)'].push({ name: itemName, total: qty });
-                    } 
-                    // เงื่อนไขที่ 3: Make to order (ทุกอย่างที่เหลือ)
+                    // 📌 2. ถ้าไม่มี ให้คำนวณอัตโนมัติตามชื่อ
                     else {
-                        workloadData[2] += qty;
-                        workloadBreakdown['Make to order'].push({ name: itemName, total: qty });
+                        let name = itemName.toUpperCase();
+                        if (name.includes('12 ขวด') || name.includes('12ขวด') || name.includes('ยกลัง')) targetGroup = 0;
+                        else if (name.includes('2 ขวด') || name.includes('2ขวด') || name.includes('4 ขวด') || name.includes('4ขวด') || name.includes('6 ขวด') || name.includes('6ขวด') || name.includes('DUO')) targetGroup = 1;
+                        else targetGroup = 2;
                     }
+
+                    workloadData[targetGroup] += qty;
+                    workloadBreakdown[['ยกลัง (12 ขวด)', 'Stock (2, 4, 6 ขวด, DUO)', 'Make to order'][targetGroup]].push({ name: itemName, total: qty });
                 });
 
                 // เรียงลำดับรายการย่อยจากยอดขายมากไปน้อย
@@ -3598,9 +3554,12 @@
                 });
 
                 charts.workloadMonth.data.datasets[0].data = workloadData;
-                charts.workloadMonth.data.breakdownData = workloadBreakdown; // ส่งข้อมูลย่อยเข้ากราฟ
+                charts.workloadMonth.data.breakdownData = workloadBreakdown; 
                 charts.workloadMonth.update('none');
             }
+
+            // จัดเก็บข้อมูลรายเดือนทั้งหมดไว้ใน Global เพื่อให้ Modal เรียกไปใช้ได้
+            window.currentMonthItems = allMonthItems;
 
             if (!hasAnyRow) {
                 wrapper.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:16px;text-align:center">ไม่พบข้อมูลใน Cloud สำหรับ ${monthNames[selMonth]} ${selYearBE}</div>`;
@@ -3803,7 +3762,7 @@
                 btn.textContent = '▼ แสดง';
             }
         }
-        // --- เพิ่มการแก้ไขที่ส่วน Export CSV ด้วย ---
+        
         function exportOrderCSV() {
             if (!window.lastConsolidated || window.lastConsolidated.grandTotal === 0) return showToast('⚠️ ไม่มีข้อมูลให้ Export');
             const { grandTotal, platformTotals, groupTotals, activePlatforms, sorted, unitGrandTotal } = window.lastConsolidated;
@@ -3840,124 +3799,8 @@
             link.click();
             showToast('📥 Export ออเดอร์เรียบร้อย!');
         }
-            // ================= WORKLOAD OVERRIDES SYSTEM =================
+
         // ================= WORKLOAD OVERRIDES SYSTEM =================
-        let workloadOverrides = JSON.parse(localStorage.getItem('ot_workload_overrides') || '{}');
-
-        function openWorkloadModal() {
-            const list = document.getElementById('workloadItemList');
-            let html = '';
-            
-            if (!window.globalMonthItems || Object.keys(window.globalMonthItems).length === 0) {
-                list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted)">ยังไม่มีข้อมูลสินค้าในเดือนนี้ กรุณารวมยอดก่อนครับ</div>';
-            } else {
-                Object.entries(window.globalMonthItems).forEach(([itemName, info]) => {
-                    const currentVal = workloadOverrides[itemName] || 'auto';
-                    html += `
-                        <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px; border-bottom: 1px solid rgba(79, 195, 247, 0.1);">
-                            <div style="font-size: 13px; flex: 1; padding-right: 10px; color:var(--text-primary); font-weight: 500;">${itemName}</div>
-                            <select class="workload-override-select" data-item="${itemName}" style="padding: 8px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: var(--accent-cyan); font-size: 13px; width: 180px; outline:none;">
-                                <option value="auto" ${currentVal === 'auto' ? 'selected' : ''}>🤖 อัตโนมัติ</option>
-                                <option value="0" ${currentVal === '0' ? 'selected' : ''}>📦 ยกลัง (12 ขวด)</option>
-                                <option value="1" ${currentVal === '1' ? 'selected' : ''}>🏪 Stock (2,4,6 ขวด)</option>
-                                <option value="2" ${currentVal === '2' ? 'selected' : ''}>🛠️ Make to order</option>
-                            </select>
-                        </div>
-                    `;
-                });
-                list.innerHTML = html;
-            }
-            document.getElementById('workloadModal').style.display = 'flex';
-        }
-
-        function closeWorkloadModal() {
-            document.getElementById('workloadModal').style.display = 'none';
-        }
-
-        async function saveWorkloadOverrides() {
-            const selects = document.querySelectorAll('.workload-override-select');
-            selects.forEach(sel => {
-                const item = sel.dataset.item;
-                const val = sel.value;
-                if (val === 'auto') {
-                    delete workloadOverrides[item];
-                } else {
-                    workloadOverrides[item] = val;
-                }
-            });
-            
-            localStorage.setItem('ot_workload_overrides', JSON.stringify(workloadOverrides));
-            closeWorkloadModal();
-            
-            showToast('⏳ กำลังบันทึกการตั้งค่าขึ้น Cloud...');
-            await pushToCloud('ot_workload_overrides', workloadOverrides);
-            showToast('✅ บันทึกสำเร็จ! กราฟกำลังอัปเดต...');
-            
-            renderMonthlyOrderSummary(false); 
-        }
-
-        // แทรกการโหลดค่า Overrides จาก Cloud ตอนเปิดเว็บ
-        const originalLoadData = loadDataAndCategories;
-        loadDataAndCategories = async function() {
-            const savedOverrides = await fetchFromCloud('ot_workload_overrides', false);
-            if (savedOverrides) workloadOverrides = savedOverrides;
-            await originalLoadData();
-        };
-
-        // แทรกการนำ Overrides มาใช้คำนวณใน Pie Chart
-        const originalRenderMonthly = renderMonthlyOrderSummary;
-        renderMonthlyOrderSummary = async function(forceCloudSync = true) {
-            await originalRenderMonthly(forceCloudSync);
-            
-            // ดึงตัวแปร global ที่เก็บข้อมูลเดือนปัจจุบัน
-            if (charts.workloadMonth && window.globalMonthItems) {
-                let workloadData = [0, 0, 0]; 
-                let workloadBreakdown = { 'ยกลัง (12 ขวด)': [], 'Stock (2, 4, 6 ขวด, DUO)': [], 'Make to order': [] };
-                const groupNames = ['ยกลัง (12 ขวด)', 'Stock (2, 4, 6 ขวด, DUO)', 'Make to order'];
-
-                Object.entries(window.globalMonthItems).forEach(([itemName, info]) => {
-                    let qty = info.total;
-                    let targetGroup = -1;
-
-                    // 📌 1. เช็คว่ามีการตั้งค่าปรับปรุงกลุ่มไว้ไหม
-                    if (workloadOverrides[itemName] !== undefined) {
-                        targetGroup = parseInt(workloadOverrides[itemName]);
-                    } 
-                    // 📌 2. ถ้าไม่มี ให้คำนวณอัตโนมัติตามชื่อ
-                    else {
-                        let name = itemName.toUpperCase();
-                        if (name.includes('12 ขวด') || name.includes('12ขวด') || name.includes('ยกลัง')) {
-                            targetGroup = 0;
-                        } else if (name.includes('2 ขวด') || name.includes('2ขวด') || name.includes('4 ขวด') || name.includes('4ขวด') || name.includes('6 ขวด') || name.includes('6ขวด') || name.includes('DUO')) {
-                            targetGroup = 1;
-                        } else {
-                            targetGroup = 2;
-                        }
-                    }
-
-                    workloadData[targetGroup] += qty;
-                    workloadBreakdown[groupNames[targetGroup]].push({ name: itemName, total: qty });
-                });
-
-                Object.keys(workloadBreakdown).forEach(key => workloadBreakdown[key].sort((a, b) => b.total - a.total));
-
-                charts.workloadMonth.data.datasets[0].data = workloadData;
-                charts.workloadMonth.data.breakdownData = workloadBreakdown; 
-                charts.workloadMonth.update('none');
-            }
-        };
-        
-        // ช่วยเก็บตัวแปรให้ระบบดึงไปใช้ได้
-        const oldConsolidateOrders = consolidateOrders;
-        consolidateOrders = function(modeLabel) {
-            oldConsolidateOrders(modeLabel);
-            if (window.lastConsolidated) {
-                window.globalMonthItems = window.lastConsolidated.allItems;
-                renderMonthlyOrderSummary(false); 
-            }
-        };
-        // ================= WORKLOAD OVERRIDES SYSTEM =================
-        // ระบบบันทึกการจัดกลุ่มสินค้า
         let workloadOverrides = JSON.parse(localStorage.getItem('ot_workload_overrides') || '{}');
 
         function openWorkloadModal() {
@@ -3965,10 +3808,10 @@
             document.getElementById('workloadSearch').value = ''; 
             let html = '';
             
-            if (!window.globalMonthItems || Object.keys(window.globalMonthItems).length === 0) {
+            if (!window.currentMonthItems || Object.keys(window.currentMonthItems).length === 0) {
                 list.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted)">ยังไม่มีข้อมูลสินค้า กรุณารวมยอดของเดือนนี้ก่อนครับ</div>';
             } else {
-                const items = Object.keys(window.globalMonthItems).sort();
+                const items = Object.keys(window.currentMonthItems).sort();
                 
                 items.forEach((itemName, index) => {
                     const currentVal = workloadOverrides[itemName] || 'auto';
@@ -4045,62 +3888,6 @@
             
             renderMonthlyOrderSummary(false); 
         }
-
-        // แทรกการโหลดค่า Overrides จาก Cloud ตอนเปิดเว็บ
-        const originalLoadData = loadDataAndCategories;
-        loadDataAndCategories = async function() {
-            const savedOverrides = await fetchFromCloud('ot_workload_overrides', false);
-            if (savedOverrides) workloadOverrides = savedOverrides;
-            await originalLoadData();
-        };
-
-        // แทรกการนำ Overrides มาใช้คำนวณใน Pie Chart
-        const originalRenderMonthly = renderMonthlyOrderSummary;
-        renderMonthlyOrderSummary = async function(forceCloudSync = true) {
-            await originalRenderMonthly(forceCloudSync);
-            
-            if (charts.workloadMonth && window.globalMonthItems) {
-                let workloadData = [0, 0, 0]; 
-                let workloadBreakdown = { 'ยกลัง (12 ขวด)': [], 'Stock (2, 4, 6 ขวด, DUO)': [], 'Make to order': [] };
-                const groupNames = ['ยกลัง (12 ขวด)', 'Stock (2, 4, 6 ขวด, DUO)', 'Make to order'];
-
-                Object.entries(window.globalMonthItems).forEach(([itemName, info]) => {
-                    let qty = info.total;
-                    let targetGroup = -1;
-
-                    // 📌 เช็คตั้งค่าจากการ Override ก่อน
-                    if (workloadOverrides[itemName] !== undefined) {
-                        targetGroup = parseInt(workloadOverrides[itemName]);
-                    } 
-                    // ถ้าไม่มีตั้งค่าให้คำนวณอัตโนมัติ
-                    else {
-                        let name = itemName.toUpperCase();
-                        if (name.includes('12 ขวด') || name.includes('12ขวด') || name.includes('ยกลัง')) targetGroup = 0;
-                        else if (name.includes('2 ขวด') || name.includes('2ขวด') || name.includes('4 ขวด') || name.includes('4ขวด') || name.includes('6 ขวด') || name.includes('6ขวด') || name.includes('DUO')) targetGroup = 1;
-                        else targetGroup = 2;
-                    }
-
-                    workloadData[targetGroup] += qty;
-                    workloadBreakdown[groupNames[targetGroup]].push({ name: itemName, total: qty });
-                });
-
-                Object.keys(workloadBreakdown).forEach(key => workloadBreakdown[key].sort((a, b) => b.total - a.total));
-
-                charts.workloadMonth.data.datasets[0].data = workloadData;
-                charts.workloadMonth.data.breakdownData = workloadBreakdown; 
-                charts.workloadMonth.update('none');
-            }
-        };
-        
-        // ช่วยเก็บตัวแปรให้ระบบดึงไปใช้ได้
-        const oldConsolidateOrders = consolidateOrders;
-        consolidateOrders = function(modeLabel) {
-            oldConsolidateOrders(modeLabel);
-            if (window.lastConsolidated) {
-                window.globalMonthItems = window.lastConsolidated.allItems;
-                renderMonthlyOrderSummary(false); 
-            }
-        };
     </script>
 </body>
 
