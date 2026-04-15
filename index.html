@@ -1090,12 +1090,11 @@
             </div>
         </div>
 
-        <div class="charts-grid animate-in" id="monthlyThirdRowCharts"
-            style="grid-template-columns: 1fr; margin-bottom: 24px;">
-            <div class="chart-card" style="border-color: var(--glass-border); padding: 20px; max-width: 700px; margin: 0 auto; width: 100%;">
+        <div class="chart-card" style="border-color: var(--glass-border); padding: 20px; max-width: 700px; margin: 0 auto; width: 100%;">
                 <div class="chart-title"
-                    style="font-size: 16px; margin-bottom: 16px; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px; text-align: center;">
-                    🥧 สัดส่วนภาระงานคลังสินค้า: ยกลัง / Stock / Make to order (จากยอดขายรายเดือน)
+                    style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px; margin-bottom: 16px;">
+                    <span style="font-size: 16px;">🥧 สัดส่วนภาระงานคลังสินค้า: ยกลัง / Stock / Make to order</span>
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="openWorkloadModal()">✏️ ปรับปรุงกลุ่ม</button>
                 </div>
                 <div class="chart-container" style="height: 350px;">
                     <canvas id="workloadMonthChart"></canvas>
@@ -1386,7 +1385,20 @@
             </div>
         </div>
     </div>
-
+    <div class="modal-overlay" id="workloadModal">
+        <div class="modal-content" style="width: 550px;">
+            <h2 style="margin-bottom: 10px; color: var(--accent-cyan);">✏️ ปรับปรุงกลุ่มสินค้า (Workload)</h2>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+                ตั้งค่าว่าสินค้ารายการใดควรจัดอยู่ในหมวดหมู่ไหน (ระบบจะจำค่านี้ไว้ใช้กับทุกเดือน)
+            </p>
+            <div id="workloadItemList" style="max-height: 400px; overflow-y: auto; padding-right: 10px;"></div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 30px;">
+                <button class="btn btn-danger" onclick="closeWorkloadModal()"
+                    style="background:transparent; border:none;">ยกเลิก</button>
+                <button class="btn btn-primary" onclick="saveWorkloadOverrides()">💾 บันทึกการเปลี่ยนแปลง</button>
+            </div>
+        </div>
+    </div>
     <div class="toast" id="toast">✅ สำเร็จ!</div>
 
     <script>
@@ -1444,6 +1456,8 @@
 
         // =========================================================================
         // Plugin สำหรับวาดเส้นป้ายกำกับกราฟวงกลม
+        // =========================================================================
+        // Plugin สำหรับวาดป้ายกำกับกราฟวงกลม (ชื่ออยู่ข้างใน, ตัวเลขอยู่ข้างนอก)
         Chart.register({
             id: 'pieLabelsLine',
             afterDraw(chart) {
@@ -1458,17 +1472,34 @@
 
                     const total = dataset.data.reduce((a, b) => a + b, 0);
                     const percent = ((value / total) * 100).toFixed(1) + '%';
-                    const text = `${label}: ${value} กล่อง (${percent})`;
-
                     const arc = meta.data[i];
                     const angle = (arc.startAngle + arc.endAngle) / 2;
 
+                    // 1. วาด "ชื่อประเภท" ด้านในกราฟ
+                    const innerRadius = arc.innerRadius || 0;
+                    const centerRadius = innerRadius + (arc.outerRadius - innerRadius) * 0.6;
+                    const innerX = arc.x + Math.cos(angle) * centerRadius;
+                    const innerY = arc.y + Math.sin(angle) * centerRadius;
+
+                    ctx.save();
+                    ctx.font = 'bold 13px "Inter", "Noto Sans Thai", sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillStyle = '#ffffff';
+                    ctx.shadowColor = 'rgba(0,0,0,0.6)';
+                    ctx.shadowBlur = 4;
+                    // ตัดเอาแค่คำแรก เช่น "ยกลัง (12 ขวด)" จะโชว์แค่ "ยกลัง" เพื่อไม่ให้ล้นชิ้นกราฟ
+                    let shortLabel = label.split('(')[0].trim(); 
+                    ctx.fillText(shortLabel, innerX, innerY);
+                    ctx.restore();
+
+                    // 2. วาดเส้น และ "ตัวเลขผลลัพธ์" ด้านนอกกราฟ
                     const radius = arc.outerRadius;
                     const startX = arc.x + Math.cos(angle) * radius;
                     const startY = arc.y + Math.sin(angle) * radius;
                     const endX = arc.x + Math.cos(angle) * (radius + 20);
                     const endY = arc.y + Math.sin(angle) * (radius + 20);
-                    const lineX = endX + (Math.cos(angle) >= 0 ? 1 : -1) * 20;
+                    const lineX = endX + (Math.cos(angle) >= 0 ? 1 : -1) * 15;
 
                     ctx.beginPath();
                     ctx.moveTo(startX, startY);
@@ -1482,7 +1513,10 @@
                     ctx.fillStyle = '#e8eaf6';
                     ctx.textAlign = Math.cos(angle) >= 0 ? 'left' : 'right';
                     ctx.textBaseline = 'middle';
-                    ctx.fillText(text, lineX + (Math.cos(angle) >= 0 ? 5 : -5), endY);
+                    
+                    // แสดงผลเฉพาะตัวเลขและเปอร์เซ็นต์
+                    const outText = `${value.toLocaleString()} กล่อง (${percent})`;
+                    ctx.fillText(outText, lineX + (Math.cos(angle) >= 0 ? 5 : -5), endY);
                 });
             }
         });
@@ -3788,6 +3822,129 @@
             link.click();
             showToast('📥 Export ออเดอร์เรียบร้อย!');
         }
+            // ================= WORKLOAD OVERRIDES SYSTEM =================
+        let workloadOverrides = JSON.parse(localStorage.getItem('ot_workload_overrides') || '{}');
+
+        // ดึงข้อมูล Override จาก Cloud ตอนโหลดหน้าเว็บ (ไปเพิ่มพ่วงในฟังก์ชัน loadDataAndCategories อัตโนมัติ)
+        const originalLoadData = loadDataAndCategories;
+        loadDataAndCategories = async function() {
+            const savedOverrides = await fetchFromCloud('ot_workload_overrides', false);
+            if (savedOverrides) workloadOverrides = savedOverrides;
+            await originalLoadData();
+        };
+
+        function openWorkloadModal() {
+            const list = document.getElementById('workloadItemList');
+            let html = '';
+            
+            // ดึงรายการสินค้าทั้งหมดที่มีขายในเดือนที่เลือกไว้
+            if (!window.globalMonthItems || Object.keys(window.globalMonthItems).length === 0) {
+                list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted)">ยังไม่มีข้อมูลสินค้าในเดือนนี้ กรุณารวมยอดก่อนครับ</div>';
+            } else {
+                Object.entries(window.globalMonthItems).forEach(([itemName, info]) => {
+                    const currentVal = workloadOverrides[itemName] || 'auto';
+                    html += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px; border-bottom: 1px solid rgba(79, 195, 247, 0.1);">
+                            <div style="font-size: 13px; flex: 1; padding-right: 10px;">${itemName}</div>
+                            <select class="workload-override-select" data-item="${itemName}" style="padding: 8px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: var(--text-primary); font-size: 12px; width: 170px;">
+                                <option value="auto" ${currentVal === 'auto' ? 'selected' : ''}>🤖 คำนวณอัตโนมัติ</option>
+                                <option value="0" ${currentVal === '0' ? 'selected' : ''}>📦 ยกลัง (12 ขวด)</option>
+                                <option value="1" ${currentVal === '1' ? 'selected' : ''}>🏪 Stock (2,4,6 ขวด)</option>
+                                <option value="2" ${currentVal === '2' ? 'selected' : ''}>🛠️ Make to order</option>
+                            </select>
+                        </div>
+                    `;
+                });
+                list.innerHTML = html;
+            }
+            document.getElementById('workloadModal').style.display = 'flex';
+        }
+
+        function closeWorkloadModal() {
+            document.getElementById('workloadModal').style.display = 'none';
+        }
+
+        async function saveWorkloadOverrides() {
+            const selects = document.querySelectorAll('.workload-override-select');
+            selects.forEach(sel => {
+                const item = sel.dataset.item;
+                const val = sel.value;
+                if (val === 'auto') {
+                    delete workloadOverrides[item];
+                } else {
+                    workloadOverrides[item] = val;
+                }
+            });
+            
+            localStorage.setItem('ot_workload_overrides', JSON.stringify(workloadOverrides));
+            closeWorkloadModal();
+            
+            showToast('⏳ กำลังบันทึกการจัดกลุ่มขึ้น Cloud...');
+            await pushToCloud('ot_workload_overrides', workloadOverrides);
+            showToast('✅ บันทึกสำเร็จ!');
+            
+            // สั่งอัปเดตกราฟใหม่ทันที
+            renderMonthlyOrderSummary(false); 
+        }
+
+        // Override ฟังก์ชันเดิมเพื่อแทรกระบบเงื่อนไข Override ก่อนวาดกราฟ Workload
+        const originalRenderMonthly = renderMonthlyOrderSummary;
+        renderMonthlyOrderSummary = async function(forceCloudSync = true) {
+            await originalRenderMonthly(forceCloudSync);
+            
+            // ดึงตัวแปรจากฟังก์ชันเดิมมาใช้
+            window.globalMonthItems = window.lastConsolidated ? window.lastConsolidated.allItems : null;
+            if (!window.globalMonthItems && document.getElementById('monthlyOrderTableWrapper').innerHTML.includes('ยอดรวมขาย')) {
+                // หากยังไม่ได้รวมยอดรายวัน แต่เปิดดูรายเดือน ให้ดึงจาก allMonthItems (ผมจะใช้ทริคนี้ดึงข้อมูล)
+            }
+
+            if (charts.workloadMonth && window.globalMonthItems) {
+                let workloadData = [0, 0, 0]; 
+                let workloadBreakdown = { 'ยกลัง (12 ขวด)': [], 'Stock (2, 4, 6 ขวด, DUO)': [], 'Make to order': [] };
+                const groupNames = ['ยกลัง (12 ขวด)', 'Stock (2, 4, 6 ขวด, DUO)', 'Make to order'];
+
+                Object.entries(window.globalMonthItems).forEach(([itemName, info]) => {
+                    let qty = info.total;
+                    let targetGroup = -1;
+
+                    // 1. เช็คว่าผู้ใช้ตั้งค่าบังคับ (Override) ไว้หรือไม่
+                    if (workloadOverrides[itemName] !== undefined) {
+                        targetGroup = parseInt(workloadOverrides[itemName]);
+                    } 
+                    // 2. ถ้าไม่ได้บังคับ ให้คำนวณตามคำอัตโนมัติ
+                    else {
+                        let name = itemName.toUpperCase();
+                        if (name.includes('12 ขวด') || name.includes('12ขวด') || name.includes('ยกลัง')) {
+                            targetGroup = 0;
+                        } else if (name.includes('2 ขวด') || name.includes('2ขวด') || name.includes('4 ขวด') || name.includes('4ขวด') || name.includes('6 ขวด') || name.includes('6ขวด') || name.includes('DUO')) {
+                            targetGroup = 1;
+                        } else {
+                            targetGroup = 2;
+                        }
+                    }
+
+                    // สะสมยอดเข้ากลุ่มที่ถูกต้อง
+                    workloadData[targetGroup] += qty;
+                    workloadBreakdown[groupNames[targetGroup]].push({ name: itemName, total: qty });
+                });
+
+                Object.keys(workloadBreakdown).forEach(key => workloadBreakdown[key].sort((a, b) => b.total - a.total));
+
+                charts.workloadMonth.data.datasets[0].data = workloadData;
+                charts.workloadMonth.data.breakdownData = workloadBreakdown; 
+                charts.workloadMonth.update('none');
+            }
+        };
+        
+        // ช่วยเซฟให้ข้อมูลเดือนปรากฏใน global เพื่อให้โค้ดส่วนบนใช้ได้
+        const oldConsolidateOrders = consolidateOrders;
+        consolidateOrders = function(modeLabel) {
+            oldConsolidateOrders(modeLabel);
+            if (window.lastConsolidated) {
+                window.globalMonthItems = window.lastConsolidated.allItems;
+                renderMonthlyOrderSummary(false); // เรียกอัปเดตกราฟ
+            }
+        };
     </script>
 </body>
 
