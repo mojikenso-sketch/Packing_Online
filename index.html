@@ -2752,6 +2752,7 @@
         const DUO_SPLIT = ['SO', 'E1H'];
 
         // ฟังก์ชันสำหรับแปลงชื่อสินค้าจากหลายแพลตฟอร์มให้เป็น "ชื่อมาตรฐาน" เดียวกัน
+        // ฟังก์ชันสำหรับแปลงชื่อสินค้าจากหลายแพลตฟอร์มให้เป็น "ชื่อมาตรฐาน" เดียวกัน
         function standardizeProductName(rawName) {
             const name = rawName.trim();
             const upper = name.toUpperCase();
@@ -2786,7 +2787,16 @@
 
             const match = name.match(/(\d+)\s*(ขวด|ซอง|กระป๋อง|ชิ้น|กล่อง|แผง|ชุด|หลอด|ก้อน|ลัง)/);
             if (match) {
-                baseName += ` (${match[1]} ${match[2]})`;
+                let unit = match[2];
+                
+                // 📌 บังคับเปลี่ยนหน่วยอัตโนมัติ หากชื่อแพลตฟอร์มส่งมาผิด
+                if (baseName.includes('ซีเรียลดริ๊งค์') && (unit === 'ขวด' || unit === 'ชิ้น')) {
+                    unit = 'กล่อง'; // บังคับให้ซีเรียลเป็น กล่อง
+                } else if (baseName.includes('ครีมเทียม') && (unit === 'ขวด' || unit === 'กล่อง' || unit === 'ชิ้น')) {
+                    unit = 'ซอง'; // บังคับให้ครีมเทียมเป็น ซอง
+                }
+                
+                baseName += ` (${match[1]} ${unit})`;
             } else if (upper.includes('ยกลัง') || name.includes('ลัง')) {
                 baseName += ' (ยกลัง)';
             }
