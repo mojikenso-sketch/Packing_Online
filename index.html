@@ -1093,7 +1093,7 @@
         <div class="chart-card" style="border-color: var(--glass-border); padding: 20px; max-width: 700px; margin: 0 auto; width: 100%;">
                 <div class="chart-title"
                     style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px; margin-bottom: 16px;">
-                    <span style="font-size: 16px;">🥧 สัดส่วนภาระงานคลังสินค้า: ยกลัง / Stock / Make to order</span>
+                    <span style="font-size: 16px;">🥧 สัดส่วนภาระงาน: ยกลัง / Stock / Make to order</span>
                     <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="openWorkloadModal()">✏️ ปรับปรุงกลุ่ม</button>
                 </div>
                 <div class="chart-container" style="height: 350px;">
@@ -1389,7 +1389,7 @@
         <div class="modal-content" style="width: 550px;">
             <h2 style="margin-bottom: 10px; color: var(--accent-cyan);">✏️ ปรับปรุงกลุ่มสินค้า (Workload)</h2>
             <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
-                ตั้งค่าว่าสินค้ารายการใดควรจัดอยู่ในหมวดหมู่ไหน (ระบบจะจำค่านี้ไว้ใช้กับทุกเดือน)
+                เลือกสินค้าเพื่อย้ายหมวดหมู่ตามต้องการ (ระบบจะจำค่านี้ไว้ใช้ตลอด)
             </p>
             <div id="workloadItemList" style="max-height: 400px; overflow-y: auto; padding-right: 10px;"></div>
             <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 30px;">
@@ -1497,9 +1497,10 @@
                     const radius = arc.outerRadius;
                     const startX = arc.x + Math.cos(angle) * radius;
                     const startY = arc.y + Math.sin(angle) * radius;
-                    const endX = arc.x + Math.cos(angle) * (radius + 20);
-                    const endY = arc.y + Math.sin(angle) * (radius + 20);
-                    const lineX = endX + (Math.cos(angle) >= 0 ? 1 : -1) * 15;
+                    // หดความยาวเส้นลงจาก 20 เป็น 15 เพื่อลดอาการชนขอบ
+                    const endX = arc.x + Math.cos(angle) * (radius + 15);
+                    const endY = arc.y + Math.sin(angle) * (radius + 15);
+                    const lineX = endX + (Math.cos(angle) >= 0 ? 1 : -1) * 10;
 
                     ctx.beginPath();
                     ctx.moveTo(startX, startY);
@@ -2556,10 +2557,14 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: {
+                        // 📌 เพิ่ม Padding ตรงนี้ เพื่อหดกราฟวงกลมให้มีที่ว่างแสดงเส้นและตัวเลข
+                        padding: { top: 35, bottom: 35, left: 80, right: 80 }
+                    },
                     plugins: {
                         legend: { 
                             position: 'bottom', 
-                            labels: { color: '#e8eaf6', font: { family: 'Inter', size: 13 }, padding: 20 } 
+                            labels: { color: '#e8eaf6', font: { family: 'Inter', size: 13 }, padding: 10 } 
                         },
                         tooltip: {
                             callbacks: {
@@ -2569,12 +2574,9 @@
                                     const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
                                     return ` ${context.label}: ${val.toLocaleString()} กล่อง (${pct}%)`;
                                 },
-                                // 📌 เพิ่ม afterLabel เพื่อแสดงรายการย่อย
-                                // 📌 เพิ่ม afterLabel เพื่อแสดงรายการย่อย
                                 afterLabel: function(context) {
                                     const label = context.label;
-                                    const breakdown = context.chart.data.breakdownData; // รับข้อมูลที่ถูกจัดกลุ่มไว้
-
+                                    const breakdown = context.chart.data.breakdownData; 
                                     if (breakdown && breakdown[label] && breakdown[label].length > 0) {
                                         const lines = ['', '🔍 รายละเอียดในหมวดนี้:'];
                                         breakdown[label].forEach(item => {
@@ -3823,21 +3825,13 @@
             showToast('📥 Export ออเดอร์เรียบร้อย!');
         }
             // ================= WORKLOAD OVERRIDES SYSTEM =================
+        // ================= WORKLOAD OVERRIDES SYSTEM =================
         let workloadOverrides = JSON.parse(localStorage.getItem('ot_workload_overrides') || '{}');
-
-        // ดึงข้อมูล Override จาก Cloud ตอนโหลดหน้าเว็บ (ไปเพิ่มพ่วงในฟังก์ชัน loadDataAndCategories อัตโนมัติ)
-        const originalLoadData = loadDataAndCategories;
-        loadDataAndCategories = async function() {
-            const savedOverrides = await fetchFromCloud('ot_workload_overrides', false);
-            if (savedOverrides) workloadOverrides = savedOverrides;
-            await originalLoadData();
-        };
 
         function openWorkloadModal() {
             const list = document.getElementById('workloadItemList');
             let html = '';
             
-            // ดึงรายการสินค้าทั้งหมดที่มีขายในเดือนที่เลือกไว้
             if (!window.globalMonthItems || Object.keys(window.globalMonthItems).length === 0) {
                 list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted)">ยังไม่มีข้อมูลสินค้าในเดือนนี้ กรุณารวมยอดก่อนครับ</div>';
             } else {
@@ -3845,9 +3839,9 @@
                     const currentVal = workloadOverrides[itemName] || 'auto';
                     html += `
                         <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px; border-bottom: 1px solid rgba(79, 195, 247, 0.1);">
-                            <div style="font-size: 13px; flex: 1; padding-right: 10px;">${itemName}</div>
-                            <select class="workload-override-select" data-item="${itemName}" style="padding: 8px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: var(--text-primary); font-size: 12px; width: 170px;">
-                                <option value="auto" ${currentVal === 'auto' ? 'selected' : ''}>🤖 คำนวณอัตโนมัติ</option>
+                            <div style="font-size: 13px; flex: 1; padding-right: 10px; color:var(--text-primary); font-weight: 500;">${itemName}</div>
+                            <select class="workload-override-select" data-item="${itemName}" style="padding: 8px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: var(--accent-cyan); font-size: 13px; width: 180px; outline:none;">
+                                <option value="auto" ${currentVal === 'auto' ? 'selected' : ''}>🤖 อัตโนมัติ</option>
                                 <option value="0" ${currentVal === '0' ? 'selected' : ''}>📦 ยกลัง (12 ขวด)</option>
                                 <option value="1" ${currentVal === '1' ? 'selected' : ''}>🏪 Stock (2,4,6 ขวด)</option>
                                 <option value="2" ${currentVal === '2' ? 'selected' : ''}>🛠️ Make to order</option>
@@ -3879,25 +3873,27 @@
             localStorage.setItem('ot_workload_overrides', JSON.stringify(workloadOverrides));
             closeWorkloadModal();
             
-            showToast('⏳ กำลังบันทึกการจัดกลุ่มขึ้น Cloud...');
+            showToast('⏳ กำลังบันทึกการตั้งค่าขึ้น Cloud...');
             await pushToCloud('ot_workload_overrides', workloadOverrides);
-            showToast('✅ บันทึกสำเร็จ!');
+            showToast('✅ บันทึกสำเร็จ! กราฟกำลังอัปเดต...');
             
-            // สั่งอัปเดตกราฟใหม่ทันที
             renderMonthlyOrderSummary(false); 
         }
 
-        // Override ฟังก์ชันเดิมเพื่อแทรกระบบเงื่อนไข Override ก่อนวาดกราฟ Workload
+        // แทรกการโหลดค่า Overrides จาก Cloud ตอนเปิดเว็บ
+        const originalLoadData = loadDataAndCategories;
+        loadDataAndCategories = async function() {
+            const savedOverrides = await fetchFromCloud('ot_workload_overrides', false);
+            if (savedOverrides) workloadOverrides = savedOverrides;
+            await originalLoadData();
+        };
+
+        // แทรกการนำ Overrides มาใช้คำนวณใน Pie Chart
         const originalRenderMonthly = renderMonthlyOrderSummary;
         renderMonthlyOrderSummary = async function(forceCloudSync = true) {
             await originalRenderMonthly(forceCloudSync);
             
-            // ดึงตัวแปรจากฟังก์ชันเดิมมาใช้
-            window.globalMonthItems = window.lastConsolidated ? window.lastConsolidated.allItems : null;
-            if (!window.globalMonthItems && document.getElementById('monthlyOrderTableWrapper').innerHTML.includes('ยอดรวมขาย')) {
-                // หากยังไม่ได้รวมยอดรายวัน แต่เปิดดูรายเดือน ให้ดึงจาก allMonthItems (ผมจะใช้ทริคนี้ดึงข้อมูล)
-            }
-
+            // ดึงตัวแปร global ที่เก็บข้อมูลเดือนปัจจุบัน
             if (charts.workloadMonth && window.globalMonthItems) {
                 let workloadData = [0, 0, 0]; 
                 let workloadBreakdown = { 'ยกลัง (12 ขวด)': [], 'Stock (2, 4, 6 ขวด, DUO)': [], 'Make to order': [] };
@@ -3907,11 +3903,11 @@
                     let qty = info.total;
                     let targetGroup = -1;
 
-                    // 1. เช็คว่าผู้ใช้ตั้งค่าบังคับ (Override) ไว้หรือไม่
+                    // 📌 1. เช็คว่ามีการตั้งค่าปรับปรุงกลุ่มไว้ไหม
                     if (workloadOverrides[itemName] !== undefined) {
                         targetGroup = parseInt(workloadOverrides[itemName]);
                     } 
-                    // 2. ถ้าไม่ได้บังคับ ให้คำนวณตามคำอัตโนมัติ
+                    // 📌 2. ถ้าไม่มี ให้คำนวณอัตโนมัติตามชื่อ
                     else {
                         let name = itemName.toUpperCase();
                         if (name.includes('12 ขวด') || name.includes('12ขวด') || name.includes('ยกลัง')) {
@@ -3923,7 +3919,6 @@
                         }
                     }
 
-                    // สะสมยอดเข้ากลุ่มที่ถูกต้อง
                     workloadData[targetGroup] += qty;
                     workloadBreakdown[groupNames[targetGroup]].push({ name: itemName, total: qty });
                 });
@@ -3936,13 +3931,13 @@
             }
         };
         
-        // ช่วยเซฟให้ข้อมูลเดือนปรากฏใน global เพื่อให้โค้ดส่วนบนใช้ได้
+        // ช่วยเก็บตัวแปรให้ระบบดึงไปใช้ได้
         const oldConsolidateOrders = consolidateOrders;
         consolidateOrders = function(modeLabel) {
             oldConsolidateOrders(modeLabel);
             if (window.lastConsolidated) {
                 window.globalMonthItems = window.lastConsolidated.allItems;
-                renderMonthlyOrderSummary(false); // เรียกอัปเดตกราฟ
+                renderMonthlyOrderSummary(false); 
             }
         };
     </script>
