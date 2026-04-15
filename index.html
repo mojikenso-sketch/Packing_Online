@@ -2536,6 +2536,7 @@
                                     return ` ${context.label}: ${val.toLocaleString()} กล่อง (${pct}%)`;
                                 },
                                 // 📌 เพิ่ม afterLabel เพื่อแสดงรายการย่อย
+                                // 📌 เพิ่ม afterLabel เพื่อแสดงรายการย่อย
                                 afterLabel: function(context) {
                                     const label = context.label;
                                     const breakdown = context.chart.data.breakdownData; // รับข้อมูลที่ถูกจัดกลุ่มไว้
@@ -2554,7 +2555,8 @@
                     }
                 }
             });
-        } // <--- 🔴 เติมปีกกาปิด } ตรงนี้ 1 ตัว เพื่อปิดฟังก์ชัน initCharts()
+        } // 🟢 เพิ่มปีกกาปิด } ตรงนี้ครับ 🟢
+
         function exportCSV() {
             const { month, year } = getMonthYear();
             const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
