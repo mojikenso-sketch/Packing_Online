@@ -1093,7 +1093,7 @@
                     <span style="font-size: 16px;">🥧 สัดส่วนภาระงานคลังสินค้า: ยกลัง / Stock / Make to order</span>
                     <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="openWorkloadModal()">✏️ ปรับปรุงกลุ่ม</button>
                 </div>
-                <div class="chart-container" style="height: 350px;">
+                <div class="chart-container" style="height: 450px;">
                     <canvas id="workloadMonthChart"></canvas>
                 </div>
             </div>
@@ -1462,7 +1462,8 @@
         // Plugin สำหรับวาดป้ายกำกับกราฟวงกลม (ชื่ออยู่ข้างใน, ตัวเลขอยู่ข้างนอก)
         Chart.register({
             id: 'pieLabelsLine',
-            afterDraw(chart) {
+            // เปลี่ยนมาใช้คำสั่งนี้ เพื่อให้วาดตัวเลขก่อน แล้วค่อยให้กล่องดำ (Tooltip) วาดทับปิดท้าย
+            afterDatasetsDraw(chart) {
                 if (chart.config.type !== 'doughnut' && chart.config.type !== 'pie') return;
                 const ctx = chart.ctx;
                 const dataset = chart.data.datasets[0];
@@ -2530,16 +2531,19 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     layout: {
-                        padding: { top: 40, bottom: 50, left: 100, right: 100 }
+                        // ปรับระยะขอบใหม่ ดันด้านล่างให้มีที่ว่าง (bottom: 40) ไม่ให้ทับ Legend
+                        padding: { top: 20, bottom: 40, left: 80, right: 80 }
                     },
                     plugins: {
                         legend: { 
                             position: 'bottom', 
                             align: 'center',
-                            labels: { color: '#e8eaf6', font: { family: 'Inter', size: 13 }, padding: 10 } 
+                            // เพิ่ม padding ให้ตัว Legend ขยับหนีห่างจากกราฟลงไปชิดล่าง
+                            labels: { color: '#e8eaf6', font: { family: 'Inter', size: 13 }, padding: 20 } 
                         },
                         tooltip: {
-                            backgroundColor: 'rgba(15, 15, 26, 1)', 
+                            // สีดำน้ำเงินเข้มทึบแสง 100%
+                            backgroundColor: 'rgba(22, 33, 62, 1)',
                             titleColor: '#ffffff',
                             bodyColor: '#e8eaf6',
                             borderColor: 'var(--glass-border)',
