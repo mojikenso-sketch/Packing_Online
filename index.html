@@ -1386,19 +1386,25 @@
         </div>
     </div>
     <div class="modal-overlay" id="workloadModal">
-        <div class="modal-content" style="width: 550px;">
-            <h2 style="margin-bottom: 10px; color: var(--accent-cyan);">✏️ ปรับปรุงกลุ่มสินค้า (Workload)</h2>
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
-                เลือกสินค้าเพื่อย้ายหมวดหมู่ตามต้องการ (ระบบจะจำค่านี้ไว้ใช้ตลอด)
+        <div class="modal-content" style="width: 600px; max-height: 85vh; display: flex; flex-direction: column;">
+            <h2 style="margin-bottom: 10px; color: var(--accent-cyan);">✏️ ปรับปรุงกลุ่ม: ภาระงานคลังสินค้า</h2>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">
+                เลือกรายการสินค้าที่ต้องการย้ายไปยังหมวดหมู่ ยกลัง / Stock / Make to order (มีผลเฉพาะกราฟนี้)
             </p>
-            <div id="workloadItemList" style="max-height: 400px; overflow-y: auto; padding-right: 10px;"></div>
-            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 30px;">
-                <button class="btn btn-danger" onclick="closeWorkloadModal()"
-                    style="background:transparent; border:none;">ยกเลิก</button>
+            
+            <input type="text" id="workloadSearch" placeholder="🔍 ค้นหาสินค้า..." style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); color: white;" onkeyup="filterWorkloadItems()">
+
+            <div id="workloadItemList" style="flex: 1; overflow-y: auto; padding-right: 10px; border: 1px solid var(--glass-border); border-radius: 8px; background: rgba(79, 195, 247, 0.02);">
+                </div>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="resetWorkloadOverrides()" style="margin-right: auto; color: var(--accent-yellow); border-color: var(--accent-yellow);">🔄 รีเซ็ตเป็นอัตโนมัติทั้งหมด</button>
+                <button class="btn btn-danger" onclick="closeWorkloadModal()" style="background:transparent; border:none;">ยกเลิก</button>
                 <button class="btn btn-primary" onclick="saveWorkloadOverrides()">💾 บันทึกการเปลี่ยนแปลง</button>
             </div>
         </div>
     </div>
+    
     <div class="toast" id="toast">✅ สำเร็จ!</div>
 
     <script>
