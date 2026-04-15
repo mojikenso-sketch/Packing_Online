@@ -2506,6 +2506,7 @@
             });
 
             // 7. กราฟวงกลม ภาระงาน (Workload)
+            // 7. กราฟวงกลม ภาระงาน (Workload)
             charts.workloadMonth = new Chart(document.getElementById('workloadMonthChart'), {
                 type: 'pie',
                 data: {
@@ -2533,13 +2534,26 @@
                                     const val = context.raw;
                                     const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
                                     return ` ${context.label}: ${val.toLocaleString()} กล่อง (${pct}%)`;
+                                },
+                                // 📌 เพิ่ม afterLabel เพื่อแสดงรายการย่อย
+                                afterLabel: function(context) {
+                                    const label = context.label;
+                                    const breakdown = context.chart.data.breakdownData; // รับข้อมูลที่ถูกจัดกลุ่มไว้
+
+                                    if (breakdown && breakdown[label] && breakdown[label].length > 0) {
+                                        const lines = ['', '🔍 รายละเอียดในหมวดนี้:'];
+                                        breakdown[label].forEach(item => {
+                                            lines.push(`- ${item.name}: ${item.total.toLocaleString()} กล่อง`);
+                                        });
+                                        return lines;
+                                    }
+                                    return null;
                                 }
                             }
                         }
                     }
                 }
             });
-        }
 
         function exportCSV() {
             const { month, year } = getMonthYear();
@@ -3487,9 +3501,16 @@
                 charts.topProductsSalesMonth.update('none');
             }
 
-            // 📌 คำนวณสัดส่วนภาระงาน (ยกลัง, Stock, Make to order)
+            // 📌 คำนวณสัดส่วนภาระงาน (ยกลัง, Stock, Make to order) พร้อมเก็บ Breakdown
             if (charts.workloadMonth) {
                 let workloadData = [0, 0, 0]; // [ยกลัง, Stock, Make to order]
+                
+                // สร้าง Object ไว้เก็บรายการย่อย
+                let workloadBreakdown = {
+                    'ยกลัง (12 ขวด)': [],
+                    'Stock (2, 4, 6 ขวด, DUO)': [],
+                    'Make to order': []
+                };
 
                 Object.entries(allMonthItems).forEach(([itemName, info]) => {
                     let name = itemName.toUpperCase();
@@ -3498,6 +3519,7 @@
                     // เงื่อนไขที่ 1: ยกลัง (12 ขวด)
                     if (name.includes('12 ขวด') || name.includes('12ขวด') || name.includes('ยกลัง')) {
                         workloadData[0] += qty;
+                        workloadBreakdown['ยกลัง (12 ขวด)'].push({ name: itemName, total: qty });
                     } 
                     // เงื่อนไขที่ 2: Stock (2, 4, 6 ขวด, DUO)
                     else if (
@@ -3507,14 +3529,22 @@
                         name.includes('DUO')
                     ) {
                         workloadData[1] += qty;
+                        workloadBreakdown['Stock (2, 4, 6 ขวด, DUO)'].push({ name: itemName, total: qty });
                     } 
                     // เงื่อนไขที่ 3: Make to order (ทุกอย่างที่เหลือ)
                     else {
                         workloadData[2] += qty;
+                        workloadBreakdown['Make to order'].push({ name: itemName, total: qty });
                     }
                 });
 
+                // เรียงลำดับรายการย่อยจากยอดขายมากไปน้อย
+                Object.keys(workloadBreakdown).forEach(key => {
+                    workloadBreakdown[key].sort((a, b) => b.total - a.total);
+                });
+
                 charts.workloadMonth.data.datasets[0].data = workloadData;
+                charts.workloadMonth.data.breakdownData = workloadBreakdown; // ส่งข้อมูลย่อยเข้ากราฟ
                 charts.workloadMonth.update('none');
             }
 
