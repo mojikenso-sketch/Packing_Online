@@ -1090,6 +1090,19 @@
             </div>
         </div>
 
+        <div class="charts-grid animate-in" id="monthlyThirdRowCharts"
+            style="grid-template-columns: 1fr; margin-bottom: 24px;">
+            <div class="chart-card" style="border-color: var(--glass-border); padding: 20px; max-width: 700px; margin: 0 auto; width: 100%;">
+                <div class="chart-title"
+                    style="font-size: 16px; margin-bottom: 16px; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px; text-align: center;">
+                    🥧 สัดส่วนภาระงานคลังสินค้า: ยกลัง / Stock / Make to order (จากยอดขายรายเดือน)
+                </div>
+                <div class="chart-container" style="height: 350px;">
+                    <canvas id="workloadMonthChart"></canvas>
+                </div>
+            </div>
+        </div>
+
         <div class="dashboard-layout">
             <aside class="sidebar animate-in">
                 <div class="tab-nav" id="mainTabNav">
@@ -2349,7 +2362,6 @@
                                         const items = breakdown[label];
                                         
                                         // 1. คำนวณขวดย่อย/ชิ้นย่อย
-                                        // 1. คำนวณขวดย่อย/ชิ้นย่อย
                                         let unitSums = {};
                                         let totalSubUnits = 0; // ตัวแปรเก็บยอดแตกรวม
                                         items.forEach(i => {
@@ -2489,6 +2501,41 @@
                     scales: {
                         x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9fa8da' } },
                         y: { grid: { display: false }, ticks: { autoSkip: false, color: '#9fa8da', font: { size: 12, family: 'Inter' } } }
+                    }
+                }
+            });
+
+            // 7. กราฟวงกลม ภาระงาน (Workload)
+            charts.workloadMonth = new Chart(document.getElementById('workloadMonthChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['ยกลัง (12 ขวด)', 'Stock (2, 4, 6 ขวด, DUO)', 'Make to order'],
+                    datasets: [{
+                        data: [0, 0, 0],
+                        backgroundColor: ['#4fc3f7', '#69f0ae', '#ff5252'],
+                        borderColor: '#16213e',
+                        borderWidth: 2,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { 
+                            position: 'bottom', 
+                            labels: { color: '#e8eaf6', font: { family: 'Inter', size: 13 }, padding: 20 } 
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const val = context.raw;
+                                    const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
+                                    return ` ${context.label}: ${val.toLocaleString()} กล่อง (${pct}%)`;
+                                }
+                            }
+                        }
                     }
                 }
             });
@@ -3249,6 +3296,13 @@
                     charts.topProductsSalesMonth.data.datasets[0].data = [];
                     charts.topProductsSalesMonth.update('none');
                 }
+                
+                // 📌 เพิ่มส่วนเคลียร์กราฟวงกลม
+                if (charts.workloadMonth) {
+                    charts.workloadMonth.data.datasets[0].data = [0, 0, 0];
+                    charts.workloadMonth.update('none');
+                }
+
                 wrapper.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:16px;text-align:center">ไม่มีข้อมูลยอดขายที่บันทึกใน ${monthNames[selMonth]} ${selYearBE}</div>`;
                 return;
             }
@@ -3431,6 +3485,37 @@
                 charts.topProductsSalesMonth.data.datasets[0].data = overallSorted.map(i => i[1].total);
                 charts.topProductsSalesMonth.data.datasets[0].backgroundColor = overallSorted.map(i => PRODUCT_GROUPS[i[1].group] ? PRODUCT_GROUPS[i[1].group].color : 'rgba(79, 195, 247, 0.8)');
                 charts.topProductsSalesMonth.update('none');
+            }
+
+            // 📌 คำนวณสัดส่วนภาระงาน (ยกลัง, Stock, Make to order)
+            if (charts.workloadMonth) {
+                let workloadData = [0, 0, 0]; // [ยกลัง, Stock, Make to order]
+
+                Object.entries(allMonthItems).forEach(([itemName, info]) => {
+                    let name = itemName.toUpperCase();
+                    let qty = info.total;
+
+                    // เงื่อนไขที่ 1: ยกลัง (12 ขวด)
+                    if (name.includes('12 ขวด') || name.includes('12ขวด') || name.includes('ยกลัง')) {
+                        workloadData[0] += qty;
+                    } 
+                    // เงื่อนไขที่ 2: Stock (2, 4, 6 ขวด, DUO)
+                    else if (
+                        name.includes('2 ขวด') || name.includes('2ขวด') || 
+                        name.includes('4 ขวด') || name.includes('4ขวด') || 
+                        name.includes('6 ขวด') || name.includes('6ขวด') || 
+                        name.includes('DUO')
+                    ) {
+                        workloadData[1] += qty;
+                    } 
+                    // เงื่อนไขที่ 3: Make to order (ทุกอย่างที่เหลือ)
+                    else {
+                        workloadData[2] += qty;
+                    }
+                });
+
+                charts.workloadMonth.data.datasets[0].data = workloadData;
+                charts.workloadMonth.update('none');
             }
 
             if (!hasAnyRow) {
