@@ -2514,7 +2514,7 @@
                 }
             });
 
-            // 7. กราฟวงกลม ภาระงาน (Workload)
+            // 7. กราฟวงกลม ภาระงาน (Workload) - แบบคมชัดกริบ
             charts.workloadMonth = new Chart(document.getElementById('workloadMonthChart'), {
                 type: 'pie',
                 data: {
@@ -2530,23 +2530,23 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    // 🌟 บังคับความคมชัดกริบ แก้ปัญหา Canvas เบลอ
+                    devicePixelRatio: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2,
                     layout: {
-                        // ปรับระยะขอบใหม่ ดันด้านล่างให้มีที่ว่าง (bottom: 40) ไม่ให้ทับ Legend
-                        padding: { top: 20, bottom: 40, left: 80, right: 80 }
+                        // ปรับระยะขอบซ้าย-ขวา ให้มีที่ว่างสำหรับเส้นที่ลากป้ายกำกับออกไป
+                        padding: { top: 30, bottom: 40, left: 130, right: 130 }
                     },
                     plugins: {
                         legend: { 
                             position: 'bottom', 
                             align: 'center',
-                            // เพิ่ม padding ให้ตัว Legend ขยับหนีห่างจากกราฟลงไปชิดล่าง
                             labels: { color: '#e8eaf6', font: { family: 'Inter', size: 13 }, padding: 20 } 
                         },
                         tooltip: {
-                            // สีดำน้ำเงินเข้มทึบแสง 100%
                             backgroundColor: 'rgba(22, 33, 62, 1)',
                             titleColor: '#ffffff',
                             bodyColor: '#e8eaf6',
-                            borderColor: 'var(--glass-border)',
+                            borderColor: 'rgba(79, 195, 247, 0.2)', // สีขอบกระจก
                             borderWidth: 1,
                             padding: 12,
                             callbacks: {
