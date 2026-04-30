@@ -2975,20 +2975,35 @@
             platformData = origData;
         }
 
-        function consolidateOrders(modeLabel) {
-            const allItems = {}; let grandTotal = 0; const platformTotals = {}; const groupTotals = {};
-            PLATFORMS.forEach(p => {
-                const items = platformData[p] || []; let pTotal = 0;
-                items.forEach(({ item, qty }) => {
-                    const stdItem = standardizeProductName(item); 
+        // ... โค้ดเดิมก่อนหน้า ...
+    function consolidateOrders(modeLabel) {
+        const allItems = {}; let grandTotal = 0; const platformTotals = {}; const groupTotals = {};
+        PLATFORMS.forEach(p => {
+            const items = platformData[p] || []; let pTotal = 0;
+            items.forEach(({ item, qty }) => {
+                
+                // 1. นับยอดกล่อง/ออเดอร์รวม (นับแค่ครั้งเดียวต่อ 1 แถวออเดอร์)
+                pTotal += qty; grandTotal += qty;
+
+                // 2. แยกสินค้าที่มัดรวมกันด้วยเครื่องหมาย "+" (ยกเว้นพวกที่พิมพ์ว่า DUO ไว้แล้ว)
+                let subItems = [];
+                if (!item.toUpperCase().includes('DUO') && item.includes('+')) {
+                    subItems = item.split('+').map(s => s.trim()).filter(s => s);
+                } else {
+                    subItems = [item];
+                }
+
+                // 3. วนลูปจับกลุ่มให้สินค้าแต่ละตัวที่แยกออกมา
+                subItems.forEach(subItemStr => {
+                    const stdItem = standardizeProductName(subItemStr);
                     const group = detectProductGroup(stdItem);
                     const itemKey = stdItem;
-                    
-                    if (!allItems[itemKey]) allItems[itemKey] = { total: 0, platforms: {}, group };
-                    allItems[itemKey].total += qty; allItems[itemKey].platforms[p] = (allItems[itemKey].platforms[p] || 0) + qty;
-                    pTotal += qty; grandTotal += qty;
 
-                    // กระจายยอดกลุ่มสินค้า (De-bundling DUO SET)
+                    if (!allItems[itemKey]) allItems[itemKey] = { total: 0, platforms: {}, group };
+                    allItems[itemKey].total += qty;
+                    allItems[itemKey].platforms[p] = (allItems[itemKey].platforms[p] || 0) + qty;
+
+                    // กระจายยอดกลุ่มสินค้า
                     if (group === 'DUO SET(SO+E1H)') {
                         DUO_SPLIT.forEach(g => {
                             groupTotals[g] = (groupTotals[g] || 0) + qty;
@@ -2997,10 +3012,12 @@
                         groupTotals[group] = (groupTotals[group] || 0) + qty;
                     }
                 });
-                platformTotals[p] = pTotal;
             });
-
-            if (grandTotal === 0) return showToast('⚠️ ยังไม่มีข้อมูล กรุณาอัปโหลดไฟล์ก่อน');
+            platformTotals[p] = pTotal;
+        });
+        
+        if (grandTotal === 0) return showToast('⚠️ ยังไม่มีข้อมูล กรุณาอัปโหลดไฟล์ก่อน');
+        // ... โค้ดเดิมหลังจากนี้ ...
             document.getElementById('orderResults').style.display = 'block';
 
             // แสดง mode label
@@ -3415,19 +3432,32 @@
                     let dayBounceTotal = 0;
                     let pCols = '';
                     
+                    // ... โค้ดเดิมก่อนหน้า ...
                     PLATFORMS.forEach(p => {
                         const items = entry.platformData[p] || [];
                         items.forEach(({ item, qty }) => {
-                            const stdItem = standardizeProductName(item);
-                            const group = detectProductGroup(stdItem);
-                            const itemKey = stdItem; 
+                            
+                            // ดักจับการแยกสินค้าด้วย "+" แบบเดียวกับข้างบน
+                            let subItems = [];
+                            if (!item.toUpperCase().includes('DUO') && item.includes('+')) {
+                                subItems = item.split('+').map(s => s.trim()).filter(s => s);
+                            } else {
+                                subItems = [item];
+                            }
 
-                            if (!allMonthItems[itemKey]) allMonthItems[itemKey] = { total: 0, group: group };
-                            allMonthItems[itemKey].total += qty;
-                            monthGroupTotals[group] = (monthGroupTotals[group] || 0) + qty;
+                            subItems.forEach(subItemStr => {
+                                const stdItem = standardizeProductName(subItemStr);
+                                const group = detectProductGroup(stdItem);
+                                const itemKey = stdItem;
+
+                                if (!allMonthItems[itemKey]) allMonthItems[itemKey] = { total: 0, group: group };
+                                allMonthItems[itemKey].total += qty;
+                                monthGroupTotals[group] = (monthGroupTotals[group] || 0) + qty;
+                            });
                         });
 
                         const pQty = items.reduce((s, r) => s + r.qty, 0);
+                        // ... โค้ดเดิมหลังจากนี้ ...
                         const pPending = (entry.pending && entry.pending[p]) ? entry.pending[p] : 0;
                         const pReturn = (entry.returned && entry.returned[p]) ? entry.returned[p] : 0;
                         const pBounce = (entry.bounced && entry.bounced[p]) ? entry.bounced[p] : 0;
