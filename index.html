@@ -2497,7 +2497,7 @@
                                     
                                     const totalDays = daysWithData.length > 0 ? daysWithData.length : 1; 
                                     
-                                    const avgPerDayBox = ((totalUnit / 12) / totalDays).toFixed(2);
+                                    const avgPerDayBox = (boxQty / totalDays).toFixed(2);
 
                                     return [
                                         `📦 แตกย่อย: ${totalUnit.toLocaleString()} ${unitName}`,
