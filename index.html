@@ -2357,6 +2357,7 @@
                     }
                 }],
                 options: {
+                    devicePixelRatio: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2, // 🌟 บังคับ Tooltip และกราฟให้คมชัดกริบ
                     indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
