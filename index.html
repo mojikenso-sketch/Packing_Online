@@ -2406,9 +2406,10 @@
                                             const parts = dateKey.split('-');
                                             return parts.length === 3 && parseInt(parts[0]) === selYearCE && parseInt(parts[1]) - 1 === selMonth;
                                         });
+                                        const boxQty = context.raw;
                                         const totalDays = daysWithData.length > 0 ? daysWithData.length : 1;
                                         
-                                        const avgPerDayBox = ((totalSubUnits / 12) / totalDays).toFixed(2);
+                                        const avgPerDayBox = (boxQty / totalDays).toFixed(2);
 
                                         const lines = [
                                             `📦 แตกย่อยรวม: ${unitString}`,
