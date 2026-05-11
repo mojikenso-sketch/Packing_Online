@@ -2205,15 +2205,15 @@
                             chart.getDatasetMeta(datasetIndex).data.forEach((datapoint, index) => {
                                 const value = dataset.data[index];
                                 if (value > 0) {
-                                    ctx.font = '600 11px Inter, sans-serif';
+                                    ctx.font = '600 12px Inter, sans-serif';
                                     if (datasetIndex === 1) {
-                                        ctx.fillStyle = '#16213e'; 
+                                        ctx.fillStyle = '#ff5252'; // 🔴 เปลี่ยนเป็นสีแดงสำหรับแท่ง Zort
                                     } else {
-                                        ctx.fillStyle = '#e8eaf6'; 
+                                        ctx.fillStyle = '#e8eaf6'; // สีขาวสำหรับแท่งคลัง
                                     }
                                     ctx.textAlign = 'left';
                                     ctx.textBaseline = 'middle';
-                                    ctx.fillText(value.toLocaleString(), Math.round(datapoint.x + 6), Math.round(datapoint.y));
+                                    ctx.fillText(value.toLocaleString(), Math.round(datapoint.x + 8), Math.round(datapoint.y));
                                 }
                             });
                         });
