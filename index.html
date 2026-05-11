@@ -1867,7 +1867,26 @@
             for (let i = 1; i <= DAYS; i++) html += `<th${i === _todayNum ? ' class="is-today"' : ''}>${formatDate(i)}</th>`;
             html += '</tr></thead><tbody>';
 
-            stockCategories.forEach(cat => {
+            // 📌 ส่วนที่เพิ่มใหม่: กรองรายการเฉพาะ Tab Zort
+            let categoriesToRender = stockCategories;
+            if (type === 'zort') {
+                const zortAllowedItems = [
+                    'SO', 
+                    'E1H', 
+                    'Ricely', 
+                    'ครีมเทียม 200ก.', 
+                    'ซีเรียลดริ๊งค์งาดำ', 
+                    'ไขน้ำมันรำข้าว 700ก.', 
+                    'ซีเรียลดริ๊งค์ออริจินอล', 
+                    'ไขน้ำมันรำข้าว 5กก.'
+                ];
+                // คัดมาเฉพาะที่ชื่อตรง หรือ จัดอยู่ในกลุ่มที่ตรงกับ 8 รายการด้านบน
+                categoriesToRender = stockCategories.filter(cat => 
+                    zortAllowedItems.includes(cat.name) || zortAllowedItems.includes(cat.group)
+                );
+            }
+
+            categoriesToRender.forEach(cat => {
                 const multiplier = getConversionMultiplier(cat);
                 let unitHtml = '';
                 
@@ -1906,7 +1925,8 @@
 
             html += '<tr style="border-top: 2px solid var(--glass-border)"><td style="font-weight:700;color:var(--accent-cyan)">รวมทั้งหมด</td><td class="cell-label">-</td>';
             for (let i = 1; i <= DAYS; i++) {
-                const totalBottles = stockCategories.reduce((sum, c) => sum + (parseFloat(data[i][type][c.id]) || 0), 0);
+                // 📌 อัปเดตการบวกรวมยอด ให้บวกเฉพาะรายการที่โชว์ในตารางเท่านั้น (categoriesToRender)
+                const totalBottles = categoriesToRender.reduce((sum, c) => sum + (parseFloat(data[i][type][c.id]) || 0), 0);
                 let displayedTotal = '-';
                 if (totalBottles > 0) {
                     if (currentStockViewUnit === 'ลัง') {
