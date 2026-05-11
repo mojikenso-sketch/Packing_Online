@@ -1437,7 +1437,6 @@
                     const arc = meta.data[i];
                     const angle = (arc.startAngle + arc.endAngle) / 2;
 
-                    // 1. วาด "ชื่อประเภท" ด้านในกราฟ
                     const innerRadius = arc.innerRadius || 0;
                     const centerRadius = innerRadius + (arc.outerRadius - innerRadius) * 0.6;
                     const innerX = arc.x + Math.cos(angle) * centerRadius;
@@ -1454,7 +1453,6 @@
                     ctx.fillText(shortLabel, innerX, innerY);
                     ctx.restore();
 
-                    // 2. วาดเส้น และ "ตัวเลขผลลัพธ์" ด้านนอกกราฟ
                     const radius = arc.outerRadius;
                     const startX = arc.x + Math.cos(angle) * radius;
                     const startY = arc.y + Math.sin(angle) * radius;
@@ -1867,23 +1865,19 @@
             for (let i = 1; i <= DAYS; i++) html += `<th${i === _todayNum ? ' class="is-today"' : ''}>${formatDate(i)}</th>`;
             html += '</tr></thead><tbody>';
 
-            // 📌 ส่วนที่เพิ่มใหม่: กรองรายการเฉพาะ Tab Zort
             let categoriesToRender = stockCategories;
+            
             if (type === 'zort') {
-                const zortAllowedItems = [
-                    'SO', 
-                    'E1H', 
-                    'Ricely', 
-                    'ครีมเทียม 200ก.', 
-                    'ซีเรียลดริ๊งค์งาดำ', 
-                    'ไขน้ำมันรำข้าว 700ก.', 
-                    'ซีเรียลดริ๊งค์ออริจินอล', 
-                    'ไขน้ำมันรำข้าว 5กก.'
+                categoriesToRender = [
+                    { id: 'SO', name: 'SO', unit: 'กล่อง' },
+                    { id: 'E1H', name: 'E1H', unit: 'กล่อง' },
+                    { id: 'Ricely', name: 'Ricely', unit: 'กล่อง' },
+                    { id: 'ครีมเทียม 200ก.', name: 'ครีมเทียม 200ก.', unit: 'กล่อง' },
+                    { id: 'ซีเรียลดริ๊งค์งาดำ', name: 'ซีเรียลดริ๊งค์งาดำ', unit: 'กล่อง' },
+                    { id: 'ไขน้ำมันรำข้าว 700ก.', name: 'ไขน้ำมันรำข้าว 700ก.', unit: 'กล่อง' },
+                    { id: 'ซีเรียลดริ๊งค์ออริจินอล', name: 'ซีเรียลดริ๊งค์ออริจินอล', unit: 'กล่อง' },
+                    { id: 'ไขน้ำมันรำข้าว 5กก.', name: 'ไขน้ำมันรำข้าว 5กก.', unit: 'กล่อง' }
                 ];
-                // คัดมาเฉพาะที่ชื่อตรง หรือ จัดอยู่ในกลุ่มที่ตรงกับ 8 รายการด้านบน
-                categoriesToRender = stockCategories.filter(cat => 
-                    zortAllowedItems.includes(cat.name) || zortAllowedItems.includes(cat.group)
-                );
             }
 
             categoriesToRender.forEach(cat => {
@@ -1893,20 +1887,23 @@
                 if (currentStockViewUnit === 'ลัง') {
                     unitHtml = `<span style="font-size:12px; color:var(--accent-purple); font-weight:600;">ลัง</span>`;
                 } else {
-                    unitHtml = `
-                        <select class="unit-select" data-id="${cat.id}" onchange="changeCatUnit(this)" style="background:transparent;border:1px solid rgba(79,195,247,0.2);border-radius:4px;color:var(--text-muted);font-family:inherit;font-size:12px;outline:none;cursor:pointer;padding:2px 4px;">
-                            <option value="ขวด" ${(!cat.unit || cat.unit === 'ขวด') ? 'selected' : ''}>ขวด</option>
-                            <option value="ซอง" ${cat.unit === 'ซอง' ? 'selected' : ''}>ซอง</option>
-                            <option value="กระป๋อง" ${cat.unit === 'กระป๋อง' ? 'selected' : ''}>กระป๋อง</option>
-                            <option value="ลัง" ${cat.unit === 'ลัง' ? 'selected' : ''}>ลัง</option>
-                            <option value="กล่อง" ${cat.unit === 'กล่อง' ? 'selected' : ''}>กล่อง</option>
-                        </select>
-                    `;
+                    if (type === 'zort') {
+                        unitHtml = `<span style="font-size:12px; color:var(--text-muted); font-weight:600;">กล่อง</span>`;
+                    } else {
+                        unitHtml = `
+                            <select class="unit-select" data-id="${cat.id}" onchange="changeCatUnit(this)" style="background:transparent;border:1px solid rgba(79,195,247,0.2);border-radius:4px;color:var(--text-muted);font-family:inherit;font-size:12px;outline:none;cursor:pointer;padding:2px 4px;">
+                                <option value="ขวด" ${(!cat.unit || cat.unit === 'ขวด') ? 'selected' : ''}>ขวด</option>
+                                <option value="ซอง" ${cat.unit === 'ซอง' ? 'selected' : ''}>ซอง</option>
+                                <option value="กระป๋อง" ${cat.unit === 'กระป๋อง' ? 'selected' : ''}>กระป๋อง</option>
+                                <option value="ลัง" ${cat.unit === 'ลัง' ? 'selected' : ''}>ลัง</option>
+                                <option value="กล่อง" ${cat.unit === 'กล่อง' ? 'selected' : ''}>กล่อง</option>
+                            </select>
+                        `;
+                    }
                 }
                 
                 html += `<tr class="row-stock"><td><span style="font-weight:700">${cat.name}</span></td><td class="cell-label">${unitHtml}</td>`;
                 for (let i = 1; i <= DAYS; i++) {
-                    // ป้องกัน error หาก type (zort) ยังไม่มีข้อมูล
                     if(!data[i][type]) data[i][type] = {};
                     const rawVal = parseFloat(data[i][type][cat.id]) || 0;
                     let displayedVal = '';
@@ -1925,12 +1922,11 @@
 
             html += '<tr style="border-top: 2px solid var(--glass-border)"><td style="font-weight:700;color:var(--accent-cyan)">รวมทั้งหมด</td><td class="cell-label">-</td>';
             for (let i = 1; i <= DAYS; i++) {
-                // 📌 อัปเดตการบวกรวมยอด ให้บวกเฉพาะรายการที่โชว์ในตารางเท่านั้น (categoriesToRender)
                 const totalBottles = categoriesToRender.reduce((sum, c) => sum + (parseFloat(data[i][type][c.id]) || 0), 0);
                 let displayedTotal = '-';
                 if (totalBottles > 0) {
                     if (currentStockViewUnit === 'ลัง') {
-                        const val = totalBottles / 12;
+                        const val = totalBottles / 12; 
                         displayedTotal = Number.isInteger(val) ? val : parseFloat(val.toFixed(2));
                     } else {
                         displayedTotal = parseFloat(totalBottles.toFixed(2));
@@ -1954,7 +1950,12 @@
 
         function onCatChange(el) {
             const day = el.dataset.day, catId = el.dataset.cat, type = el.dataset.type;
-            const cat = stockCategories.find(c => c.id === catId);
+            
+            let cat = stockCategories.find(c => c.id === catId);
+            if (type === 'zort' && !cat) {
+                cat = { id: catId, name: catId, unit: 'กล่อง' };
+            }
+
             const multiplier = getConversionMultiplier(cat);
             const inputVal = parseFloat(el.value) || 0;
 
@@ -1965,7 +1966,16 @@
 
             data[day][type][catId] = savedVal;
             
-            const totalBottles = stockCategories.reduce((sum, c) => sum + (parseFloat(data[day][type][c.id]) || 0), 0);
+            let categoriesToRender = stockCategories;
+            if (type === 'zort') {
+                categoriesToRender = [
+                    { id: 'SO' }, { id: 'E1H' }, { id: 'Ricely' }, { id: 'ครีมเทียม 200ก.' },
+                    { id: 'ซีเรียลดริ๊งค์งาดำ' }, { id: 'ไขน้ำมันรำข้าว 700ก.' }, 
+                    { id: 'ซีเรียลดริ๊งค์ออริจินอล' }, { id: 'ไขน้ำมันรำข้าว 5กก.' }
+                ];
+            }
+
+            const totalBottles = categoriesToRender.reduce((sum, c) => sum + (parseFloat(data[day][type][c.id]) || 0), 0);
             let displayedTotal = '-';
             if (totalBottles > 0) {
                 if (currentStockViewUnit === 'ลัง') {
@@ -2002,7 +2012,6 @@
             let latestWH = {};
             let latestZort = {};
 
-            // คลัง
             for (let i = DAYS; i >= 1; i--) {
                 const totalWH = stockCategories.reduce((sum, c) => sum + (parseFloat(data[i].warehouse[c.id]) || 0), 0);
                 if (totalWH > 0) {
@@ -2011,11 +2020,15 @@
                 }
             }
 
-            // Zort
+            const zortKeys = ['SO', 'E1H', 'Ricely', 'ครีมเทียม 200ก.', 'ซีเรียลดริ๊งค์งาดำ', 'ไขน้ำมันรำข้าว 700ก.', 'ซีเรียลดริ๊งค์ออริจินอล', 'ไขน้ำมันรำข้าว 5กก.'];
             for (let i = DAYS; i >= 1; i--) {
                 if(!data[i].zort) continue;
-                const totalZort = stockCategories.reduce((sum, c) => sum + (parseFloat(data[i].zort[c.id]) || 0), 0);
+                let totalZort = zortKeys.reduce((sum, k) => sum + (parseFloat(data[i].zort[k]) || 0), 0);
+                
+                stockCategories.forEach(c => totalZort += (parseFloat(data[i].zort[c.id]) || 0));
+
                 if (totalZort > 0) {
+                    zortKeys.forEach(k => latestZort[k] = parseFloat(data[i].zort[k]) || 0);
                     stockCategories.forEach(c => latestZort[c.id] = parseFloat(data[i].zort[c.id]) || 0);
                     break;
                 }
@@ -2027,20 +2040,23 @@
             stockCategories.forEach(cat => {
                 const group = cat.group || 'ผสม/อื่นๆ';
                 const valWH = latestWH[cat.id] || 0;
-                const valZort = latestZort[cat.id] || 0;
 
                 if (group === 'DUO SET(SO+E1H)') {
                     DUO_SPLIT.forEach(g => {
                         whGroupTotals[g] = (whGroupTotals[g] || 0) + valWH;
-                        zortGroupTotals[g] = (zortGroupTotals[g] || 0) + valZort;
                     });
                 } else {
                     whGroupTotals[group] = (whGroupTotals[group] || 0) + valWH;
-                    zortGroupTotals[group] = (zortGroupTotals[group] || 0) + valZort;
                 }
             });
 
-            // จัดเรียงเฉพาะกลุ่มที่มีข้อมูล (รวมทั้งคลังและ Zort)
+            zortKeys.forEach(g => {
+                zortGroupTotals[g] = latestZort[g] || 0;
+                stockCategories.forEach(cat => {
+                    if (cat.group === g) zortGroupTotals[g] += (latestZort[cat.id] || 0);
+                });
+            });
+
             const sortedStockGroups = Object.keys(PRODUCT_GROUPS)
                 .filter(g => g !== 'DUO SET(SO+E1H)') 
                 .map(g => ({
@@ -2052,7 +2068,6 @@
                 .filter(g => g.valWH > 0 || g.valZort > 0)
                 .sort((a, b) => Math.max(b.valWH, b.valZort) - Math.max(a.valWH, a.valZort));
 
-            // กราฟแท่งคู่
             if (charts.stockGroup) {
                 charts.stockGroup.data.labels = sortedStockGroups.map(g => g.label);
                 
@@ -2068,7 +2083,7 @@
                     {
                         label: 'ข้อมูลจาก Zort',
                         data: sortedStockGroups.map(g => g.valZort),
-                        backgroundColor: 'rgba(255, 255, 255, 0.95)', // สีขาวนีออน
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
                         borderColor: '#ffffff',
                         borderWidth: 1,
                         borderRadius: 4,
@@ -2168,10 +2183,9 @@
         function initCharts() {
             const labels = Array.from({ length: DAYS }, (_, i) => `${i + 1}`);
 
-            // 1. กราฟสต็อกแยกตามกลุ่ม (แก้ไขสำหรับ 2 ชุดข้อมูล คลัง vs Zort)
             charts.stockGroup = new Chart(document.getElementById('stockGroupChart'), {
                 type: 'bar',
-                data: { labels: [], datasets: [] }, // ปล่อยว่างไว้ เดี๋ยวให้ updateSummaryAndCharts เติม
+                data: { labels: [], datasets: [] }, 
                 options: {
                     indexAxis: 'y',
                     responsive: true,
@@ -2192,11 +2206,10 @@
                                 const value = dataset.data[index];
                                 if (value > 0) {
                                     ctx.font = '600 11px Inter, sans-serif';
-                                    // แยกสีตัวอักษรระหว่างคลังกับ Zort
                                     if (datasetIndex === 1) {
-                                        ctx.fillStyle = '#16213e'; // ตัวเลขสีเข้มบนแท่ง Zort สีขาว
+                                        ctx.fillStyle = '#16213e'; 
                                     } else {
-                                        ctx.fillStyle = '#e8eaf6'; // ตัวเลขสีขาวบนแท่งคลัง
+                                        ctx.fillStyle = '#e8eaf6'; 
                                     }
                                     ctx.textAlign = 'left';
                                     ctx.textBaseline = 'middle';
@@ -2209,7 +2222,6 @@
                 }]
             });
 
-            // 2. กราฟ Rate
             charts.rate = new Chart(document.getElementById('rateChart'), {
                 type: 'line',
                 data: {
@@ -2247,7 +2259,6 @@
                 }
             });
 
-            // 3. กราฟ Latest Stock
             charts.latestStock = new Chart(document.getElementById('latestStockChart'), {
                 type: 'bar',
                 data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderRadius: 4 }] },
@@ -2282,7 +2293,6 @@
                 }
             });
 
-            // 4. กราฟ Monthly Sales 
             const pKeys = ['shopee', 'lazada', 'flash', 'best'];
             const pNames = { shopee: 'Shopee', lazada: 'Lazada', flash: 'Flash', best: 'Best' };
             const pColors = { shopee: 'rgba(255, 87, 34, 0.8)', lazada: 'rgba(123, 127, 246, 0.8)', flash: 'rgba(255, 193, 7, 0.8)', best: 'rgba(233, 30, 99, 0.8)' };
@@ -2357,7 +2367,6 @@
                 }
             });
 
-            // 5. กราฟหมวดหมู่
             charts.categorySalesMonth = new Chart(document.getElementById('categorySalesChartMonth'), {
                 type: 'bar',
                 data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderRadius: 4 }] },
@@ -2460,7 +2469,6 @@
                 }
             });
 
-            // 6. กราฟ Top 15 
             charts.topProductsSalesMonth = new Chart(document.getElementById('topProductsSalesChartMonth'), {
                 type: 'bar',
                 data: { labels: [], datasets: [{ data: [], backgroundColor: 'rgba(79, 195, 247, 0.8)', borderRadius: 4 }] },
@@ -2539,7 +2547,6 @@
                 }
             });
 
-            // 7. กราฟวงกลม ภาระงาน
             charts.workloadMonth = new Chart(document.getElementById('workloadMonthChart'), {
                 type: 'pie',
                 data: {
@@ -2645,10 +2652,16 @@
                 csv += '\n';
             });
             
-            // เพิ่มการส่งออกข้อมูล Zort
-            stockCategories.forEach(c => {
-                csv += `Zort ${c.name},กล่อง`;
-                for (let i = 1; i <= DAYS; i++) csv += `,${data[i].zort[c.id] || ''}`;
+            const zortKeys = ['SO', 'E1H', 'Ricely', 'ครีมเทียม 200ก.', 'ซีเรียลดริ๊งค์งาดำ', 'ไขน้ำมันรำข้าว 700ก.', 'ซีเรียลดริ๊งค์ออริจินอล', 'ไขน้ำมันรำข้าว 5กก.'];
+            zortKeys.forEach(k => {
+                csv += `Zort ${k},กล่อง`;
+                for (let i = 1; i <= DAYS; i++) {
+                    if(data[i].zort) {
+                        csv += `,${data[i].zort[k] || ''}`;
+                    } else {
+                        csv += `,`;
+                    }
+                }
                 csv += '\n';
             });
 
@@ -2677,7 +2690,7 @@
             renderDynamicTable('stockTableWrapper', 'stock');
             renderRemarkTable(); 
             renderDynamicTable('warehouseTableWrapper', 'warehouse');
-            renderDynamicTable('zortTableWrapper', 'zort'); // ส่วนเสริมใหม่
+            renderDynamicTable('zortTableWrapper', 'zort'); 
             updateSummaryAndCharts();
             renderMonthlyOrderSummary();
 
