@@ -986,8 +986,17 @@
         <div class="charts-grid animate-in" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 24px;">
             <div class="chart-card" style="border-color: var(--glass-border); padding: 20px;">
                 <div class="chart-title"
-                    style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px; margin-bottom: 16px;">
+                    style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
                     <span style="font-size: 16px;">📊 สต็อกคงเหลือแยกตามกลุ่มสินค้า(ขวด,ซอง,กระป๋อง,กล่อง)</span>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <label style="font-size:12px; color:var(--text-secondary);">📅 วันที่:</label>
+                        <select id="stockGroupDaySelect"
+                            style="padding:5px 10px; background:rgba(79,195,247,0.1); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-primary); font-family:inherit; font-size:13px; outline:none; cursor:pointer;"
+                            onchange="onStockGroupDayChange()">
+                            <option value="latest">ล่าสุด</option>
+                        </select>
+                        <span id="stockGroupDayLabel" style="font-size:12px; color:var(--accent-cyan);"></span>
+                    </div>
                 </div>
                 <div class="chart-container" style="height: 400px;">
                     <canvas id="stockGroupChart"></canvas>
@@ -2008,93 +2017,127 @@
             }
         }
 
-        function updateSummaryAndCharts() {
-            let latestWH = {};
-            let latestZort = {};
+        const zortKeys = ['SO', 'E1H', 'Ricely', 'ครีมเทียม 200ก.', 'ซีเรียลดริ๊งค์งาดำ', 'ไขน้ำมันรำข้าว 700ก.', 'ซีเรียลดริ๊งค์ออริจินอล', 'ไขน้ำมันรำข้าว 5กก.'];
 
-            for (let i = DAYS; i >= 1; i--) {
-                const totalWH = stockCategories.reduce((sum, c) => sum + (parseFloat(data[i].warehouse[c.id]) || 0), 0);
-                if (totalWH > 0) {
-                    stockCategories.forEach(c => latestWH[c.id] = parseFloat(data[i].warehouse[c.id]) || 0);
-                    break;
+        function getStockDataForDay(targetDay) {
+            let whData = {};
+            let zortData = {};
+
+            if (targetDay === 'latest' || targetDay == null) {
+                for (let i = DAYS; i >= 1; i--) {
+                    const total = stockCategories.reduce((sum, c) => sum + (parseFloat(data[i].warehouse[c.id]) || 0), 0);
+                    if (total > 0) { stockCategories.forEach(c => whData[c.id] = parseFloat(data[i].warehouse[c.id]) || 0); break; }
+                }
+                for (let i = DAYS; i >= 1; i--) {
+                    if (!data[i].zort) continue;
+                    let tot = zortKeys.reduce((s, k) => s + (parseFloat(data[i].zort[k]) || 0), 0);
+                    stockCategories.forEach(c => tot += (parseFloat(data[i].zort[c.id]) || 0));
+                    if (tot > 0) { zortKeys.forEach(k => zortData[k] = parseFloat(data[i].zort[k]) || 0); stockCategories.forEach(c => zortData[c.id] = parseFloat(data[i].zort[c.id]) || 0); break; }
+                }
+            } else {
+                const d = parseInt(targetDay);
+                stockCategories.forEach(c => whData[c.id] = parseFloat(data[d] && data[d].warehouse && data[d].warehouse[c.id]) || 0);
+                if (data[d] && data[d].zort) {
+                    zortKeys.forEach(k => zortData[k] = parseFloat(data[d].zort[k]) || 0);
+                    stockCategories.forEach(c => zortData[c.id] = parseFloat(data[d].zort[c.id]) || 0);
                 }
             }
+            return { whData, zortData };
+        }
 
-            const zortKeys = ['SO', 'E1H', 'Ricely', 'ครีมเทียม 200ก.', 'ซีเรียลดริ๊งค์งาดำ', 'ไขน้ำมันรำข้าว 700ก.', 'ซีเรียลดริ๊งค์ออริจินอล', 'ไขน้ำมันรำข้าว 5กก.'];
-            for (let i = DAYS; i >= 1; i--) {
-                if(!data[i].zort) continue;
-                let totalZort = zortKeys.reduce((sum, k) => sum + (parseFloat(data[i].zort[k]) || 0), 0);
-                
-                stockCategories.forEach(c => totalZort += (parseFloat(data[i].zort[c.id]) || 0));
-
-                if (totalZort > 0) {
-                    zortKeys.forEach(k => latestZort[k] = parseFloat(data[i].zort[k]) || 0);
-                    stockCategories.forEach(c => latestZort[c.id] = parseFloat(data[i].zort[c.id]) || 0);
-                    break;
+        function populateStockGroupDaySelect() {
+            const sel = document.getElementById('stockGroupDaySelect');
+            if (!sel) return;
+            const prev = sel.value;
+            while (sel.options.length > 1) sel.remove(1);
+            for (let i = 1; i <= DAYS; i++) {
+                const totalWH = stockCategories.reduce((s, c) => s + (parseFloat(data[i] && data[i].warehouse && data[i].warehouse[c.id]) || 0), 0);
+                let totalZort = 0;
+                if (data[i] && data[i].zort) {
+                    zortKeys.forEach(k => totalZort += parseFloat(data[i].zort[k]) || 0);
+                    stockCategories.forEach(c => totalZort += parseFloat(data[i].zort[c.id]) || 0);
+                }
+                if (totalWH > 0 || totalZort > 0) {
+                    const opt = document.createElement('option');
+                    opt.value = i;
+                    opt.textContent = `วันที่ ${i} (${formatDate(i)})`;
+                    sel.appendChild(opt);
                 }
             }
+            if (prev && prev !== 'latest' && [...sel.options].some(o => o.value === prev)) sel.value = prev;
+        }
 
-            let whGroupTotals = {};
-            let zortGroupTotals = {};
+        function renderStockGroupChart(targetDay) {
+            const { whData, zortData } = getStockDataForDay(targetDay);
+            let whGroupTotals = {}, zortGroupTotals = {};
 
             stockCategories.forEach(cat => {
                 const group = cat.group || 'ผสม/อื่นๆ';
-                const valWH = latestWH[cat.id] || 0;
-
+                const valWH = whData[cat.id] || 0;
                 if (group === 'DUO SET(SO+E1H)') {
-                    DUO_SPLIT.forEach(g => {
-                        whGroupTotals[g] = (whGroupTotals[g] || 0) + valWH;
-                    });
+                    DUO_SPLIT.forEach(g => { whGroupTotals[g] = (whGroupTotals[g] || 0) + valWH; });
                 } else {
                     whGroupTotals[group] = (whGroupTotals[group] || 0) + valWH;
                 }
             });
 
             zortKeys.forEach(g => {
-                zortGroupTotals[g] = latestZort[g] || 0;
-                stockCategories.forEach(cat => {
-                    if (cat.group === g) zortGroupTotals[g] += (latestZort[cat.id] || 0);
-                });
+                zortGroupTotals[g] = zortData[g] || 0;
+                stockCategories.forEach(cat => { if (cat.group === g) zortGroupTotals[g] += (zortData[cat.id] || 0); });
             });
 
+            // กระจาย ผสม/อื่นๆ ให้ SO และ E1H คนละครึ่ง แล้วตัดออก
+            const mixWH = whGroupTotals['ผสม/อื่นๆ'] || 0;
+            const mixZort = zortGroupTotals['ผสม/อื่นๆ'] || 0;
+            if (mixWH > 0 || mixZort > 0) {
+                whGroupTotals['SO'] = (whGroupTotals['SO'] || 0) + mixWH / 2;
+                whGroupTotals['E1H'] = (whGroupTotals['E1H'] || 0) + mixWH / 2;
+                zortGroupTotals['SO'] = (zortGroupTotals['SO'] || 0) + mixZort / 2;
+                zortGroupTotals['E1H'] = (zortGroupTotals['E1H'] || 0) + mixZort / 2;
+                delete whGroupTotals['ผสม/อื่นๆ'];
+                delete zortGroupTotals['ผสม/อื่นๆ'];
+            }
+
             const sortedStockGroups = Object.keys(PRODUCT_GROUPS)
-                .filter(g => g !== 'DUO SET(SO+E1H)') 
-                .map(g => ({
-                    label: PRODUCT_GROUPS[g].label,
-                    valWH: whGroupTotals[g] || 0,
-                    valZort: zortGroupTotals[g] || 0,
-                    color: PRODUCT_GROUPS[g].color
-                }))
+                .filter(g => g !== 'DUO SET(SO+E1H)' && g !== 'ผสม/อื่นๆ')
+                .map(g => ({ label: PRODUCT_GROUPS[g].label, valWH: whGroupTotals[g] || 0, valZort: zortGroupTotals[g] || 0, color: PRODUCT_GROUPS[g].color }))
                 .filter(g => g.valWH > 0 || g.valZort > 0)
                 .sort((a, b) => Math.max(b.valWH, b.valZort) - Math.max(a.valWH, a.valZort));
 
             if (charts.stockGroup) {
                 charts.stockGroup.data.labels = sortedStockGroups.map(g => g.label);
-                
                 charts.stockGroup.data.datasets = [
-                    {
-                        label: 'Stock คลัง',
-                        data: sortedStockGroups.map(g => g.valWH),
-                        backgroundColor: sortedStockGroups.map(g => g.color),
-                        borderRadius: 4,
-                        barPercentage: 0.8,
-                        categoryPercentage: 0.8
-                    },
-                    {
-                        label: 'ข้อมูลจาก Zort',
-                        data: sortedStockGroups.map(g => g.valZort),
-                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                        borderColor: '#ffffff',
-                        borderWidth: 1,
-                        borderRadius: 4,
-                        barPercentage: 0.8,
-                        categoryPercentage: 0.8
-                    }
+                    { label: 'Stock คลัง', data: sortedStockGroups.map(g => g.valWH), backgroundColor: sortedStockGroups.map(g => g.color), borderRadius: 4, barPercentage: 0.8, categoryPercentage: 0.8 },
+                    { label: 'ข้อมูลจาก Zort', data: sortedStockGroups.map(g => g.valZort), backgroundColor: 'rgba(255, 255, 255, 0.95)', borderColor: '#ffffff', borderWidth: 1, borderRadius: 4, barPercentage: 0.8, categoryPercentage: 0.8 }
                 ];
                 charts.stockGroup.options.plugins.legend.display = true;
                 charts.stockGroup.options.plugins.legend.labels.color = '#9fa8da';
                 charts.stockGroup.update('none');
             }
+
+            const lbl = document.getElementById('stockGroupDayLabel');
+            if (lbl) {
+                if (targetDay === 'latest' || targetDay == null) {
+                    lbl.textContent = '';
+                } else {
+                    lbl.textContent = `(${formatDate(parseInt(targetDay))})`;
+                }
+            }
+        }
+
+        function onStockGroupDayChange() {
+            const sel = document.getElementById('stockGroupDaySelect');
+            renderStockGroupChart(sel ? sel.value : 'latest');
+        }
+
+        function updateSummaryAndCharts() {
+            populateStockGroupDaySelect();
+
+            const sel = document.getElementById('stockGroupDaySelect');
+            const selectedDay = sel ? sel.value : 'latest';
+            renderStockGroupChart(selectedDay);
+
+            const { whData: latestWH } = getStockDataForDay('latest');
 
             let sortedStock = stockCategories.map((cat, index) => {
                 const groupInfo = PRODUCT_GROUPS[cat.group] || PRODUCT_GROUPS['ผสม/อื่นๆ'];
